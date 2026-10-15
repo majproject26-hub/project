@@ -24,6 +24,7 @@ import {
   ExternalLink,
   Building2,
   Lock,
+  TrendingUp,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -58,6 +59,7 @@ export function AppLayout() {
     { name: 'Datasets', path: '/datasets', icon: Database, roles: ['ADMIN', 'HR', 'STAFF'] },
     { name: 'Upload Dataset', path: '/upload', icon: UploadCloud, roles: ['ADMIN', 'HR', 'STAFF'] },
     { name: 'Ask Your Data', path: '/ask', icon: MessageSquareCode, roles: ['ADMIN', 'HR', 'STAFF'] },
+    { name: 'Predictive AI', path: '/predict', icon: TrendingUp, roles: ['ADMIN', 'HR', 'STAFF'] },
     { name: 'SQL Editor', path: '/sql', icon: Terminal, roles: ['ADMIN', 'HR', 'STAFF'] },
     { name: 'User Management', path: '/users', icon: Users, roles: ['ADMIN'] },
     { name: 'Audit Log', path: '/audit', icon: ScrollText, roles: ['ADMIN'] },

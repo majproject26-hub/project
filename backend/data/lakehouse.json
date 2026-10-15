@@ -1032,6 +1032,149 @@
       "_mongo_id": "6ad07620e6cfe9271473401e"
     },
     {
+      "id": "ds-acme-revenue-trends",
+      "accessLevel": "All",
+      "colCount": 5,
+      "columnStats": [
+        {
+          "column": "daily_revenue",
+          "min": 6428.49,
+          "max": 14200.0,
+          "mean": 9480.0,
+          "stdDev": 1420.0,
+          "distribution": [
+            {
+              "label": "<$7k",
+              "value": 12
+            },
+            {
+              "label": "$7k-$9k",
+              "value": 44
+            },
+            {
+              "label": "$9k-$11k",
+              "value": 36
+            },
+            {
+              "label": "$11k+",
+              "value": 14
+            }
+          ]
+        }
+      ],
+      "companyId": "ACME-001",
+      "compressionRatio": "82% (vs CSV)",
+      "description": "Continuous 106-day historical daily cloud revenue, active connected users, compute cluster hours, and storage volume for predictive forecasting.",
+      "displayName": "Daily Cloud Revenue & System Telemetry Trends",
+      "format": "Parquet (Snappy)",
+      "history": [
+        {
+          "id": "v-1",
+          "version": "v1.0",
+          "author": "Maya Patel",
+          "action": "Time-Series Ingestion",
+          "date": "2026-10-14 12:00",
+          "comment": "Continuous daily billing & telemetry time series stream."
+        }
+      ],
+      "name": "daily_revenue_and_usage_trends.parquet",
+      "previewData": [
+        {
+          "date": "2026-07-01",
+          "daily_revenue": 8059.28,
+          "active_users": 1227,
+          "compute_hours": 294.3,
+          "storage_gb": 12006.5
+        },
+        {
+          "date": "2026-07-02",
+          "daily_revenue": 7964.58,
+          "active_users": 1181,
+          "compute_hours": 292.0,
+          "storage_gb": 12052.4
+        },
+        {
+          "date": "2026-07-03",
+          "daily_revenue": 8182.49,
+          "active_users": 1190,
+          "compute_hours": 279.7,
+          "storage_gb": 12111.9
+        },
+        {
+          "date": "2026-07-04",
+          "daily_revenue": 6770.07,
+          "active_users": 936,
+          "compute_hours": 298.0,
+          "storage_gb": 12176.9
+        },
+        {
+          "date": "2026-07-05",
+          "daily_revenue": 6428.49,
+          "active_users": 886,
+          "compute_hours": 277.2,
+          "storage_gb": 12203.6
+        }
+      ],
+      "rowCount": 106,
+      "schema": [
+        {
+          "column": "date",
+          "type": "DATE",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 106,
+          "sample": "2026-07-01"
+        },
+        {
+          "column": "daily_revenue",
+          "type": "FLOAT",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 106,
+          "sample": "8059.28"
+        },
+        {
+          "column": "active_users",
+          "type": "INTEGER",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 102,
+          "sample": "1227"
+        },
+        {
+          "column": "compute_hours",
+          "type": "FLOAT",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 104,
+          "sample": "294.3"
+        },
+        {
+          "column": "storage_gb",
+          "type": "FLOAT",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 106,
+          "sample": "12006.5"
+        }
+      ],
+      "size": "6.7 KB",
+      "tags": [
+        "time-series",
+        "revenue",
+        "usage",
+        "telemetry",
+        "predictive-ai",
+        "forecasting"
+      ],
+      "uploadDate": "2026-10-14",
+      "uploaderEmail": "maya.staff@acme.io",
+      "uploaderId": "u-acme-3",
+      "uploaderName": "Maya Patel",
+      "uploaderRole": "STAFF",
+      "_mongo_id": "6ad0b1af328f7428dd4613e5"
+    },
+    {
       "id": "ds-nova-1",
       "companyId": "NOVA-002",
       "name": "aerospace_avionics_supply_inventory.parquet",
@@ -1887,6 +2030,148 @@
       "uploaderName": "pournami",
       "uploaderRole": "ADMIN",
       "_mongo_id": "6ad0a020328f7428dd46122c"
+    },
+    {
+      "id": "ds-iedc-revenue-trends",
+      "accessLevel": "All",
+      "colCount": 5,
+      "columnStats": [
+        {
+          "column": "daily_revenue",
+          "min": 6428.49,
+          "max": 14200.0,
+          "mean": 9480.0,
+          "stdDev": 1420.0,
+          "distribution": [
+            {
+              "label": "<$7k",
+              "value": 12
+            },
+            {
+              "label": "$7k-$9k",
+              "value": 44
+            },
+            {
+              "label": "$9k-$11k",
+              "value": 36
+            },
+            {
+              "label": "$11k+",
+              "value": 14
+            }
+          ]
+        }
+      ],
+      "companyId": "IEDC-001",
+      "compressionRatio": "82% (vs CSV)",
+      "description": "Continuous 106-day daily operational revenue, active users, and compute utilization metrics for predictive forecasting.",
+      "displayName": "IEDC Daily Revenue & Operational Trends",
+      "format": "Parquet (Snappy)",
+      "history": [
+        {
+          "id": "v-1",
+          "version": "v1.0",
+          "author": "IEDC Administrator",
+          "action": "Time-Series Ingestion",
+          "date": "2026-10-14 12:00",
+          "comment": "Operational daily telemetry series."
+        }
+      ],
+      "name": "iedc-001_daily_revenue_trends.parquet",
+      "previewData": [
+        {
+          "date": "2026-07-01",
+          "daily_revenue": 8059.28,
+          "active_users": 1227,
+          "compute_hours": 294.3,
+          "storage_gb": 12006.5
+        },
+        {
+          "date": "2026-07-02",
+          "daily_revenue": 7964.58,
+          "active_users": 1181,
+          "compute_hours": 292.0,
+          "storage_gb": 12052.4
+        },
+        {
+          "date": "2026-07-03",
+          "daily_revenue": 8182.49,
+          "active_users": 1190,
+          "compute_hours": 279.7,
+          "storage_gb": 12111.9
+        },
+        {
+          "date": "2026-07-04",
+          "daily_revenue": 6770.07,
+          "active_users": 936,
+          "compute_hours": 298.0,
+          "storage_gb": 12176.9
+        },
+        {
+          "date": "2026-07-05",
+          "daily_revenue": 6428.49,
+          "active_users": 886,
+          "compute_hours": 277.2,
+          "storage_gb": 12203.6
+        }
+      ],
+      "rowCount": 106,
+      "schema": [
+        {
+          "column": "date",
+          "type": "DATE",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 106,
+          "sample": "2026-07-01"
+        },
+        {
+          "column": "daily_revenue",
+          "type": "FLOAT",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 106,
+          "sample": "8059.28"
+        },
+        {
+          "column": "active_users",
+          "type": "INTEGER",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 102,
+          "sample": "1227"
+        },
+        {
+          "column": "compute_hours",
+          "type": "FLOAT",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 104,
+          "sample": "294.3"
+        },
+        {
+          "column": "storage_gb",
+          "type": "FLOAT",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 106,
+          "sample": "12006.5"
+        }
+      ],
+      "size": "6.7 KB",
+      "tags": [
+        "time-series",
+        "revenue",
+        "predictive-ai",
+        "iedc",
+        "forecasting"
+      ],
+      "uploadDate": "2026-10-14",
+      "uploaderEmail": "admin@iedc.org",
+      "uploaderId": "u-iedc-1",
+      "uploaderName": "IEDC Administrator",
+      "uploaderRole": "ADMIN",
+      "_mongo_id": "6ad0b1af328f7428dd4613e6"
     }
   ],
   "charts": [
@@ -1981,30 +2266,6 @@
     }
   ],
   "audit_logs": [
-    {
-      "id": "aud-1792060246294",
-      "companyId": "IEDC-001",
-      "timestamp": "04:00 PM 10/15/2026",
-      "userName": "SHEHZADA",
-      "userRole": "STAFF",
-      "action": "Query Saved",
-      "resource": "What is the average base_salary by department?",
-      "details": "Saved analytical query to library.",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1792060246291",
-      "companyId": "IEDC-001",
-      "timestamp": "04:00 PM 10/15/2026",
-      "userName": "SHEHZADA",
-      "userRole": "STAFF",
-      "action": "Query Saved",
-      "resource": "What is the average base_salary by department?",
-      "details": "Saved analytical query to organization library.",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
     {
       "id": "aud-3",
       "companyId": "ACME-001",
@@ -2409,6 +2670,84 @@
       "_mongo_id": "6ad092b30cf47c31c7afdf75"
     },
     {
+      "id": "aud-1792060853562",
+      "companyId": "IEDC-001",
+      "timestamp": "04:10 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 5 rows in 121 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0adb56a930f508daf3ba7"
+    },
+    {
+      "id": "aud-1792060843376",
+      "companyId": "IEDC-001",
+      "timestamp": "04:10 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 5 rows in 133 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0adab6a930f508daf3ba6"
+    },
+    {
+      "id": "aud-1792060609944",
+      "companyId": "IEDC-001",
+      "timestamp": "04:06 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 5 rows in 88 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0acc16a930f508daf3ba5"
+    },
+    {
+      "id": "aud-1792060565958",
+      "companyId": "IEDC-001",
+      "timestamp": "04:06 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 5 rows in 100 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0ac956a930f508daf3ba4"
+    },
+    {
+      "id": "aud-1792060246294",
+      "companyId": "IEDC-001",
+      "timestamp": "04:00 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Saved",
+      "resource": "What is the average base_salary by department?",
+      "details": "Saved analytical query to library.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0ab566a930f508daf3ba3"
+    },
+    {
+      "id": "aud-1792060246291",
+      "companyId": "IEDC-001",
+      "timestamp": "04:00 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Saved",
+      "resource": "What is the average base_salary by department?",
+      "details": "Saved analytical query to organization library.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0ab566a930f508daf3ba2"
+    },
+    {
       "id": "aud-1792059323446",
       "companyId": "IEDC-001",
       "timestamp": "03:45 PM 10/15/2026",
@@ -2709,48 +3048,6 @@
     }
   ],
   "saved_queries": [
-    {
-      "id": "q-1792060246246",
-      "question": "What is the average base_salary by department?",
-      "interpreted": "Group records by department, calculate average base_salary, count headcount, and sort descending.",
-      "datasetId": "ds-1792057376282",
-      "datasetName": "iedc-001_employee_salaries_q4parquet.parquet",
-      "sql": "SELECT \"department\", ROUND(AVG(\"base_salary\"), 2) as avg_base_salary, COUNT(*) as headcount FROM \"iedc_001_employee_salaries_q4parquet\" GROUP BY \"department\" ORDER BY avg_base_salary DESC LIMIT 8;",
-      "chartType": "bar",
-      "xAxis": "department",
-      "yAxis": "avg_base_salary",
-      "summary": "Executed analytical query on employee salaries q4. Returned 5 rows. Peak aggregation observed for 'Chemical Engineering' (178,000.0).",
-      "results": [
-        {
-          "department": "Chemical Engineering",
-          "avg_base_salary": 178000,
-          "headcount": 1
-        },
-        {
-          "department": "R&D",
-          "avg_base_salary": 165000,
-          "headcount": 1
-        },
-        {
-          "department": "Finance",
-          "avg_base_salary": 142000,
-          "headcount": 1
-        },
-        {
-          "department": "Investigations",
-          "avg_base_salary": 120000,
-          "headcount": 1
-        },
-        {
-          "department": "Operations",
-          "avg_base_salary": 98000,
-          "headcount": 1
-        }
-      ],
-      "date": "Just now",
-      "companyId": "IEDC-001",
-      "savedAt": "2026-10-15 16:00"
-    },
     {
       "id": "q-1",
       "question": "Show top 5 departments by average employee salary",

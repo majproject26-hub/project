@@ -330,6 +330,19 @@ class ApiService {
       body: JSON.stringify(event),
     });
   }
+
+  // --- Predictive AI & Time-Series Forecasting ---
+  async getForecastDatasets() {
+    return this.request('/api/forecast/datasets');
+  }
+
+  async runForecast(params) {
+    return this.request('/api/forecast/predict', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  }
 }
 
 export const api = new ApiService();
+

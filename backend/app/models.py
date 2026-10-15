@@ -161,3 +161,13 @@ class AuditLogCreate(BaseModel):
     resource: str
     details: str
     status: Optional[str] = "Success"
+
+# --- Predictive AI & Forecasting Schemas ---
+class ForecastRequest(BaseModel):
+    datasetId: str
+    dateColumn: str
+    metricColumn: str
+    modelType: Optional[str] = "auto"
+    horizonDays: Optional[int] = 14
+    confidenceLevel: Optional[float] = 0.95
+

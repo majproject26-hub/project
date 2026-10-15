@@ -231,6 +231,14 @@ SAMPLE_TELEMETRY_DATA = [
     {"packet_id": "PKT-9925", "satellite_id": "NOVA-SAT-05", "orbital_altitude_km": 541.0, "velocity_km_s": 7.63, "solar_temp_c": 46.5, "battery_soc_pct": 90.2, "status": "Nominal"},
 ]
 
+SAMPLE_TIME_SERIES_DATA = [
+    {"date": "2026-07-01", "daily_revenue": 8059.28, "active_users": 1227, "compute_hours": 294.3, "storage_gb": 12006.5},
+    {"date": "2026-07-02", "daily_revenue": 7964.58, "active_users": 1181, "compute_hours": 292.0, "storage_gb": 12052.4},
+    {"date": "2026-07-03", "daily_revenue": 8182.49, "active_users": 1190, "compute_hours": 279.7, "storage_gb": 12111.9},
+    {"date": "2026-07-04", "daily_revenue": 6770.07, "active_users": 936, "compute_hours": 298.0, "storage_gb": 12176.9},
+    {"date": "2026-07-05", "daily_revenue": 6428.49, "active_users": 886, "compute_hours": 277.2, "storage_gb": 12203.6},
+]
+
 INITIAL_DATASETS = [
     # ACME-001 Datasets
     {
@@ -485,6 +493,88 @@ INITIAL_DATASETS = [
         ],
         "history": [
             {"id": "v-1", "version": "v1.0", "author": "Liam O'Connor", "action": "Initial Ingestion", "date": "2026-10-09 18:22", "comment": "Downlink batch ingested from Goldstone ground station."}
+        ]
+    },
+    {
+        "id": "ds-acme-revenue-trends",
+        "companyId": "ACME-001",
+        "name": "daily_revenue_and_usage_trends.parquet",
+        "displayName": "Daily Cloud Revenue & System Telemetry Trends",
+        "description": "Continuous 106-day historical daily cloud revenue, active connected users, compute cluster hours, and storage volume for predictive forecasting.",
+        "format": "Parquet (Snappy)",
+        "size": "6.7 KB",
+        "rowCount": 106,
+        "colCount": 5,
+        "compressionRatio": "82% (vs CSV)",
+        "accessLevel": "All",
+        "uploaderId": "u-acme-3",
+        "uploaderEmail": "maya.staff@acme.io",
+        "uploaderName": "Maya Patel",
+        "uploaderRole": "STAFF",
+        "uploadDate": "2026-10-14",
+        "tags": ["time-series", "revenue", "usage", "telemetry", "predictive-ai", "forecasting"],
+        "previewData": SAMPLE_TIME_SERIES_DATA,
+        "schema": [
+            {"column": "date", "type": "DATE", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 106, "sample": "2026-07-01"},
+            {"column": "daily_revenue", "type": "FLOAT", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 106, "sample": "8059.28"},
+            {"column": "active_users", "type": "INTEGER", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 102, "sample": "1227"},
+            {"column": "compute_hours", "type": "FLOAT", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 104, "sample": "294.3"},
+            {"column": "storage_gb", "type": "FLOAT", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 106, "sample": "12006.5"},
+        ],
+        "columnStats": [
+            {
+                "column": "daily_revenue", "min": 6428.49, "max": 14200.0, "mean": 9480.0, "stdDev": 1420.0,
+                "distribution": [
+                    {"label": "<$7k", "value": 12},
+                    {"label": "$7k-$9k", "value": 44},
+                    {"label": "$9k-$11k", "value": 36},
+                    {"label": "$11k+", "value": 14}
+                ]
+            }
+        ],
+        "history": [
+            {"id": "v-1", "version": "v1.0", "author": "Maya Patel", "action": "Time-Series Ingestion", "date": "2026-10-14 12:00", "comment": "Continuous daily billing & telemetry time series stream."}
+        ]
+    },
+    {
+        "id": "ds-iedc-revenue-trends",
+        "companyId": "IEDC-001",
+        "name": "iedc-001_daily_revenue_trends.parquet",
+        "displayName": "IEDC Daily Revenue & Operational Trends",
+        "description": "Continuous 106-day daily operational revenue, active users, and compute utilization metrics for predictive forecasting.",
+        "format": "Parquet (Snappy)",
+        "size": "6.7 KB",
+        "rowCount": 106,
+        "colCount": 5,
+        "compressionRatio": "82% (vs CSV)",
+        "accessLevel": "All",
+        "uploaderId": "u-iedc-1",
+        "uploaderEmail": "admin@iedc.org",
+        "uploaderName": "IEDC Administrator",
+        "uploaderRole": "ADMIN",
+        "uploadDate": "2026-10-14",
+        "tags": ["time-series", "revenue", "predictive-ai", "iedc", "forecasting"],
+        "previewData": SAMPLE_TIME_SERIES_DATA,
+        "schema": [
+            {"column": "date", "type": "DATE", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 106, "sample": "2026-07-01"},
+            {"column": "daily_revenue", "type": "FLOAT", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 106, "sample": "8059.28"},
+            {"column": "active_users", "type": "INTEGER", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 102, "sample": "1227"},
+            {"column": "compute_hours", "type": "FLOAT", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 104, "sample": "294.3"},
+            {"column": "storage_gb", "type": "FLOAT", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 106, "sample": "12006.5"},
+        ],
+        "columnStats": [
+            {
+                "column": "daily_revenue", "min": 6428.49, "max": 14200.0, "mean": 9480.0, "stdDev": 1420.0,
+                "distribution": [
+                    {"label": "<$7k", "value": 12},
+                    {"label": "$7k-$9k", "value": 44},
+                    {"label": "$9k-$11k", "value": 36},
+                    {"label": "$11k+", "value": 14}
+                ]
+            }
+        ],
+        "history": [
+            {"id": "v-1", "version": "v1.0", "author": "IEDC Administrator", "action": "Time-Series Ingestion", "date": "2026-10-14 12:00", "comment": "Operational daily telemetry series."}
         ]
     }
 ]

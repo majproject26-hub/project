@@ -14,7 +14,8 @@ from app.routers import (
     ask,
     charts,
     dashboards,
-    audit
+    audit,
+    forecast
 )
 
 @asynccontextmanager
@@ -51,6 +52,7 @@ app.include_router(ask.router)
 app.include_router(charts.router)
 app.include_router(dashboards.router)
 app.include_router(audit.router)
+app.include_router(forecast.router)
 
 from app.mongodb import mongo
 

@@ -15,6 +15,7 @@ import {
   HardDrive,
   Cpu,
   Share2,
+  TrendingUp,
 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { useAuth } from '../context/AuthContext';
@@ -191,6 +192,12 @@ export function DatasetDetailPage() {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-2">
+          <NavLink to={`/predict?dataset=${dataset.id}`}>
+            <Button variant="secondary" size="sm" icon={TrendingUp}>
+              Predict AI
+            </Button>
+          </NavLink>
+
           <NavLink to={`/sql?dataset=${dataset.id}`}>
             <Button variant="secondary" size="sm" icon={Terminal}>
               Query SQL
