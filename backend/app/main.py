@@ -52,11 +52,17 @@ app.include_router(charts.router)
 app.include_router(dashboards.router)
 app.include_router(audit.router)
 
+from app.mongodb import mongo
+
 @app.get("/api/health", tags=["Health"])
 def health_check():
     return {
         "status": "healthy",
-        "engine": "FastAPI + DuckDB 1.0 + PyArrow",
+        "engines": {
+            "analytical": "DuckDB 1.0 (Columnar Parquet Analytics & AI SQL)",
+            "metadata": "MongoDB Atlas" if mongo.is_connected else "Local Storage Fallback (Configure MONGODB_URI in backend/.env)"
+        },
+        "mongoConnected": mongo.is_connected,
         "tenants": len(db.companies),
         "datasets": len(db.datasets),
         "users": len(db.users)

@@ -62,9 +62,9 @@ def login(req: LoginRequest):
     # Generate token
     token = create_access_token({"sub": user["id"], "companyId": user["companyId"], "role": user["role"]})
     
-    # Update last active
+    # Update last active in MongoDB
     user["lastActive"] = "Just now"
-    db.save()
+    db.update_user(user["id"], {"lastActive": "Just now"})
 
     return {
         "success": True,
@@ -82,7 +82,7 @@ def quick_login(req: QuickLoginRequest):
     company = db.get_company(user["companyId"])
     token = create_access_token({"sub": user["id"], "companyId": user["companyId"], "role": user["role"]})
     user["lastActive"] = "Just now"
-    db.save()
+    db.update_user(user["id"], {"lastActive": "Just now"})
 
     return {
         "success": True,
@@ -122,7 +122,7 @@ def register(req: RegisterRequest):
         "voiceLanguage": "en-US",
     }
 
-    db.users.insert(0, new_user)
+    db.save_user(new_user)
     db.log_event(
         company_id=req.companyId,
         user_name=req.name,
@@ -131,7 +131,6 @@ def register(req: RegisterRequest):
         resource=f"{req.name} ({req.email})",
         details="Submitted access request pending admin approval."
     )
-    db.save()
 
     return {"success": True, "user": new_user}
 
@@ -175,8 +174,8 @@ def register_company(req: RegisterCompanyRequest):
         "voiceLanguage": "en-US",
     }
 
-    db.companies[formatted_id] = new_company
-    db.users.insert(0, admin_user)
+    db.save_company(new_company)
+    db.save_user(admin_user)
 
     db.log_event(
         company_id=formatted_id,
@@ -207,7 +206,7 @@ def reset_password(req: ResetPasswordRequest):
         )
 
     user["password"] = req.newPassword
-    db.save()
+    db.update_user(user["id"], {"password": req.newPassword})
     return {
         "success": True,
         "message": f"Password for {user['name']} ({user['email']}) has been successfully updated."
@@ -224,16 +223,22 @@ def get_me(current_user: Dict[str, Any] = Depends(get_current_user)):
 
 @router.put("/profile")
 def update_profile(updates: UserProfileUpdate, current_user: Dict[str, Any] = Depends(get_current_user)):
+    user_updates = {}
     if updates.name:
         current_user["name"] = updates.name.strip()
+        user_updates["name"] = current_user["name"]
     if updates.title:
         current_user["title"] = updates.title.strip()
+        user_updates["title"] = current_user["title"]
     if updates.avatar:
         current_user["avatar"] = updates.avatar
+        user_updates["avatar"] = current_user["avatar"]
     if updates.voiceLanguage:
         current_user["voiceLanguage"] = updates.voiceLanguage
+        user_updates["voiceLanguage"] = current_user["voiceLanguage"]
     if updates.password:
         current_user["password"] = updates.password
+        user_updates["password"] = current_user["password"]
 
-    db.save()
+    db.update_user(current_user["id"], user_updates)
     return {"success": True, "user": current_user}

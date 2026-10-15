@@ -37,6 +37,7 @@ def approve_user(
 
     target["status"] = "ACTIVE"
     target["lastActive"] = "Recently approved"
+    db.update_user(user_id, {"status": "ACTIVE", "lastActive": "Recently approved"})
     db.log_event(
         company_id=current_user.get("companyId"),
         user_name=current_user.get("name"),
@@ -45,7 +46,6 @@ def approve_user(
         resource=f"{target.get('name')} ({target.get('email')})",
         details=f"Approved access request with role {target.get('role')}."
     )
-    db.save()
     return {"success": True, "user": target}
 
 @router.post("/bulk-approve")
@@ -59,6 +59,7 @@ def bulk_approve(
         if u["id"] in req.userIds and u.get("companyId", "").upper() == company_id:
             u["status"] = "ACTIVE"
             u["lastActive"] = "Recently approved"
+            db.update_user(u["id"], {"status": "ACTIVE", "lastActive": "Recently approved"})
             approved_count += 1
 
     db.log_event(
@@ -88,6 +89,11 @@ def reject_user(
     target["status"] = "REJECTED"
     target["rejectionReason"] = req.reason or "Access denied by administrator."
     target["lastActive"] = "Rejected"
+    db.update_user(user_id, {
+        "status": "REJECTED",
+        "rejectionReason": target["rejectionReason"],
+        "lastActive": "Rejected"
+    })
 
     db.log_event(
         company_id=current_user.get("companyId"),
@@ -98,7 +104,6 @@ def reject_user(
         details=f"Rejected registration request: {target['rejectionReason']}",
         status="Denied"
     )
-    db.save()
     return {"success": True, "user": target}
 
 @router.put("/{user_id}/role")
@@ -113,6 +118,7 @@ def change_role(
 
     old_role = target.get("role")
     target["role"] = req.role
+    db.update_user(user_id, {"role": req.role})
     db.log_event(
         company_id=current_user.get("companyId"),
         user_name=current_user.get("name"),
@@ -121,7 +127,6 @@ def change_role(
         resource=f"{target.get('name')}",
         details=f"Updated role permission from {old_role} to {req.role}."
     )
-    db.save()
     return {"success": True, "user": target}
 
 @router.post("/{user_id}/toggle-status")
@@ -135,6 +140,7 @@ def toggle_status(
 
     new_status = "DEACTIVATED" if target.get("status") == "ACTIVE" else "ACTIVE"
     target["status"] = new_status
+    db.update_user(user_id, {"status": new_status})
     db.log_event(
         company_id=current_user.get("companyId"),
         user_name=current_user.get("name"),
@@ -143,7 +149,6 @@ def toggle_status(
         resource=f"{target.get('name')}",
         details=f"Account status set to {new_status}."
     )
-    db.save()
     return {"success": True, "user": target}
 
 @router.post("/{user_id}/reset-password")
@@ -160,6 +165,7 @@ def reset_user_password(
         raise HTTPException(status_code=403, detail="Cannot manage users in another company.")
 
     target["password"] = req.newPassword
+    db.update_user(user_id, {"password": req.newPassword})
     db.log_event(
         company_id=current_user.get("companyId"),
         user_name=current_user.get("name"),
@@ -168,6 +174,5 @@ def reset_user_password(
         resource=f"{target.get('name')} ({target.get('email')})",
         details=f"Admin reset temporary password for {target.get('name')}."
     )
-    db.save()
     return {"success": True, "message": f"Password reset for {target.get('name')}."}
 

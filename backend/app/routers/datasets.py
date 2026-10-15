@@ -97,7 +97,7 @@ async def upload_dataset(
         uploader=current_user
     )
 
-    db.datasets.insert(0, dataset_dict)
+    db.add_dataset(dataset_dict)
     db.log_event(
         company_id=company_id,
         user_name=current_user.get("name", "User"),
@@ -125,7 +125,8 @@ def delete_all_datasets(current_user: Dict[str, Any] = Depends(require_roles(["A
             except Exception:
                 pass
 
-    db.datasets = [d for d in db.datasets if d.get("companyId", "").upper() != company_id]
+    for d in existing:
+        db.delete_dataset(d["id"])
     db.log_event(
         company_id=company_id,
         user_name=current_user.get("name", "Admin"),
@@ -180,7 +181,7 @@ def delete_dataset(dataset_id: str, current_user: Dict[str, Any] = Depends(get_c
         except Exception:
             pass
 
-    db.datasets.pop(target_idx)
+    db.delete_dataset(target["id"])
     is_admin = current_user.get("role") == "ADMIN"
     db.log_event(
         company_id=company_id,
@@ -226,7 +227,7 @@ def update_dataset_access(
 ):
     for d in db.datasets:
         if d["id"] == dataset_id:
-            d["accessLevel"] = req.accessLevel
+            db.update_dataset(dataset_id, {"accessLevel": req.accessLevel})
             db.log_event(
                 company_id=current_user.get("companyId"),
                 user_name=current_user.get("name"),
@@ -235,7 +236,6 @@ def update_dataset_access(
                 resource=d.get("name", dataset_id),
                 details=f"Admin changed dataset access permission to \"{req.accessLevel}\"."
             )
-            db.save()
             return {"success": True, "dataset": d}
 
     raise HTTPException(status_code=404, detail="Dataset not found.")
@@ -250,15 +250,20 @@ def update_dataset_metadata(
         if d["id"] == dataset_id:
             if not check_can_delete(d, current_user):
                 raise HTTPException(status_code=403, detail="Only the uploader or admin can edit dataset metadata.")
+            update_fields = {}
             if req.displayName:
                 d["displayName"] = req.displayName
+                update_fields["displayName"] = req.displayName
             if req.description:
                 d["description"] = req.description
+                update_fields["description"] = req.description
             if req.tags:
                 d["tags"] = req.tags
+                update_fields["tags"] = req.tags
             if req.accessLevel and current_user.get("role") == "ADMIN":
                 d["accessLevel"] = req.accessLevel
-            db.save()
+                update_fields["accessLevel"] = req.accessLevel
+            db.update_dataset(dataset_id, update_fields)
             return {"success": True, "dataset": d}
 
     raise HTTPException(status_code=404, detail="Dataset not found.")

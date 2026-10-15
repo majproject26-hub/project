@@ -96,7 +96,7 @@ def ask_your_data(req: AskDataRequest, current_user: Dict[str, Any] = Depends(ge
             y_axis = "frequency"
             summary = f"Categorical breakdown of {cat_col} in {target_ds.get('displayName')}."
 
-    # Run query with DuckDB
+    # Run query with DuckDB (Analytical Engine)
     query_exec = execute_lakehouse_query(
         sql=sql,
         company_id=company_id,
@@ -107,6 +107,30 @@ def ask_your_data(req: AskDataRequest, current_user: Dict[str, Any] = Depends(ge
 
     columns = query_exec.get("columns", [])
     results = query_exec.get("rows", [])
+    telemetry = query_exec.get("telemetry", {})
+    exec_status = "Success" if query_exec.get("success") else "Failed"
+
+    # Persist AI Query & Execution History to MongoDB Atlas
+    db.log_query_history(
+        company_id=company_id,
+        user_id=current_user.get("id"),
+        user_name=current_user.get("name", "User"),
+        user_role=user_role,
+        prompt=question,
+        input_type="voice" if req.isVoice else "text",
+        generated_sql=sql,
+        target_dataset_id=target_ds.get("id"),
+        target_dataset_name=target_ds.get("name", ""),
+        execution_status=exec_status,
+        latency=telemetry.get("latency", "12 ms"),
+        row_count=len(results),
+        scanned_bytes=telemetry.get("scannedBytes", "0 B"),
+        suggested_chart=suggested_chart,
+        x_axis=x_axis,
+        y_axis=y_axis,
+        summary=summary,
+        error_message=query_exec.get("error")
+    )
 
     return AskDataResponse(
         question=question,
@@ -120,3 +144,9 @@ def ask_your_data(req: AskDataRequest, current_user: Dict[str, Any] = Depends(ge
         yAxis=y_axis,
         summary=summary
     )
+
+@router.get("/history")
+def get_query_history(limit: int = 50, current_user: Dict[str, Any] = Depends(get_current_user)):
+    company_id = current_user.get("companyId", "ACME-001").upper()
+    history = db.get_query_history(company_id=company_id, limit=limit)
+    return {"success": True, "history": history}

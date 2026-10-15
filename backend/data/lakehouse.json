@@ -15,7 +15,8 @@
         "STAFF"
       ],
       "dataRetentionDays": 365,
-      "autoArchiveParquet": true
+      "autoArchiveParquet": true,
+      "_mongo_id": "6ad0761fe6cfe92714734010"
     },
     "NOVA-002": {
       "id": "NOVA-002",
@@ -31,24 +32,11 @@
         "STAFF"
       ],
       "dataRetentionDays": 730,
-      "autoArchiveParquet": true
+      "autoArchiveParquet": true,
+      "_mongo_id": "6ad0761fe6cfe92714734011"
     }
   },
   "users": [
-    {
-      "id": "u-acme-1",
-      "companyId": "ACME-001",
-      "name": "Sarah Jenkins",
-      "email": "sarah.admin@acme.io",
-      "password": "password123",
-      "role": "ADMIN",
-      "title": "VP of Data Architecture",
-      "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
-      "status": "ACTIVE",
-      "joinDate": "2023-02-01",
-      "lastActive": "Just now",
-      "voiceLanguage": "en-US"
-    },
     {
       "id": "u-acme-2",
       "companyId": "ACME-001",
@@ -61,35 +49,8 @@
       "status": "ACTIVE",
       "joinDate": "2023-04-12",
       "lastActive": "12 mins ago",
-      "voiceLanguage": "en-US"
-    },
-    {
-      "id": "u-acme-3",
-      "companyId": "ACME-001",
-      "name": "Maya Patel",
-      "email": "maya.staff@acme.io",
-      "password": "password123",
-      "role": "STAFF",
-      "title": "Financial Revenue Analyst",
-      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
-      "status": "ACTIVE",
-      "joinDate": "2023-08-20",
-      "lastActive": "1 hour ago",
-      "voiceLanguage": "en-US"
-    },
-    {
-      "id": "u-acme-4",
-      "companyId": "ACME-001",
-      "name": "Robert Taylor",
-      "email": "robert.taylor@acme.io",
-      "password": "password123",
-      "role": "HR",
-      "title": "Compensation Consultant",
-      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
-      "status": "PENDING",
-      "joinDate": "2026-10-08",
-      "lastActive": "Pending approval",
-      "voiceLanguage": "en-US"
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0761fe6cfe92714734013"
     },
     {
       "id": "u-acme-5",
@@ -104,7 +65,53 @@
       "rejectionReason": "Non-corporate email domain is not permitted for Acme Lakehouse access.",
       "joinDate": "2026-10-02",
       "lastActive": "Rejected",
-      "voiceLanguage": "en-US"
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0761fe6cfe92714734016"
+    },
+    {
+      "id": "u-acme-3",
+      "companyId": "ACME-001",
+      "name": "Maya Patel",
+      "email": "maya.staff@acme.io",
+      "password": "password123",
+      "role": "STAFF",
+      "title": "Financial Revenue Analyst",
+      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+      "status": "ACTIVE",
+      "joinDate": "2023-08-20",
+      "lastActive": "1 hour ago",
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0761fe6cfe92714734014"
+    },
+    {
+      "id": "u-acme-4",
+      "companyId": "ACME-001",
+      "name": "Robert Taylor",
+      "email": "robert.taylor@acme.io",
+      "password": "password123",
+      "role": "HR",
+      "title": "Compensation Consultant",
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+      "status": "PENDING",
+      "joinDate": "2026-10-08",
+      "lastActive": "Pending approval",
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0761fe6cfe92714734015"
+    },
+    {
+      "id": "u-acme-1",
+      "companyId": "ACME-001",
+      "name": "Sarah Jenkins",
+      "email": "sarah.admin@acme.io",
+      "password": "password123",
+      "role": "ADMIN",
+      "title": "VP of Data Architecture",
+      "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+      "status": "ACTIVE",
+      "joinDate": "2023-02-01",
+      "lastActive": "Just now",
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0761fe6cfe92714734012"
     },
     {
       "id": "u-nova-1",
@@ -118,21 +125,8 @@
       "status": "ACTIVE",
       "joinDate": "2023-06-25",
       "lastActive": "Just now",
-      "voiceLanguage": "en-US"
-    },
-    {
-      "id": "u-nova-2",
-      "companyId": "NOVA-002",
-      "name": "Marcus Vance",
-      "email": "marcus.hr@nova.space",
-      "password": "password123",
-      "role": "HR",
-      "title": "Director of Mission Talent",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-      "status": "ACTIVE",
-      "joinDate": "2023-09-01",
-      "lastActive": "45 mins ago",
-      "voiceLanguage": "en-US"
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0761fe6cfe92714734017"
     },
     {
       "id": "u-nova-3",
@@ -146,21 +140,8 @@
       "status": "ACTIVE",
       "joinDate": "2024-01-10",
       "lastActive": "3 hours ago",
-      "voiceLanguage": "en-US"
-    },
-    {
-      "id": "u-nova-4",
-      "companyId": "NOVA-002",
-      "name": "Sophia Kim",
-      "email": "sophia.kim@nova.space",
-      "password": "password123",
-      "role": "STAFF",
-      "title": "Guidance Sensor Researcher",
-      "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
-      "status": "PENDING",
-      "joinDate": "2026-10-07",
-      "lastActive": "Pending approval",
-      "voiceLanguage": "en-US"
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0761fe6cfe92714734019"
     },
     {
       "id": "u-nova-5",
@@ -174,7 +155,38 @@
       "status": "DEACTIVATED",
       "joinDate": "2023-11-05",
       "lastActive": "Deactivated on 2026-09-30",
-      "voiceLanguage": "en-US"
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0761fe6cfe9271473401b"
+    },
+    {
+      "id": "u-nova-2",
+      "companyId": "NOVA-002",
+      "name": "Marcus Vance",
+      "email": "marcus.hr@nova.space",
+      "password": "password123",
+      "role": "HR",
+      "title": "Director of Mission Talent",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      "status": "ACTIVE",
+      "joinDate": "2023-09-01",
+      "lastActive": "45 mins ago",
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0761fe6cfe92714734018"
+    },
+    {
+      "id": "u-nova-4",
+      "companyId": "NOVA-002",
+      "name": "Sophia Kim",
+      "email": "sophia.kim@nova.space",
+      "password": "password123",
+      "role": "STAFF",
+      "title": "Guidance Sensor Researcher",
+      "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
+      "status": "PENDING",
+      "joinDate": "2026-10-07",
+      "lastActive": "Pending approval",
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0761fe6cfe9271473401a"
     }
   ],
   "datasets": [
@@ -529,7 +541,8 @@
           "date": "2026-08-28 11:45",
           "comment": "Uploaded raw CSV and converted to Lakehouse Delta/Parquet."
         }
-      ]
+      ],
+      "_mongo_id": "6ad07620e6cfe9271473401c"
     },
     {
       "id": "ds-acme-2",
@@ -761,7 +774,8 @@
           "date": "2026-10-04 16:30",
           "comment": "Exported from CRM pipeline into Snappy Parquet."
         }
-      ]
+      ],
+      "_mongo_id": "6ad07620e6cfe9271473401d"
     },
     {
       "id": "ds-acme-3",
@@ -933,7 +947,8 @@
           "date": "2026-09-28 09:00",
           "comment": "Sync from AI customer analytics pipeline."
         }
-      ]
+      ],
+      "_mongo_id": "6ad07620e6cfe9271473401e"
     },
     {
       "id": "ds-nova-1",
@@ -1105,7 +1120,8 @@
           "date": "2026-09-18 10:30",
           "comment": "Avionics supply chain warehouse sync."
         }
-      ]
+      ],
+      "_mongo_id": "6ad07620e6cfe9271473401f"
     },
     {
       "id": "ds-nova-2",
@@ -1272,7 +1288,8 @@
           "date": "2026-10-09 18:22",
           "comment": "Downlink batch ingested from Goldstone ground station."
         }
-      ]
+      ],
+      "_mongo_id": "6ad07620e6cfe92714734020"
     }
   ],
   "charts": [
@@ -1287,7 +1304,8 @@
       "yAxis": "salary",
       "color": "#3b82f6",
       "isPinned": true,
-      "createdAt": "2026-09-15"
+      "createdAt": "2026-09-15",
+      "_mongo_id": "6ad07620e6cfe92714734021"
     },
     {
       "id": "ch-2",
@@ -1300,7 +1318,8 @@
       "yAxis": "deal_size",
       "color": "#10b981",
       "isPinned": true,
-      "createdAt": "2026-10-05"
+      "createdAt": "2026-10-05",
+      "_mongo_id": "6ad07620e6cfe92714734022"
     },
     {
       "id": "ch-3",
@@ -1313,7 +1332,8 @@
       "yAxis": "salary",
       "color": "#8b5cf6",
       "isPinned": false,
-      "createdAt": "2026-09-20"
+      "createdAt": "2026-09-20",
+      "_mongo_id": "6ad07620e6cfe92714734023"
     },
     {
       "id": "ch-4",
@@ -1326,7 +1346,8 @@
       "yAxis": "stock_qty",
       "color": "#06b6d4",
       "isPinned": true,
-      "createdAt": "2026-09-22"
+      "createdAt": "2026-09-22",
+      "_mongo_id": "6ad07620e6cfe92714734024"
     }
   ],
   "dashboards": [
@@ -1343,7 +1364,8 @@
       ],
       "charts": [],
       "createdAt": "2026-09-16",
-      "updatedAt": "2026-10-10 14:32"
+      "updatedAt": "2026-10-10 14:32",
+      "_mongo_id": "6ad07620e6cfe92714734025"
     },
     {
       "id": "dash-2",
@@ -1357,200 +1379,21 @@
       ],
       "charts": [],
       "createdAt": "2026-09-25",
-      "updatedAt": "2026-10-12 09:15"
+      "updatedAt": "2026-10-12 09:15",
+      "_mongo_id": "6ad07620e6cfe92714734026"
     }
   ],
   "audit_logs": [
     {
-      "id": "aud-1791971043724",
+      "id": "aud-1792046999702",
       "companyId": "ACME-001",
-      "timestamp": "03:14 PM 10/14/2026",
-      "userName": "Sarah Jenkins",
-      "userRole": "ADMIN",
-      "action": "Dataset Deleted",
-      "resource": "acme-001_test_empcsv.parquet",
-      "details": "Sarah Jenkins (Administrator) permanently removed dataset from storage.",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1791971043712",
-      "companyId": "ACME-001",
-      "timestamp": "03:14 PM 10/14/2026",
+      "timestamp": "12:19 PM 10/15/2026",
       "userName": "Sarah Jenkins",
       "userRole": "ADMIN",
       "action": "Query Executed",
       "resource": "SQL Studio",
-      "details": "Returned 2 rows in 32 ms.",
+      "details": "Returned 8 rows in 178 ms.",
       "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1791971043655",
-      "companyId": "ACME-001",
-      "timestamp": "03:14 PM 10/14/2026",
-      "userName": "Sarah Jenkins",
-      "userRole": "ADMIN",
-      "action": "Dataset Upload",
-      "resource": "acme-001_test_empcsv.parquet",
-      "details": "Uploaded and converted to Parquet (3 rows).",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1791971043245",
-      "companyId": "ACME-001",
-      "timestamp": "03:14 PM 10/14/2026",
-      "userName": "Sarah Jenkins",
-      "userRole": "ADMIN",
-      "action": "Query Executed",
-      "resource": "SQL Studio",
-      "details": "Returned 8 rows in 156 ms.",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1791967179642",
-      "companyId": "ACME-001",
-      "timestamp": "02:09 PM 10/14/2026",
-      "userName": "Sarah Jenkins",
-      "userRole": "ADMIN",
-      "action": "Dataset Deleted",
-      "resource": "acme-001_test_empcsv.parquet",
-      "details": "Sarah Jenkins (Administrator) permanently removed dataset from storage.",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1791967179630",
-      "companyId": "ACME-001",
-      "timestamp": "02:09 PM 10/14/2026",
-      "userName": "Sarah Jenkins",
-      "userRole": "ADMIN",
-      "action": "Query Executed",
-      "resource": "SQL Studio",
-      "details": "Returned 2 rows in 38 ms.",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1791967179568",
-      "companyId": "ACME-001",
-      "timestamp": "02:09 PM 10/14/2026",
-      "userName": "Sarah Jenkins",
-      "userRole": "ADMIN",
-      "action": "Dataset Upload",
-      "resource": "acme-001_test_empcsv.parquet",
-      "details": "Uploaded and converted to Parquet (3 rows).",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1791967179491",
-      "companyId": "ACME-001",
-      "timestamp": "02:09 PM 10/14/2026",
-      "userName": "Sarah Jenkins",
-      "userRole": "ADMIN",
-      "action": "Query Executed",
-      "resource": "SQL Studio",
-      "details": "Returned 8 rows in 107 ms.",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1791966530820",
-      "companyId": "ACME-001",
-      "timestamp": "01:58 PM 10/14/2026",
-      "userName": "Sarah Jenkins",
-      "userRole": "ADMIN",
-      "action": "Dataset Deleted",
-      "resource": "acme-001_test_empcsv.parquet",
-      "details": "Sarah Jenkins (Administrator) permanently removed dataset from storage.",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1791966530801",
-      "companyId": "ACME-001",
-      "timestamp": "01:58 PM 10/14/2026",
-      "userName": "Sarah Jenkins",
-      "userRole": "ADMIN",
-      "action": "Query Executed",
-      "resource": "SQL Studio",
-      "details": "Returned 2 rows in 38 ms.",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1791966530759",
-      "companyId": "ACME-001",
-      "timestamp": "01:58 PM 10/14/2026",
-      "userName": "Sarah Jenkins",
-      "userRole": "ADMIN",
-      "action": "Dataset Upload",
-      "resource": "acme-001_test_empcsv.parquet",
-      "details": "Uploaded and converted to Parquet (3 rows).",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1791966530617",
-      "companyId": "ACME-001",
-      "timestamp": "01:58 PM 10/14/2026",
-      "userName": "Sarah Jenkins",
-      "userRole": "ADMIN",
-      "action": "Query Executed",
-      "resource": "SQL Studio",
-      "details": "Returned 8 rows in 47 ms.",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1791966412294",
-      "companyId": "ACME-001",
-      "timestamp": "01:56 PM 10/14/2026",
-      "userName": "Sarah Jenkins",
-      "userRole": "ADMIN",
-      "action": "Query Executed",
-      "resource": "SQL Studio",
-      "details": "Returned 8 rows in 81 ms.",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1791965984664",
-      "companyId": "ACME-001",
-      "timestamp": "01:49 PM 10/14/2026",
-      "userName": "Sarah Jenkins",
-      "userRole": "ADMIN",
-      "action": "Query Executed",
-      "resource": "SQL Studio",
-      "details": "Returned 8 rows in 68 ms.",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1",
-      "companyId": "ACME-001",
-      "timestamp": "10:14 AM 10/14/2026",
-      "userName": "Sarah Jenkins",
-      "userRole": "ADMIN",
-      "action": "User Approved",
-      "resource": "Maya Patel (u-acme-3)",
-      "details": "Granted active lakehouse access with role STAFF.",
-      "ip": "192.168.1.104",
-      "status": "Success"
-    },
-    {
-      "id": "aud-2",
-      "companyId": "ACME-001",
-      "timestamp": "09:42 AM 10/14/2026",
-      "userName": "David Chen",
-      "userRole": "HR",
-      "action": "Query Executed",
-      "resource": "acme_employees_2025.parquet",
-      "details": "Ran aggregation: avg salary by department (returned 8 rows).",
-      "ip": "192.168.1.112",
       "status": "Success"
     },
     {
@@ -1563,7 +1406,34 @@
       "resource": "customer_churn_risk_telemetry.parquet",
       "details": "Blocked access: STAFF role attempted query on Admin-only dataset.",
       "ip": "192.168.1.189",
-      "status": "Denied"
+      "status": "Denied",
+      "_mongo_id": "6ad07620e6cfe92714734029"
+    },
+    {
+      "id": "aud-2",
+      "companyId": "ACME-001",
+      "timestamp": "09:42 AM 10/14/2026",
+      "userName": "David Chen",
+      "userRole": "HR",
+      "action": "Query Executed",
+      "resource": "acme_employees_2025.parquet",
+      "details": "Ran aggregation: avg salary by department (returned 8 rows).",
+      "ip": "192.168.1.112",
+      "status": "Success",
+      "_mongo_id": "6ad07620e6cfe92714734028"
+    },
+    {
+      "id": "aud-1",
+      "companyId": "ACME-001",
+      "timestamp": "10:14 AM 10/14/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "User Approved",
+      "resource": "Maya Patel (u-acme-3)",
+      "details": "Granted active lakehouse access with role STAFF.",
+      "ip": "192.168.1.104",
+      "status": "Success",
+      "_mongo_id": "6ad07620e6cfe92714734027"
     },
     {
       "id": "aud-4",
@@ -1575,7 +1445,8 @@
       "resource": "constellation_satellite_telemetry_stream.parquet",
       "details": "Converted 320,400 raw telemetry records to Snappy Parquet.",
       "ip": "10.0.4.12",
-      "status": "Success"
+      "status": "Success",
+      "_mongo_id": "6ad07620e6cfe9271473402a"
     }
   ],
   "saved_queries": [
@@ -1621,7 +1492,8 @@
       "xAxis": "department",
       "yAxis": "avg_salary",
       "summary": "Engineering and Product departments lead the compensation bands, with average salaries of $153,750 and $168,000 respectively across active personnel.",
-      "companyId": "ACME-001"
+      "companyId": "ACME-001",
+      "_mongo_id": "6ad07620e6cfe9271473402b"
     },
     {
       "id": "q-2",
@@ -1650,7 +1522,8 @@
       "xAxis": "region",
       "yAxis": "total_revenue",
       "summary": "North America accounts for $1,010,000 in closed-won revenue across 3 major enterprise deals, followed by EMEA with $785,000.",
-      "companyId": "ACME-001"
+      "companyId": "ACME-001",
+      "_mongo_id": "6ad07620e6cfe9271473402c"
     },
     {
       "id": "q-3",
@@ -1689,7 +1562,8 @@
       "xAxis": "category",
       "yAxis": "total_stock",
       "summary": "Propulsion components currently report critical stock levels at only 18 units combined, with the longest replacement lead time of 67.5 days.",
-      "companyId": "NOVA-002"
+      "companyId": "NOVA-002",
+      "_mongo_id": "6ad07620e6cfe9271473402d"
     }
   ]
 }

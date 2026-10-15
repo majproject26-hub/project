@@ -102,6 +102,7 @@ class SqlQueryResponse(BaseModel):
 class AskDataRequest(BaseModel):
     question: str
     datasetId: Optional[str] = None
+    isVoice: Optional[bool] = False
 
 class AskDataResponse(BaseModel):
     question: str

@@ -9,3 +9,5 @@ pyarrow>=16.1.0
 pandas>=2.2.2
 numpy>=1.26.0
 python-dotenv>=1.0.1
+pymongo>=4.8.0
+dnspython>=2.6.0
