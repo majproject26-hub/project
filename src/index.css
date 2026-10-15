@@ -1,0 +1,171 @@
+@import "tailwindcss";
+
+@theme {
+  --color-deep-olive: #25291D;
+  --color-olive: #4D5A2A;
+  --color-sage-olive: #748447;
+  --color-pale-sage: #DCE4C2;
+  --color-ivory: #F7F4E8;
+
+  /* Custom named Olive / Sage scale */
+  --color-olive-50: #F7F4E8;  /* Ivory Background */
+  --color-olive-100: #EFF2DD;
+  --color-olive-200: #DCE4C2; /* Pale sage */
+  --color-olive-300: #BCCB93;
+  --color-olive-400: #98AD61;
+  --color-olive-500: #748447; /* Sage olive */
+  --color-olive-600: #5F6F35;
+  --color-olive-700: #4D5A2A; /* Olive */
+  --color-olive-800: #39441D;
+  --color-olive-900: #25291D; /* Deep olive */
+  --color-olive-950: #181B12;
+
+  /* Remap sky to Olive / Sage brand scale */
+  --color-sky-50: #F7F4E8;
+  --color-sky-100: #EFF2DD;
+  --color-sky-200: #DCE4C2;
+  --color-sky-300: #BCCB93;
+  --color-sky-400: #98AD61;
+  --color-sky-500: #748447;
+  --color-sky-600: #5F6F35;
+  --color-sky-700: #4D5A2A;
+  --color-sky-800: #39441D;
+  --color-sky-900: #25291D;
+  --color-sky-950: #181B12;
+
+  /* Remap teal to Sage olive to Pale sage scale */
+  --color-teal-50: #F7F4E8;
+  --color-teal-100: #EBF0D8;
+  --color-teal-200: #DCE4C2;
+  --color-teal-300: #B4C68B;
+  --color-teal-400: #8EA75E;
+  --color-teal-500: #748447;
+  --color-teal-600: #5B6A35;
+  --color-teal-700: #4D5A2A;
+  --color-teal-800: #39441D;
+  --color-teal-900: #25291D;
+  --color-teal-950: #181B12;
+
+  /* Remap slate to Pale Sage, Ivory & Deep Olive neutrals */
+  --color-slate-50: #F7F4E8;   /* Ivory Light Background */
+  --color-slate-100: #EFF2E3;  /* Muted Surface / Light Hover */
+  --color-slate-200: #DCE4C2;  /* Pale Sage Border */
+  --color-slate-300: #B8C39F;  /* Neutral Sage */
+  --color-slate-400: #8A9672;  /* Secondary Text / Icons */
+  --color-slate-500: #626D4F;  /* Muted Text */
+  --color-slate-600: #485239;  /* Body Text */
+  --color-slate-700: #363E2B;  /* High Contrast Text */
+  --color-slate-800: #2D3323;  /* Dark Surface / Dark Card */
+  --color-slate-900: #25291D;  /* Deep Olive Card/Header */
+  --color-slate-950: #1C1F16;  /* Primary Deep Olive Dark Background */
+}
+
+@layer base {
+  :root {
+    --deep-olive: #25291D;
+    --olive: #4D5A2A;
+    --sage-olive: #748447;
+    --pale-sage: #DCE4C2;
+    --ivory: #F7F4E8;
+  }
+
+  * {
+    border-color: rgba(220, 228, 194, 0.6);
+  }
+  .dark * {
+    border-color: rgba(77, 90, 42, 0.4);
+  }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #F7F4E8;
+    color: #25291D;
+  }
+  .dark body {
+    background-color: #25291D;
+    color: #F7F4E8;
+  }
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+  ::selection {
+    background-color: #4D5A2A;
+    color: #F7F4E8;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(77, 90, 42, 0.4);
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(220, 228, 194, 0.4);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(77, 90, 42, 0.7);
+}
+
+/* Voice pulse animation */
+@keyframes voice-wave {
+  0%, 100% { height: 8px; }
+  50% { height: 28px; }
+}
+
+.voice-bar {
+  animation: voice-wave 1s ease-in-out infinite;
+}
+.voice-bar:nth-child(2) { animation-delay: 0.15s; }
+.voice-bar:nth-child(3) { animation-delay: 0.3s; }
+.voice-bar:nth-child(4) { animation-delay: 0.45s; }
+.voice-bar:nth-child(5) { animation-delay: 0.6s; }
+
+/* Custom glow and backdrop effects */
+.glass-panel {
+  background: rgba(247, 244, 232, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(220, 228, 194, 0.7);
+}
+.dark .glass-panel {
+  background: rgba(37, 41, 29, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(77, 90, 42, 0.35);
+}
+
+.gradient-border {
+  position: relative;
+  background-clip: padding-box;
+}
+
+/* Shimmer animation for skeleton loaders */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.animate-shimmer::after {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(247, 244, 232, 0) 0,
+    rgba(220, 228, 194, 0.3) 20%,
+    rgba(116, 132, 71, 0.35) 60%,
+    rgba(247, 244, 232, 0)
+  );
+  animation: shimmer 2s infinite;
+  content: '';
+}

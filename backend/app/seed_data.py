@@ -1,0 +1,683 @@
+"""
+Initial seed data for the SHEGU Lakehouse backend.
+Provides cryptographic multi-tenant isolation data for ACME-001 and NOVA-002.
+"""
+
+INITIAL_COMPANIES = {
+    "ACME-001": {
+        "id": "ACME-001",
+        "name": "Acme Technologies Inc.",
+        "tagline": "Enterprise Cloud & AI Solutions",
+        "industry": "Enterprise Software & SaaS",
+        "timezone": "America/New_York (EST)",
+        "logo": "⚡",
+        "createdDate": "2023-01-15",
+        "storageTier": "Enterprise Lakehouse (50 TB)",
+        "defaultAccess": "Public to Company",
+        "allowedRegistrationRoles": ["HR", "STAFF"],
+        "dataRetentionDays": 365,
+        "autoArchiveParquet": True,
+    },
+    "NOVA-002": {
+        "id": "NOVA-002",
+        "name": "Nova Dynamics Global",
+        "tagline": "Aerospace & Autonomous Systems",
+        "industry": "Aerospace & Advanced Defense",
+        "timezone": "America/Los_Angeles (PST)",
+        "logo": "🚀",
+        "createdDate": "2023-06-20",
+        "storageTier": "Mission Critical Lakehouse (100 TB)",
+        "defaultAccess": "Restricted (Admin approval)",
+        "allowedRegistrationRoles": ["STAFF"],
+        "dataRetentionDays": 730,
+        "autoArchiveParquet": True,
+    }
+}
+
+INITIAL_USERS = [
+    # ACME-001 Users
+    {
+        "id": "u-acme-1",
+        "companyId": "ACME-001",
+        "name": "Sarah Jenkins",
+        "email": "sarah.admin@acme.io",
+        "password": "password123",
+        "role": "ADMIN",
+        "title": "VP of Data Architecture",
+        "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+        "status": "ACTIVE",
+        "joinDate": "2023-02-01",
+        "lastActive": "Just now",
+        "voiceLanguage": "en-US",
+    },
+    {
+        "id": "u-acme-2",
+        "companyId": "ACME-001",
+        "name": "David Chen",
+        "email": "david.hr@acme.io",
+        "password": "password123",
+        "role": "HR",
+        "title": "Senior People Analytics Lead",
+        "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+        "status": "ACTIVE",
+        "joinDate": "2023-04-12",
+        "lastActive": "12 mins ago",
+        "voiceLanguage": "en-US",
+    },
+    {
+        "id": "u-acme-3",
+        "companyId": "ACME-001",
+        "name": "Maya Patel",
+        "email": "maya.staff@acme.io",
+        "password": "password123",
+        "role": "STAFF",
+        "title": "Financial Revenue Analyst",
+        "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+        "status": "ACTIVE",
+        "joinDate": "2023-08-20",
+        "lastActive": "1 hour ago",
+        "voiceLanguage": "en-US",
+    },
+    {
+        "id": "u-acme-4",
+        "companyId": "ACME-001",
+        "name": "Robert Taylor",
+        "email": "robert.taylor@acme.io",
+        "password": "password123",
+        "role": "HR",
+        "title": "Compensation Consultant",
+        "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+        "status": "PENDING",
+        "joinDate": "2026-10-08",
+        "lastActive": "Pending approval",
+        "voiceLanguage": "en-US",
+    },
+    {
+        "id": "u-acme-5",
+        "companyId": "ACME-001",
+        "name": "Kevin Vance",
+        "email": "kevin.rejected@external.com",
+        "password": "password123",
+        "role": "STAFF",
+        "title": "Contractor",
+        "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
+        "status": "REJECTED",
+        "rejectionReason": "Non-corporate email domain is not permitted for Acme Lakehouse access.",
+        "joinDate": "2026-10-02",
+        "lastActive": "Rejected",
+        "voiceLanguage": "en-US",
+    },
+
+    # NOVA-002 Users
+    {
+        "id": "u-nova-1",
+        "companyId": "NOVA-002",
+        "name": "Dr. Elena Rostov",
+        "email": "elena.admin@nova.space",
+        "password": "password123",
+        "role": "ADMIN",
+        "title": "Chief Scientific Officer",
+        "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
+        "status": "ACTIVE",
+        "joinDate": "2023-06-25",
+        "lastActive": "Just now",
+        "voiceLanguage": "en-US",
+    },
+    {
+        "id": "u-nova-2",
+        "companyId": "NOVA-002",
+        "name": "Marcus Vance",
+        "email": "marcus.hr@nova.space",
+        "password": "password123",
+        "role": "HR",
+        "title": "Director of Mission Talent",
+        "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+        "status": "ACTIVE",
+        "joinDate": "2023-09-01",
+        "lastActive": "45 mins ago",
+        "voiceLanguage": "en-US",
+    },
+    {
+        "id": "u-nova-3",
+        "companyId": "NOVA-002",
+        "name": "Liam O'Connor",
+        "email": "liam.staff@nova.space",
+        "password": "password123",
+        "role": "STAFF",
+        "title": "Orbital Telemetry Systems Specialist",
+        "avatar": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
+        "status": "ACTIVE",
+        "joinDate": "2024-01-10",
+        "lastActive": "3 hours ago",
+        "voiceLanguage": "en-US",
+    },
+    {
+        "id": "u-nova-4",
+        "companyId": "NOVA-002",
+        "name": "Sophia Kim",
+        "email": "sophia.kim@nova.space",
+        "password": "password123",
+        "role": "STAFF",
+        "title": "Guidance Sensor Researcher",
+        "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
+        "status": "PENDING",
+        "joinDate": "2026-10-07",
+        "lastActive": "Pending approval",
+        "voiceLanguage": "en-US",
+    },
+    {
+        "id": "u-nova-5",
+        "companyId": "NOVA-002",
+        "name": "Marcus Brody",
+        "email": "marcus.brody@nova.space",
+        "password": "password123",
+        "role": "STAFF",
+        "title": "Former Flight Test Analyst",
+        "avatar": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80",
+        "status": "DEACTIVATED",
+        "joinDate": "2023-11-05",
+        "lastActive": "Deactivated on 2026-09-30",
+        "voiceLanguage": "en-US",
+    }
+]
+
+SAMPLE_EMPLOYEES_DATA = [
+    {"id": "EMP-101", "name": "John Doe", "department": "Engineering", "role": "Staff Backend Eng", "salary": 145000, "tenure_years": 4.2, "rating": 4.8, "location": "San Francisco, CA", "status": "Full-Time"},
+    {"id": "EMP-102", "name": "Alicia Keys", "department": "Sales", "role": "Strategic Enterprise AE", "salary": 132000, "tenure_years": 2.8, "rating": 4.5, "location": "New York, NY", "status": "Full-Time"},
+    {"id": "EMP-103", "name": "Michael Chang", "department": "Product", "role": "Principal Product Mgr", "salary": 168000, "tenure_years": 5.1, "rating": 4.9, "location": "Seattle, WA", "status": "Full-Time"},
+    {"id": "EMP-104", "name": "Priya Sharma", "department": "Engineering", "role": "Senior ML Engineer", "salary": 158000, "tenure_years": 3.0, "rating": 4.7, "location": "San Francisco, CA", "status": "Full-Time"},
+    {"id": "EMP-105", "name": "Carlos Morales", "department": "Customer Success", "role": "Enterprise CSM Lead", "salary": 98000, "tenure_years": 2.1, "rating": 4.3, "location": "Austin, TX", "status": "Full-Time"},
+    {"id": "EMP-106", "name": "Emma Watson", "department": "Marketing", "role": "Head of Growth Marketing", "salary": 125000, "tenure_years": 3.7, "rating": 4.6, "location": "New York, NY", "status": "Full-Time"},
+    {"id": "EMP-107", "name": "Derrick Ross", "department": "Finance", "role": "Senior FP&A Analyst", "salary": 112000, "tenure_years": 1.8, "rating": 4.2, "location": "Chicago, IL", "status": "Full-Time"},
+    {"id": "EMP-108", "name": "Samantha Miller", "department": "Engineering", "role": "DevOps & Infra Architect", "salary": 172000, "tenure_years": 6.0, "rating": 4.9, "location": "Remote", "status": "Full-Time"},
+    {"id": "EMP-109", "name": "Brian O'Neal", "department": "Sales", "role": "Mid-Market Account Exec", "salary": 105000, "tenure_years": 1.5, "rating": 4.0, "location": "Boston, MA", "status": "Full-Time"},
+    {"id": "EMP-110", "name": "Zoe Kravitz", "department": "Design", "role": "Lead Design Systems UI", "salary": 130000, "tenure_years": 3.4, "rating": 4.8, "location": "San Francisco, CA", "status": "Full-Time"},
+    {"id": "EMP-111", "name": "Kenji Sato", "department": "Engineering", "role": "Senior Frontend Eng", "salary": 140000, "tenure_years": 2.9, "rating": 4.6, "location": "Remote", "status": "Full-Time"},
+    {"id": "EMP-112", "name": "Laura Bailey", "department": "Human Resources", "role": "Senior Talent Partner", "salary": 102000, "tenure_years": 3.2, "rating": 4.4, "location": "Denver, CO", "status": "Full-Time"},
+]
+
+SAMPLE_SALES_DATA = [
+    {"deal_id": "DL-901", "account_name": "Stark Logistics", "region": "North America", "deal_size": 240000, "product_line": "Lakehouse Cloud", "sales_rep": "Alicia Keys", "close_date": "2026-08-14", "status": "Closed Won"},
+    {"deal_id": "DL-902", "account_name": "Helios Financial", "region": "EMEA", "deal_size": 185000, "product_line": "Enterprise Engine", "sales_rep": "Brian O'Neal", "close_date": "2026-08-20", "status": "Closed Won"},
+    {"deal_id": "DL-903", "account_name": "Oasis Biotech", "region": "North America", "deal_size": 320000, "product_line": "Lakehouse Cloud", "sales_rep": "Alicia Keys", "close_date": "2026-09-02", "status": "Closed Won"},
+    {"deal_id": "DL-904", "account_name": "Tokyo Tech Corp", "region": "APAC", "deal_size": 95000, "product_line": "Vector Analytics", "sales_rep": "Kenji Sato", "close_date": "2026-09-11", "status": "In Pipeline"},
+    {"deal_id": "DL-905", "account_name": "Nordic Clean Energy", "region": "EMEA", "deal_size": 210000, "product_line": "Enterprise Engine", "sales_rep": "Brian O'Neal", "close_date": "2026-09-18", "status": "Closed Won"},
+    {"deal_id": "DL-906", "account_name": "Apex Health Systems", "region": "North America", "deal_size": 450000, "product_line": "Lakehouse Cloud", "sales_rep": "Alicia Keys", "close_date": "2026-09-25", "status": "Closed Won"},
+    {"deal_id": "DL-907", "account_name": "Sao Paulo Retailers", "region": "LATAM", "deal_size": 78000, "product_line": "Vector Analytics", "sales_rep": "Carlos Morales", "close_date": "2026-10-01", "status": "Contract Sent"},
+    {"deal_id": "DL-908", "account_name": "Bavaria Automotive", "region": "EMEA", "deal_size": 390000, "product_line": "Lakehouse Cloud", "sales_rep": "Brian O'Neal", "close_date": "2026-10-04", "status": "Closed Won"},
+]
+
+SAMPLE_CHURN_DATA = [
+    {"customer_id": "CST-401", "company_name": "CloudSync IO", "mrr": 12000, "nps_score": 9, "health_score": 94, "risk_level": "Low", "renewal_month": "Nov 2026", "csm": "Carlos Morales"},
+    {"customer_id": "CST-402", "company_name": "Vortex Logistics", "mrr": 28000, "nps_score": 6, "health_score": 61, "risk_level": "High", "renewal_month": "Dec 2026", "csm": "Carlos Morales"},
+    {"customer_id": "CST-403", "company_name": "Pulse Media", "mrr": 8500, "nps_score": 10, "health_score": 98, "risk_level": "Low", "renewal_month": "Jan 2027", "csm": "Carlos Morales"},
+    {"customer_id": "CST-404", "company_name": "Delta Cyber", "mrr": 34000, "nps_score": 7, "health_score": 72, "risk_level": "Medium", "renewal_month": "Feb 2027", "csm": "Carlos Morales"},
+    {"customer_id": "CST-405", "company_name": "Quantum Bio", "mrr": 45000, "nps_score": 9, "health_score": 92, "risk_level": "Low", "renewal_month": "Mar 2027", "csm": "Carlos Morales"},
+]
+
+SAMPLE_HARDWARE_DATA = [
+    {"sku": "AV-7001", "component_name": "StarTracker Optic v4", "category": "Sensors", "warehouse_id": "WH-Mojave", "stock_qty": 48, "unit_cost": 14200, "lead_days": 21, "status": "Optimal"},
+    {"sku": "AV-7002", "component_name": "Ion Thruster Valve B", "category": "Propulsion", "warehouse_id": "WH-Kenedy", "stock_qty": 12, "unit_cost": 28900, "lead_days": 45, "status": "Low Stock"},
+    {"sku": "AV-7003", "component_name": "Gallium Nitride Solar Wing", "category": "Power", "warehouse_id": "WH-Mojave", "stock_qty": 85, "unit_cost": 8400, "lead_days": 14, "status": "Optimal"},
+    {"sku": "AV-7004", "component_name": "Radiation-Hardened SoC", "category": "Avionics", "warehouse_id": "WH-Vandenberg", "stock_qty": 34, "unit_cost": 31500, "lead_days": 60, "status": "Optimal"},
+    {"sku": "AV-7005", "component_name": "Titanium Fuel Manifold", "category": "Propulsion", "warehouse_id": "WH-Kenedy", "stock_qty": 6, "unit_cost": 42000, "lead_days": 90, "status": "Critical"},
+]
+
+SAMPLE_TELEMETRY_DATA = [
+    {"packet_id": "PKT-9921", "satellite_id": "NOVA-SAT-01", "orbital_altitude_km": 542.4, "velocity_km_s": 7.62, "solar_temp_c": 44.2, "battery_soc_pct": 98.1, "status": "Nominal"},
+    {"packet_id": "PKT-9922", "satellite_id": "NOVA-SAT-02", "orbital_altitude_km": 539.8, "velocity_km_s": 7.64, "solar_temp_c": 51.8, "battery_soc_pct": 86.4, "status": "Warning"},
+    {"packet_id": "PKT-9923", "satellite_id": "NOVA-SAT-03", "orbital_altitude_km": 548.1, "velocity_km_s": 7.59, "solar_temp_c": 39.0, "battery_soc_pct": 99.2, "status": "Nominal"},
+    {"packet_id": "PKT-9924", "satellite_id": "NOVA-SAT-04", "orbital_altitude_km": 545.2, "velocity_km_s": 7.61, "solar_temp_c": 42.1, "battery_soc_pct": 94.8, "status": "Nominal"},
+    {"packet_id": "PKT-9925", "satellite_id": "NOVA-SAT-05", "orbital_altitude_km": 541.0, "velocity_km_s": 7.63, "solar_temp_c": 46.5, "battery_soc_pct": 90.2, "status": "Nominal"},
+]
+
+INITIAL_DATASETS = [
+    # ACME-001 Datasets
+    {
+        "id": "ds-acme-1",
+        "companyId": "ACME-001",
+        "name": "acme_employees_2025.parquet",
+        "displayName": "Global Employee Directory & Compensation",
+        "description": "Comprehensive workforce dataset including engineering, sales, department hierarchy, salaries, and performance ratings.",
+        "format": "Parquet (Snappy)",
+        "size": "4.2 MB",
+        "rowCount": 64280,
+        "colCount": 9,
+        "compressionRatio": "68% (vs CSV)",
+        "accessLevel": "HR+Admin",
+        "uploaderId": "u-acme-2",
+        "uploaderEmail": "david.hr@acme.io",
+        "uploaderName": "David Chen",
+        "uploaderRole": "HR",
+        "uploadDate": "2026-09-14",
+        "tags": ["workforce", "salaries", "hr", "ratings", "compensation"],
+        "previewData": SAMPLE_EMPLOYEES_DATA,
+        "schema": [
+            {"column": "id", "type": "VARCHAR(16)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 64280, "sample": "EMP-101"},
+            {"column": "name", "type": "VARCHAR(64)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 63900, "sample": "John Doe"},
+            {"column": "department", "type": "VARCHAR(32)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 8, "sample": "Engineering"},
+            {"column": "role", "type": "VARCHAR(64)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 42, "sample": "Staff Backend Eng"},
+            {"column": "salary", "type": "INTEGER", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 1450, "sample": "145000"},
+            {"column": "tenure_years", "type": "FLOAT", "nullCount": 12, "nullPct": "0.02%", "uniqueCount": 88, "sample": "4.2"},
+            {"column": "rating", "type": "FLOAT", "nullCount": 40, "nullPct": "0.06%", "uniqueCount": 25, "sample": "4.8"},
+            {"column": "location", "type": "VARCHAR(64)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 14, "sample": "San Francisco, CA"},
+            {"column": "status", "type": "VARCHAR(24)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 3, "sample": "Full-Time"},
+        ],
+        "columnStats": [
+            {
+                "column": "salary", "min": 65000, "max": 210000, "mean": 132400, "stdDev": 24500,
+                "distribution": [
+                    {"label": "<$80k", "value": 8500},
+                    {"label": "$80k-$110k", "value": 16200},
+                    {"label": "$110k-$140k", "value": 23100},
+                    {"label": "$140k-$170k", "value": 12800},
+                    {"label": "$170k+", "value": 3680}
+                ]
+            },
+            {
+                "column": "rating", "min": 3.1, "max": 5.0, "mean": 4.52, "stdDev": 0.38,
+                "distribution": [
+                    {"label": "3.0-3.5", "value": 3200},
+                    {"label": "3.5-4.0", "value": 9400},
+                    {"label": "4.0-4.5", "value": 24600},
+                    {"label": "4.5-5.0", "value": 27080}
+                ]
+            },
+            {
+                "column": "department", "uniqueCount": 8,
+                "distribution": [
+                    {"label": "Engineering", "value": 28400},
+                    {"label": "Sales", "value": 14200},
+                    {"label": "Product", "value": 6800},
+                    {"label": "Marketing", "value": 5200},
+                    {"label": "Customer Success", "value": 4900},
+                    {"label": "Finance", "value": 2600},
+                    {"label": "Design", "value": 1300},
+                    {"label": "HR", "value": 880}
+                ]
+            }
+        ],
+        "history": [
+            {"id": "v-3", "version": "v1.2", "author": "David Chen", "action": "Schema Update", "date": "2026-09-14 14:20", "comment": "Added location column and converted to Snappy Parquet."},
+            {"id": "v-2", "version": "v1.1", "author": "Sarah Jenkins", "action": "Indexing Optimized", "date": "2026-09-02 09:12", "comment": "Created Z-Order clustering on department and salary."},
+            {"id": "v-1", "version": "v1.0", "author": "David Chen", "action": "Initial Ingestion", "date": "2026-08-28 11:45", "comment": "Uploaded raw CSV and converted to Lakehouse Delta/Parquet."}
+        ]
+    },
+    {
+        "id": "ds-acme-2",
+        "companyId": "ACME-001",
+        "name": "q3_global_sales_revenue.parquet",
+        "displayName": "Q3 Enterprise Sales Pipeline & Revenue",
+        "description": "Closed-won deals, deal sizes, account names, sales reps, and regional revenue breakdown for Q3 fiscal reporting.",
+        "format": "Parquet (Snappy)",
+        "size": "8.7 MB",
+        "rowCount": 142050,
+        "colCount": 8,
+        "compressionRatio": "74% (vs CSV)",
+        "accessLevel": "All",
+        "uploaderId": "u-acme-3",
+        "uploaderEmail": "maya.staff@acme.io",
+        "uploaderName": "Maya Patel",
+        "uploaderRole": "STAFF",
+        "uploadDate": "2026-10-04",
+        "tags": ["revenue", "sales", "deals", "finance", "q3"],
+        "previewData": SAMPLE_SALES_DATA,
+        "schema": [
+            {"column": "deal_id", "type": "VARCHAR(24)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 142050, "sample": "DL-901"},
+            {"column": "account_name", "type": "VARCHAR(96)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 1280, "sample": "Stark Logistics"},
+            {"column": "region", "type": "VARCHAR(32)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 4, "sample": "North America"},
+            {"column": "deal_size", "type": "INTEGER", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 890, "sample": "240000"},
+            {"column": "product_line", "type": "VARCHAR(48)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 3, "sample": "Lakehouse Cloud"},
+            {"column": "sales_rep", "type": "VARCHAR(64)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 48, "sample": "Alicia Keys"},
+            {"column": "close_date", "type": "DATE", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 90, "sample": "2026-08-14"},
+            {"column": "status", "type": "VARCHAR(24)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 3, "sample": "Closed Won"},
+        ],
+        "columnStats": [
+            {
+                "column": "deal_size", "min": 25000, "max": 750000, "mean": 218000, "stdDev": 84000,
+                "distribution": [
+                    {"label": "<$100k", "value": 18200},
+                    {"label": "$100k-$250k", "value": 64500},
+                    {"label": "$250k-$500k", "value": 47200},
+                    {"label": "$500k+", "value": 12150}
+                ]
+            },
+            {
+                "column": "region", "uniqueCount": 4,
+                "distribution": [
+                    {"label": "North America", "value": 62400},
+                    {"label": "EMEA", "value": 44100},
+                    {"label": "APAC", "value": 24200},
+                    {"label": "LATAM", "value": 11350}
+                ]
+            }
+        ],
+        "history": [
+            {"id": "v-1", "version": "v1.0", "author": "Maya Patel", "action": "Initial Ingestion", "date": "2026-10-04 16:30", "comment": "Exported from CRM pipeline into Snappy Parquet."}
+        ]
+    },
+    {
+        "id": "ds-acme-3",
+        "companyId": "ACME-001",
+        "name": "customer_churn_risk_telemetry.parquet",
+        "displayName": "Enterprise Customer Health & Churn Signals",
+        "description": "Calculated health scores, Monthly Recurring Revenue (MRR), Net Promoter Scores, and retention predictions.",
+        "format": "Parquet (Snappy)",
+        "size": "2.8 MB",
+        "rowCount": 32800,
+        "colCount": 7,
+        "compressionRatio": "65% (vs CSV)",
+        "accessLevel": "Admin only",
+        "uploaderId": "u-acme-1",
+        "uploaderEmail": "sarah.admin@acme.io",
+        "uploaderName": "Sarah Jenkins",
+        "uploaderRole": "ADMIN",
+        "uploadDate": "2026-09-28",
+        "tags": ["churn", "retention", "nps", "mrr", "health"],
+        "previewData": SAMPLE_CHURN_DATA,
+        "schema": [
+            {"column": "customer_id", "type": "VARCHAR(24)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 32800, "sample": "CST-401"},
+            {"column": "company_name", "type": "VARCHAR(96)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 32800, "sample": "CloudSync IO"},
+            {"column": "mrr", "type": "INTEGER", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 420, "sample": "12000"},
+            {"column": "nps_score", "type": "INTEGER", "nullCount": 18, "nullPct": "0.05%", "uniqueCount": 11, "sample": "9"},
+            {"column": "health_score", "type": "INTEGER", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 65, "sample": "94"},
+            {"column": "risk_level", "type": "VARCHAR(16)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 3, "sample": "Low"},
+            {"column": "renewal_month", "type": "VARCHAR(16)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 12, "sample": "Nov 2026"},
+        ],
+        "columnStats": [
+            {
+                "column": "health_score", "min": 24, "max": 99, "mean": 82.4, "stdDev": 14.2,
+                "distribution": [
+                    {"label": "0-50 (Critical)", "value": 2400},
+                    {"label": "51-75 (Warning)", "value": 6800},
+                    {"label": "76-90 (Good)", "value": 14200},
+                    {"label": "91-100 (Exceptional)", "value": 9400}
+                ]
+            }
+        ],
+        "history": [
+            {"id": "v-1", "version": "v1.0", "author": "Sarah Jenkins", "action": "Initial Ingestion", "date": "2026-09-28 09:00", "comment": "Sync from AI customer analytics pipeline."}
+        ]
+    },
+
+    # NOVA-002 Datasets
+    {
+        "id": "ds-nova-1",
+        "companyId": "NOVA-002",
+        "name": "aerospace_avionics_supply_inventory.parquet",
+        "displayName": "Orbital Hardware & Critical Component Stock",
+        "description": "Mission critical propulsion, avionics, solar components, supply lead times, and warehouse allocations.",
+        "format": "Parquet (Snappy)",
+        "size": "5.6 MB",
+        "rowCount": 51200,
+        "colCount": 7,
+        "compressionRatio": "71% (vs CSV)",
+        "accessLevel": "All",
+        "uploaderId": "u-nova-1",
+        "uploaderEmail": "elena.admin@nova.space",
+        "uploaderName": "Dr. Elena Rostov",
+        "uploaderRole": "ADMIN",
+        "uploadDate": "2026-09-18",
+        "tags": ["avionics", "aerospace", "hardware", "satellites", "propulsion"],
+        "previewData": SAMPLE_HARDWARE_DATA,
+        "schema": [
+            {"column": "sku", "type": "VARCHAR(24)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 51200, "sample": "AV-7001"},
+            {"column": "component_name", "type": "VARCHAR(96)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 4200, "sample": "StarTracker Optic v4"},
+            {"column": "category", "type": "VARCHAR(32)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 6, "sample": "Sensors"},
+            {"column": "warehouse_id", "type": "VARCHAR(24)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 5, "sample": "WH-Mojave"},
+            {"column": "stock_qty", "type": "INTEGER", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 380, "sample": "48"},
+            {"column": "unit_cost", "type": "INTEGER", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 540, "sample": "14200"},
+            {"column": "lead_days", "type": "INTEGER", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 45, "sample": "21"},
+        ],
+        "columnStats": [
+            {
+                "column": "unit_cost", "min": 1200, "max": 185000, "mean": 24800, "stdDev": 19400,
+                "distribution": [
+                    {"label": "<$10k", "value": 14200},
+                    {"label": "$10k-$30k", "value": 22100},
+                    {"label": "$30k-$75k", "value": 11400},
+                    {"label": "$75k+", "value": 3500}
+                ]
+            }
+        ],
+        "history": [
+            {"id": "v-1", "version": "v1.0", "author": "Dr. Elena Rostov", "action": "Initial Ingestion", "date": "2026-09-18 10:30", "comment": "Avionics supply chain warehouse sync."}
+        ]
+    },
+    {
+        "id": "ds-nova-2",
+        "companyId": "NOVA-002",
+        "name": "constellation_satellite_telemetry_stream.parquet",
+        "displayName": "Constellation Real-Time Orbital Telemetry",
+        "description": "Satellite orbital altitude, velocity vectors, thermal shield readings, battery state-of-charge, and health statuses.",
+        "format": "Parquet (Snappy)",
+        "size": "19.4 MB",
+        "rowCount": 320400,
+        "colCount": 7,
+        "compressionRatio": "79% (vs CSV)",
+        "accessLevel": "Admin only",
+        "uploaderId": "u-nova-3",
+        "uploaderEmail": "liam.staff@nova.space",
+        "uploaderName": "Liam O'Connor",
+        "uploaderRole": "STAFF",
+        "uploadDate": "2026-10-09",
+        "tags": ["satellites", "orbital", "telemetry", "thermal", "space"],
+        "previewData": SAMPLE_TELEMETRY_DATA,
+        "schema": [
+            {"column": "packet_id", "type": "VARCHAR(32)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 320400, "sample": "PKT-9921"},
+            {"column": "satellite_id", "type": "VARCHAR(24)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 48, "sample": "NOVA-SAT-01"},
+            {"column": "orbital_altitude_km", "type": "FLOAT", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 840, "sample": "542.4"},
+            {"column": "velocity_km_s", "type": "FLOAT", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 320, "sample": "7.62"},
+            {"column": "solar_temp_c", "type": "FLOAT", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 410, "sample": "44.2"},
+            {"column": "battery_soc_pct", "type": "FLOAT", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 590, "sample": "98.1"},
+            {"column": "status", "type": "VARCHAR(16)", "nullCount": 0, "nullPct": "0.0%", "uniqueCount": 3, "sample": "Nominal"},
+        ],
+        "columnStats": [
+            {
+                "column": "battery_soc_pct", "min": 68.2, "max": 100.0, "mean": 94.1, "stdDev": 4.8,
+                "distribution": [
+                    {"label": "<80%", "value": 4800},
+                    {"label": "80-90%", "value": 46200},
+                    {"label": "90-95%", "value": 112000},
+                    {"label": "95-100%", "value": 157400}
+                ]
+            }
+        ],
+        "history": [
+            {"id": "v-1", "version": "v1.0", "author": "Liam O'Connor", "action": "Initial Ingestion", "date": "2026-10-09 18:22", "comment": "Downlink batch ingested from Goldstone ground station."}
+        ]
+    }
+]
+
+INITIAL_CHARTS = [
+    {
+        "id": "ch-1",
+        "companyId": "ACME-001",
+        "title": "Headcount by Department",
+        "datasetId": "ds-acme-1",
+        "datasetName": "acme_employees_2025.parquet",
+        "chartType": "bar",
+        "xAxis": "department",
+        "yAxis": "salary",
+        "color": "#3b82f6",
+        "isPinned": True,
+        "createdAt": "2026-09-15"
+    },
+    {
+        "id": "ch-2",
+        "companyId": "ACME-001",
+        "title": "Regional Revenue Distribution",
+        "datasetId": "ds-acme-2",
+        "datasetName": "q3_global_sales_revenue.parquet",
+        "chartType": "pie",
+        "xAxis": "region",
+        "yAxis": "deal_size",
+        "color": "#10b981",
+        "isPinned": True,
+        "createdAt": "2026-10-05"
+    },
+    {
+        "id": "ch-3",
+        "companyId": "ACME-001",
+        "title": "Salary vs Tenure Trend",
+        "datasetId": "ds-acme-1",
+        "datasetName": "acme_employees_2025.parquet",
+        "chartType": "line",
+        "xAxis": "tenure_years",
+        "yAxis": "salary",
+        "color": "#8b5cf6",
+        "isPinned": False,
+        "createdAt": "2026-09-20"
+    },
+    {
+        "id": "ch-4",
+        "companyId": "NOVA-002",
+        "title": "Avionics Stock by Category",
+        "datasetId": "ds-nova-1",
+        "datasetName": "aerospace_avionics_supply_inventory.parquet",
+        "chartType": "bar",
+        "xAxis": "category",
+        "yAxis": "stock_qty",
+        "color": "#06b6d4",
+        "isPinned": True,
+        "createdAt": "2026-09-22"
+    }
+]
+
+INITIAL_DASHBOARDS = [
+    {
+        "id": "dash-1",
+        "companyId": "ACME-001",
+        "name": "Executive Lakehouse Overview",
+        "description": "Unified executive overview across enterprise workforce, compensation trends, and Q3 sales revenue targets.",
+        "visibility": "Company Wide",
+        "layout": "grid-2x2",
+        "chartIds": ["ch-1", "ch-2"],
+        "charts": [],
+        "createdAt": "2026-09-16",
+        "updatedAt": "2026-10-10 14:32"
+    },
+    {
+        "id": "dash-2",
+        "companyId": "NOVA-002",
+        "name": "Orbital Mission Readiness",
+        "description": "Satellite health, supply chain component inventory, and ground station downlink telemetry.",
+        "visibility": "Restricted",
+        "layout": "grid-2x2",
+        "chartIds": ["ch-4"],
+        "charts": [],
+        "createdAt": "2026-09-25",
+        "updatedAt": "2026-10-12 09:15"
+    }
+]
+
+INITIAL_AUDIT_LOGS = [
+    {
+        "id": "aud-1",
+        "companyId": "ACME-001",
+        "timestamp": "10:14 AM 10/14/2026",
+        "userName": "Sarah Jenkins",
+        "userRole": "ADMIN",
+        "action": "User Approved",
+        "resource": "Maya Patel (u-acme-3)",
+        "details": "Granted active lakehouse access with role STAFF.",
+        "ip": "192.168.1.104",
+        "status": "Success"
+    },
+    {
+        "id": "aud-2",
+        "companyId": "ACME-001",
+        "timestamp": "09:42 AM 10/14/2026",
+        "userName": "David Chen",
+        "userRole": "HR",
+        "action": "Query Executed",
+        "resource": "acme_employees_2025.parquet",
+        "details": "Ran aggregation: avg salary by department (returned 8 rows).",
+        "ip": "192.168.1.112",
+        "status": "Success"
+    },
+    {
+        "id": "aud-3",
+        "companyId": "ACME-001",
+        "timestamp": "04:15 PM 10/13/2026",
+        "userName": "Maya Patel",
+        "userRole": "STAFF",
+        "action": "Query Blocked",
+        "resource": "customer_churn_risk_telemetry.parquet",
+        "details": "Blocked access: STAFF role attempted query on Admin-only dataset.",
+        "ip": "192.168.1.189",
+        "status": "Denied"
+    },
+    {
+        "id": "aud-4",
+        "companyId": "NOVA-002",
+        "timestamp": "08:30 AM 10/14/2026",
+        "userName": "Dr. Elena Rostov",
+        "userRole": "ADMIN",
+        "action": "Dataset Ingested",
+        "resource": "constellation_satellite_telemetry_stream.parquet",
+        "details": "Converted 320,400 raw telemetry records to Snappy Parquet.",
+        "ip": "10.0.4.12",
+        "status": "Success"
+    }
+]
+
+MOCK_ASK_QUESTIONS = {
+    "ACME-001": [
+        {
+            "id": "q-1",
+            "question": "Show top 5 departments by average employee salary",
+            "interpreted": "Group by department, calculate AVG(salary), sort descending, limit 5.",
+            "datasetName": "acme_employees_2025.parquet",
+            "sql": "SELECT department, ROUND(AVG(salary), 2) as avg_salary, COUNT(*) as headcount FROM acme_employees GROUP BY department ORDER BY avg_salary DESC LIMIT 5;",
+            "columns": ["department", "avg_salary", "headcount"],
+            "results": [
+                {"department": "Engineering", "avg_salary": 153750, "headcount": 4},
+                {"department": "Product", "avg_salary": 168000, "headcount": 1},
+                {"department": "Design", "avg_salary": 130000, "headcount": 1},
+                {"department": "Marketing", "avg_salary": 125000, "headcount": 1},
+                {"department": "Sales", "avg_salary": 118500, "headcount": 2}
+            ],
+            "suggestedChart": "bar",
+            "xAxis": "department",
+            "yAxis": "avg_salary",
+            "summary": "Engineering and Product departments lead the compensation bands, with average salaries of $153,750 and $168,000 respectively across active personnel."
+        },
+        {
+            "id": "q-2",
+            "question": "What is our total closed-won revenue by region in Q3?",
+            "interpreted": "Filter status = 'Closed Won', group by region, SUM(deal_size).",
+            "datasetName": "q3_global_sales_revenue.parquet",
+            "sql": "SELECT region, SUM(deal_size) as total_revenue, COUNT(*) as deals_won FROM sales WHERE status = 'Closed Won' GROUP BY region ORDER BY total_revenue DESC;",
+            "columns": ["region", "total_revenue", "deals_won"],
+            "results": [
+                {"region": "North America", "total_revenue": 1010000, "deals_won": 3},
+                {"region": "EMEA", "total_revenue": 785000, "deals_won": 3}
+            ],
+            "suggestedChart": "pie",
+            "xAxis": "region",
+            "yAxis": "total_revenue",
+            "summary": "North America accounts for $1,010,000 in closed-won revenue across 3 major enterprise deals, followed by EMEA with $785,000."
+        }
+    ],
+    "NOVA-002": [
+        {
+            "id": "q-3",
+            "question": "Which avionics inventory categories have the lowest current stock?",
+            "interpreted": "Group by category, SUM(stock_qty), order by stock_qty ascending.",
+            "datasetName": "aerospace_avionics_supply_inventory.parquet",
+            "sql": "SELECT category, SUM(stock_qty) as total_stock, ROUND(AVG(lead_days), 1) as avg_lead_days FROM avionics_inventory GROUP BY category ORDER BY total_stock ASC;",
+            "columns": ["category", "total_stock", "avg_lead_days"],
+            "results": [
+                {"category": "Propulsion", "total_stock": 18, "avg_lead_days": 67.5},
+                {"category": "Avionics", "total_stock": 34, "avg_lead_days": 60.0},
+                {"category": "Sensors", "total_stock": 48, "avg_lead_days": 21.0},
+                {"category": "Power", "total_stock": 85, "avg_lead_days": 14.0}
+            ],
+            "suggestedChart": "bar",
+            "xAxis": "category",
+            "yAxis": "total_stock",
+            "summary": "Propulsion components currently report critical stock levels at only 18 units combined, with the longest replacement lead time of 67.5 days."
+        }
+    ]
+}
