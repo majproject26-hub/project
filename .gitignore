@@ -22,3 +22,23 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python & Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+*.venv
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Environment & Local configs
+.env
+.env.local
+.env.*.local
+
+# Database temporary files / locks
+*.duckdb.tmp
+*.duckdb.wal
