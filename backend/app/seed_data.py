@@ -501,7 +501,17 @@ INITIAL_CHARTS = [
         "yAxis": "salary",
         "color": "#3b82f6",
         "isPinned": True,
-        "createdAt": "2026-09-15"
+        "createdAt": "2026-09-15",
+        "data": [
+            {"department": "Product", "salary": 168000},
+            {"department": "Engineering", "salary": 153750},
+            {"department": "Design", "salary": 130000},
+            {"department": "Marketing", "salary": 125000},
+            {"department": "Sales", "salary": 118500},
+            {"department": "Finance", "salary": 112000},
+            {"department": "HR", "salary": 102000},
+            {"department": "Support", "salary": 98000},
+        ]
     },
     {
         "id": "ch-2",
@@ -514,7 +524,13 @@ INITIAL_CHARTS = [
         "yAxis": "deal_size",
         "color": "#10b981",
         "isPinned": True,
-        "createdAt": "2026-10-05"
+        "createdAt": "2026-10-05",
+        "data": [
+            {"name": "North America", "value": 1010000},
+            {"name": "EMEA", "value": 785000},
+            {"name": "APAC", "value": 95000},
+            {"name": "LATAM", "value": 78000},
+        ]
     },
     {
         "id": "ch-3",
@@ -527,7 +543,15 @@ INITIAL_CHARTS = [
         "yAxis": "salary",
         "color": "#8b5cf6",
         "isPinned": False,
-        "createdAt": "2026-09-20"
+        "createdAt": "2026-09-20",
+        "data": [
+            {"tenure_years": "1", "salary": 85000},
+            {"tenure_years": "2", "salary": 98000},
+            {"tenure_years": "3", "salary": 115000},
+            {"tenure_years": "4", "salary": 132000},
+            {"tenure_years": "5", "salary": 148000},
+            {"tenure_years": "6+", "salary": 165000},
+        ]
     },
     {
         "id": "ch-4",
@@ -540,9 +564,17 @@ INITIAL_CHARTS = [
         "yAxis": "stock_qty",
         "color": "#06b6d4",
         "isPinned": True,
-        "createdAt": "2026-09-22"
+        "createdAt": "2026-09-22",
+        "data": [
+            {"category": "Flight Computer", "stock_qty": 340},
+            {"category": "Radar Sensors", "stock_qty": 520},
+            {"category": "Transceivers", "stock_qty": 810},
+            {"category": "Power Modules", "stock_qty": 1200},
+            {"category": "Actuators", "stock_qty": 670},
+        ]
     }
 ]
+
 
 INITIAL_DASHBOARDS = [
     {

@@ -14,6 +14,7 @@ const SQL_KEYWORDS = [
 export function SqlCodeEditor({
   value = '',
   onChange,
+  onRun,
   readOnly = false,
   tables = [],
   placeholder = '-- Write standard SQL or click schema items to insert...',
@@ -27,6 +28,13 @@ export function SqlCodeEditor({
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionPos, setSuggestionPos] = useState({ top: 0, left: 0 });
   const textareaRef = useRef(null);
+
+  const handleKeyDown = (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      if (onRun) onRun();
+    }
+  };
 
   // Line numbers calculation
   const lines = value ? value.split('\n') : [''];
@@ -230,6 +238,7 @@ export function SqlCodeEditor({
             value={value}
             readOnly={readOnly}
             onChange={(e) => onChange && onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
             onKeyUp={handleKeyUp}
             placeholder={placeholder}
             spellCheck="false"

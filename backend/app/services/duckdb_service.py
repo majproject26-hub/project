@@ -68,15 +68,34 @@ def execute_lakehouse_query(
         filename = d["name"]
         file_path = PARQUET_DIR / filename
         table_name = filename.replace(".parquet", "").replace("-", "_")
+        raw_name = filename.replace(".parquet", "")
 
         # If parquet file exists on disk, register view
         if file_path.exists():
             con.execute(f"CREATE OR REPLACE VIEW \"{table_name}\" AS SELECT * FROM read_parquet('{file_path.as_posix()}');")
+            if raw_name != table_name:
+                try:
+                    con.execute(f"CREATE OR REPLACE VIEW \"{raw_name}\" AS SELECT * FROM read_parquet('{file_path.as_posix()}');")
+                except Exception:
+                    pass
+            try:
+                con.execute(f"CREATE OR REPLACE VIEW \"{filename}\" AS SELECT * FROM read_parquet('{file_path.as_posix()}');")
+            except Exception:
+                pass
             scanned_bytes_estimate += file_path.stat().st_size
         elif "previewData" in d and d["previewData"]:
             # Fallback to preview data if physical parquet file was not written yet
             df_preview = pd.DataFrame(d["previewData"])
             con.register(table_name, df_preview)
+            if raw_name != table_name:
+                try:
+                    con.register(raw_name, df_preview)
+                except Exception:
+                    pass
+            try:
+                con.register(filename, df_preview)
+            except Exception:
+                pass
 
     # 5. Transform mock S3/URL paths to local parquet files
     # E.g. 's3://lakehouse-acme-001/acme_employees_2025.parquet' -> local file path
@@ -88,6 +107,10 @@ def execute_lakehouse_query(
             target = PARQUET_DIR / fname
             if target.exists():
                 return f"read_parquet('{target.as_posix()}')"
+            # Case-insensitive / partial search in PARQUET_DIR
+            for p in PARQUET_DIR.glob("*.parquet"):
+                if p.name.lower() == fname.lower():
+                    return f"read_parquet('{p.as_posix()}')"
         return s3_url
 
     transformed_sql = re.sub(

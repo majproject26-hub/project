@@ -1,11 +1,13 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any, List, Optional
 import re
+from pathlib import Path
 
 from app.database import db
 from app.models import AskDataRequest, AskDataResponse
 from app.services.auth_service import get_current_user
 from app.services.duckdb_service import execute_lakehouse_query
+from app.config import PARQUET_DIR
 
 router = APIRouter(prefix="/api/ask", tags=["Ask Your Data"])
 
@@ -21,25 +23,77 @@ def ask_your_data(req: AskDataRequest, current_user: Dict[str, Any] = Depends(ge
     if not permitted_datasets:
         raise HTTPException(status_code=403, detail="No accessible datasets found for your user role.")
 
-    # Target dataset selection
+    # 1. Score datasets based on query relevance & schema richness
+    def score_dataset(ds):
+        score = 0
+        ds_name = ds.get("name", "").lower()
+        disp_name = ds.get("displayName", "").lower()
+        cols = [c.get("column", "").lower() for c in ds.get("schema", [])]
+        
+        words = [w for w in re.findall(r"\b[a-zA-Z]{3,}\b", q_lower)]
+        for w in words:
+            if w in ds_name or w in disp_name:
+                score += 8
+            if any(w in c for c in cols):
+                score += 5
+
+        # Domain concept matching
+        if any(k in q_lower for k in ["salary", "compensation", "pay", "wage", "employee", "headcount"]):
+            if any(k in ds_name for k in ["salary", "salaries", "employee", "staff"]):
+                score += 15
+            if any(any(k in c for k in ["salary", "pay", "wage", "compensation"]) for c in cols):
+                score += 20
+
+        if any(k in q_lower for k in ["revenue", "deal", "sales", "region"]):
+            if any(k in ds_name for k in ["sales", "revenue", "order", "deal"]):
+                score += 15
+            if any(any(k in c for k in ["revenue", "deal_size", "sales", "amount"]) for c in cols):
+                score += 20
+
+        # Favor rich tabular schemas over single-column code/raw text
+        if len(cols) > 2:
+            score += 4
+        return score
+
     target_ds = None
     if req.datasetId:
         target_ds = next((d for d in permitted_datasets if d["id"] == req.datasetId), None)
-    
+
+    # If the user-selected dataset is irrelevant to the question's domain but another dataset is a strong match, switch
+    best_candidate = max(permitted_datasets, key=score_dataset)
+    if target_ds:
+        curr_score = score_dataset(target_ds)
+        best_score = score_dataset(best_candidate)
+        if best_score >= curr_score + 10:
+            target_ds = best_candidate
+    else:
+        target_ds = best_candidate
+
     if not target_ds:
-        # Match by keywords in question
-        for d in permitted_datasets:
-            d_name = d.get("displayName", "").lower()
-            tags = [t.lower() for t in d.get("tags", [])]
-            if any(w in q_lower for w in tags) or any(w in q_lower for w in d_name.split()):
-                target_ds = d
-                break
-        if not target_ds:
-            target_ds = permitted_datasets[0]
+        target_ds = permitted_datasets[0]
 
     ds_table_name = target_ds["name"].replace(".parquet", "").replace("-", "_")
+    schema_cols = target_ds.get("schema", [])
+    col_names = [c["column"] for c in schema_cols]
 
-    # Match predefined question patterns or synthesize analytical query
+    def find_column(candidate_patterns):
+        for pattern in candidate_patterns:
+            for col in col_names:
+                if pattern.lower() in col.lower():
+                    return col
+        return None
+
+    # Identify numeric and categorical columns
+    num_cols = [
+        c["column"] for c in schema_cols
+        if any(t in c.get("type", "").upper() for t in ["INT", "FLOAT", "DOUBLE", "NUMERIC", "DECIMAL", "REAL"])
+    ]
+    cat_cols = [
+        c["column"] for c in schema_cols
+        if any(t in c.get("type", "").upper() for t in ["VARCHAR", "TEXT", "STRING", "CHAR", "DATE"])
+    ]
+
+    # Synthesize intelligent schema-grounded SQL
     sql = ""
     interpreted = ""
     suggested_chart = "bar"
@@ -47,56 +101,102 @@ def ask_your_data(req: AskDataRequest, current_user: Dict[str, Any] = Depends(ge
     y_axis = ""
     summary = ""
 
-    if "salary" in q_lower or "compensation" in q_lower or "department" in q_lower:
-        sql = f"SELECT department, ROUND(AVG(salary), 2) as avg_salary, COUNT(*) as headcount FROM \"{ds_table_name}\" GROUP BY department ORDER BY avg_salary DESC LIMIT 6;"
-        interpreted = "Group by department, calculate AVG(salary), count headcount, order by avg_salary descending."
+    # Check for Salary / HR queries
+    salary_col = find_column(["base_salary", "salary", "compensation", "pay", "wage", "bonus"])
+    dept_col = find_column(["department", "dept", "team", "division", "group", "category"])
+    name_col = find_column(["full_name", "employee_name", "name", "employee_id"])
+
+    # Check for Sales / Revenue queries
+    revenue_col = find_column(["deal_size", "revenue", "sales", "amount", "total", "mrr"])
+    region_col = find_column(["region", "territory", "country", "location", "city", "state"])
+
+    # Check for Inventory / Stock queries
+    stock_col = find_column(["stock_qty", "stock", "quantity", "qty", "inventory", "count"])
+    category_col = find_column(["category", "part", "component", "type"])
+
+    # Check for Telemetry / Float metrics
+    metric_col = find_column(["battery_soc", "battery", "altitude", "temp", "score", "value"])
+    entity_col = find_column(["satellite_id", "device_id", "sku", "id"])
+
+    if salary_col and (dept_col or cat_cols) and any(w in q_lower for w in ["salary", "compensation", "pay", "department", "employee", "headcount"]):
+        dim = dept_col or cat_cols[0]
+        sql = f'SELECT "{dim}", ROUND(AVG("{salary_col}"), 2) as avg_{salary_col}, COUNT(*) as headcount FROM "{ds_table_name}" GROUP BY "{dim}" ORDER BY avg_{salary_col} DESC LIMIT 8;'
+        interpreted = f"Group records by {dim}, calculate average {salary_col}, count headcount, and sort descending."
         suggested_chart = "bar"
-        x_axis = "department"
-        y_axis = "avg_salary"
-        summary = "Engineering and Product departments lead total compensation bands across active organizational headcount."
-    elif "revenue" in q_lower or "sales" in q_lower or "region" in q_lower:
-        sql = f"SELECT region, SUM(deal_size) as total_revenue, COUNT(*) as deal_count FROM \"{ds_table_name}\" GROUP BY region ORDER BY total_revenue DESC;"
-        interpreted = "Group sales by region, sum total revenue deal size, order descending."
-        suggested_chart = "pie"
-        x_axis = "region"
-        y_axis = "total_revenue"
-        summary = "North America leads top-line closed deal revenue, followed by EMEA and APAC markets."
-    elif "stock" in q_lower or "inventory" in q_lower or "category" in q_lower:
-        sql = f"SELECT category, SUM(stock_qty) as total_stock, ROUND(AVG(lead_days), 1) as avg_lead_time FROM \"{ds_table_name}\" GROUP BY category ORDER BY total_stock ASC;"
-        interpreted = "Aggregate component stock quantity and average lead time by category, sorted by lowest stock."
+        x_axis = dim
+        y_axis = f"avg_{salary_col}"
+        summary = f"Aggregated compensation analysis in {target_ds.get('displayName', target_ds['name'])} grouped by {dim}."
+
+    elif revenue_col and (region_col or cat_cols) and any(w in q_lower for w in ["revenue", "sales", "deal", "region", "market"]):
+        dim = region_col or cat_cols[0]
+        sql = f'SELECT "{dim}", SUM("{revenue_col}") as total_{revenue_col}, COUNT(*) as deal_count FROM "{ds_table_name}" GROUP BY "{dim}" ORDER BY total_{revenue_col} DESC LIMIT 8;'
+        interpreted = f"Group records by {dim}, calculate total {revenue_col}, and sort descending."
+        suggested_chart = "pie" if len(schema_cols) <= 4 else "bar"
+        x_axis = dim
+        y_axis = f"total_{revenue_col}"
+        summary = f"Revenue distribution in {target_ds.get('displayName', target_ds['name'])} segmented across {dim}."
+
+    elif stock_col and (category_col or cat_cols) and any(w in q_lower for w in ["stock", "inventory", "item", "part", "lead"]):
+        dim = category_col or cat_cols[0]
+        sql = f'SELECT "{dim}", SUM("{stock_col}") as total_{stock_col} FROM "{ds_table_name}" GROUP BY "{dim}" ORDER BY total_{stock_col} ASC LIMIT 8;'
+        interpreted = f"Aggregate component {stock_col} grouped by {dim}, sorted by lowest stock levels."
         suggested_chart = "bar"
-        x_axis = "category"
-        y_axis = "total_stock"
-        summary = "Critical supply inventory indicates propulsion and flight sensor units have the lowest available reserve count."
-    elif "satellite" in q_lower or "altitude" in q_lower or "telemetry" in q_lower or "battery" in q_lower:
-        sql = f"SELECT satellite_id, ROUND(AVG(orbital_altitude_km), 1) as avg_altitude, ROUND(AVG(battery_soc_pct), 1) as avg_battery FROM \"{ds_table_name}\" GROUP BY satellite_id ORDER BY avg_battery DESC;"
-        interpreted = "Calculate average orbital altitude and battery state-of-charge per constellation satellite."
+        x_axis = dim
+        y_axis = f"total_{stock_col}"
+        summary = f"Inventory reserves grouped by {dim}."
+
+    elif metric_col and (entity_col or cat_cols) and any(w in q_lower for w in ["telemetry", "satellite", "battery", "altitude", "metric", "trend"]):
+        dim = entity_col or cat_cols[0]
+        sql = f'SELECT "{dim}", ROUND(AVG("{metric_col}"), 2) as avg_{metric_col} FROM "{ds_table_name}" GROUP BY "{dim}" ORDER BY avg_{metric_col} DESC LIMIT 8;'
+        interpreted = f"Calculate telemetry average {metric_col} grouped by {dim}."
         suggested_chart = "line"
-        x_axis = "satellite_id"
-        y_axis = "avg_battery"
-        summary = "Orbital telemetry confirms constellation assets maintain nominal altitude and 90%+ battery state-of-charge."
+        x_axis = dim
+        y_axis = f"avg_{metric_col}"
+        summary = f"Telemetry telemetry distribution for {metric_col} across {dim} units."
+
+    elif any(w in q_lower for w in ["top", "highest", "max", "best"]) and num_cols:
+        dim = name_col or (cat_cols[0] if cat_cols else col_names[0])
+        val = num_cols[0]
+        sql = f'SELECT "{dim}", "{val}" FROM "{ds_table_name}" ORDER BY "{val}" DESC LIMIT 5;'
+        interpreted = f"Top 5 records ordered by {val} descending."
+        suggested_chart = "bar"
+        x_axis = dim
+        y_axis = val
+        summary = f"Top records by {val} in {target_ds.get('displayName', target_ds['name'])}."
+
+    elif any(w in q_lower for w in ["records", "all", "show", "list", "sample", "view", "what are", "table"]):
+        sql = f'SELECT * FROM "{ds_table_name}" LIMIT 10;'
+        interpreted = f"Retrieve leading records from {target_ds.get('displayName', target_ds['name'])}."
+        suggested_chart = "bar"
+        summary = f"Direct tabular records from {target_ds.get('displayName', target_ds['name'])}."
+
+    elif num_cols and cat_cols:
+        dim = cat_cols[0]
+        val = num_cols[0]
+        sql = f'SELECT "{dim}", ROUND(AVG("{val}"), 2) as avg_{val}, COUNT(*) as records FROM "{ds_table_name}" GROUP BY "{dim}" ORDER BY avg_{val} DESC LIMIT 8;'
+        interpreted = f"Group records by {dim}, calculate average {val}, limit to top 8."
+        suggested_chart = "bar"
+        x_axis = dim
+        y_axis = f"avg_{val}"
+        summary = f"Distribution of {val} segmented across {dim} categories."
+
+    elif cat_cols:
+        dim = cat_cols[0]
+        sql = f'SELECT "{dim}", COUNT(*) as record_count FROM "{ds_table_name}" GROUP BY "{dim}" ORDER BY record_count DESC LIMIT 8;'
+        interpreted = f"Count occurrences grouped by {dim}."
+        suggested_chart = "bar"
+        x_axis = dim
+        y_axis = "record_count"
+        summary = f"Categorical breakdown of {dim} in {target_ds.get('displayName', target_ds['name'])}."
+
     else:
-        # Generic query against first categorical and numeric column
-        cols = target_ds.get("schema", [])
-        cat_col = next((c["column"] for c in cols if "VARCHAR" in c["type"] or c["type"] == "DATE"), cols[0]["column"] if cols else "id")
-        num_col = next((c["column"] for c in cols if c["type"] in ["INTEGER", "FLOAT"]), None)
+        # Fallback for single column / code files
+        sql = f'SELECT * FROM "{ds_table_name}" LIMIT 10;'
+        interpreted = f"Retrieve records from {target_ds.get('displayName', target_ds['name'])}."
+        suggested_chart = "bar"
+        summary = f"Data records extracted from {target_ds.get('displayName', target_ds['name'])}."
 
-        if num_col:
-            sql = f"SELECT {cat_col}, ROUND(AVG({num_col}), 2) as avg_{num_col}, COUNT(*) as records FROM \"{ds_table_name}\" GROUP BY {cat_col} ORDER BY avg_{num_col} DESC LIMIT 8;"
-            interpreted = f"Group records by {cat_col}, calculate average {num_col}, limit to top 8."
-            suggested_chart = "bar"
-            x_axis = cat_col
-            y_axis = f"avg_{num_col}"
-            summary = f"Aggregated distribution of {num_col} segmented across {cat_col} categories."
-        else:
-            sql = f"SELECT {cat_col}, COUNT(*) as frequency FROM \"{ds_table_name}\" GROUP BY {cat_col} ORDER BY frequency DESC LIMIT 8;"
-            interpreted = f"Count occurrences grouped by {cat_col}."
-            suggested_chart = "bar"
-            x_axis = cat_col
-            y_axis = "frequency"
-            summary = f"Categorical breakdown of {cat_col} in {target_ds.get('displayName')}."
-
-    # Run query with DuckDB (Analytical Engine)
+    # Execute with DuckDB
     query_exec = execute_lakehouse_query(
         sql=sql,
         company_id=company_id,
@@ -105,10 +205,40 @@ def ask_your_data(req: AskDataRequest, current_user: Dict[str, Any] = Depends(ge
         limit=20
     )
 
+    # Self-healing fallback if initial query fails
+    if not query_exec.get("success") or not query_exec.get("rows"):
+        fallback_sql = f'SELECT * FROM "{ds_table_name}" LIMIT 10;'
+        query_exec_fb = execute_lakehouse_query(
+            sql=fallback_sql,
+            company_id=company_id,
+            user_role=user_role,
+            user_name=current_user.get("name", "User"),
+            limit=20
+        )
+        if query_exec_fb.get("success") and query_exec_fb.get("rows"):
+            query_exec = query_exec_fb
+            sql = fallback_sql
+            interpreted = f"Extracted records from {target_ds.get('displayName', target_ds['name'])}."
+
     columns = query_exec.get("columns", [])
     results = query_exec.get("rows", [])
     telemetry = query_exec.get("telemetry", {})
     exec_status = "Success" if query_exec.get("success") else "Failed"
+
+    # Harmonize chart axes with returned columns
+    if columns:
+        if not x_axis or x_axis not in columns:
+            x_axis = columns[0]
+        if not y_axis or y_axis not in columns:
+            y_axis = columns[1] if len(columns) > 1 else columns[0]
+
+    # Dynamically refine summary with actual output numbers
+    if results and len(results) > 0:
+        top_row = results[0]
+        top_name = top_row.get(x_axis, "Primary record")
+        top_val = top_row.get(y_axis, "")
+        val_str = f" ({top_val:,})" if isinstance(top_val, (int, float)) else f" ({top_val})" if top_val else ""
+        summary = f"Executed analytical query on {target_ds.get('displayName', target_ds['name'])}. Returned {len(results)} rows. Peak aggregation observed for '{top_name}'{val_str}."
 
     # Persist AI Query & Execution History to MongoDB Atlas
     db.log_query_history(

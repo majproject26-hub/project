@@ -8,7 +8,8 @@ from app.models import (
     RegisterRequest,
     RegisterCompanyRequest,
     ResetPasswordRequest,
-    QuickLoginRequest,
+    RequestOtpRequest,
+    VerifyOtpRequest,
     UserProfileUpdate
 )
 from app.services.auth_service import (
@@ -16,6 +17,7 @@ from app.services.auth_service import (
     verify_password,
     get_current_user
 )
+from app.services.email_service import send_otp_email
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
@@ -73,23 +75,6 @@ def login(req: LoginRequest):
         "company": company
     }
 
-@router.post("/quick-login")
-def quick_login(req: QuickLoginRequest):
-    user = db.get_user_by_id(req.userId)
-    if not user:
-        raise HTTPException(status_code=404, detail="Demo user not found.")
-    
-    company = db.get_company(user["companyId"])
-    token = create_access_token({"sub": user["id"], "companyId": user["companyId"], "role": user["role"]})
-    user["lastActive"] = "Just now"
-    db.update_user(user["id"], {"lastActive": "Just now"})
-
-    return {
-        "success": True,
-        "token": token,
-        "user": user,
-        "company": company
-    }
 
 @router.post("/register")
 def register(req: RegisterRequest):
@@ -196,17 +181,142 @@ def register_company(req: RegisterCompanyRequest):
         "user": admin_user
     }
 
-@router.post("/reset-password")
-def reset_password(req: ResetPasswordRequest):
-    user = db.get_user_by_email(req.companyId, req.email)
+OTP_STORE: Dict[str, Dict[str, Any]] = {}
+
+@router.post("/forgot-password/request-otp")
+def request_password_reset_otp(req: RequestOtpRequest):
+    import random
+    clean_cid = req.companyId.strip().upper()
+    clean_email = req.email.strip().lower()
+
+    company = db.get_company(clean_cid)
+    if not company:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Company ID '{clean_cid}' does not exist in the lakehouse registry."
+        )
+
+    user = db.get_user_by_email(clean_cid, clean_email)
     if not user:
         raise HTTPException(
             status_code=404,
-            detail=f"No registered account found with email '{req.email}' in organization '{req.companyId}'."
+            detail=f"No registered account found matching '{clean_email}' in organization '{clean_cid}'."
         )
+
+    # Generate 6-digit OTP code
+    otp_code = f"{random.randint(100000, 999999)}"
+    expires_at = datetime.datetime.now(datetime.timezone.utc).timestamp() + 600  # 10 minutes
+
+    key = f"{clean_cid}:{clean_email}"
+    OTP_STORE[key] = {
+        "otp": otp_code,
+        "expires_at": expires_at,
+        "user_id": user["id"]
+    }
+
+    email_sent, email_msg = send_otp_email(
+        to_email=clean_email,
+        otp_code=otp_code,
+        user_name=user.get("name", "User"),
+        company_id=clean_cid
+    )
+
+    db.log_event(
+        company_id=clean_cid,
+        user_name=user.get("name", "User"),
+        user_role=user.get("role", "STAFF"),
+        action="Password Reset Requested",
+        resource=f"{user.get('name')} ({clean_email})",
+        details=f"Generated security OTP for identity verification. Email sent: {email_sent} ({email_msg})"
+    )
+
+    try:
+        from app.config import DATA_DIR
+        with open(DATA_DIR / "otp_debug.log", "w", encoding="utf-8") as f:
+            f.write(f"Timestamp: {datetime.datetime.now().isoformat()}\n")
+            f.write(f"Organization: {clean_cid}\n")
+            f.write(f"Recipient: {clean_email}\n")
+            f.write(f"OTP: {otp_code}\n")
+            f.write(f"Email Delivered: {email_sent}\n")
+    except Exception:
+        pass
+
+    return {
+        "success": True,
+        "message": f"A 6-digit verification code has been dispatched to {clean_email}.",
+        "email_sent": email_sent,
+        "status_detail": email_msg
+    }
+
+@router.post("/forgot-password/verify-otp")
+def verify_password_reset_otp(req: VerifyOtpRequest):
+    clean_cid = req.companyId.strip().upper()
+    clean_email = req.email.strip().lower()
+    clean_otp = req.otp.strip()
+
+    key = f"{clean_cid}:{clean_email}"
+    entry = OTP_STORE.get(key)
+    if not entry:
+        raise HTTPException(
+            status_code=400,
+            detail="No active verification code found for this account. Please request a new code."
+        )
+
+    now = datetime.datetime.now(datetime.timezone.utc).timestamp()
+    if now > entry["expires_at"]:
+        OTP_STORE.pop(key, None)
+        raise HTTPException(
+            status_code=400,
+            detail="Verification code has expired. Please request a new code."
+        )
+
+    if entry["otp"] != clean_otp:
+        raise HTTPException(
+            status_code=400,
+            detail="Incorrect verification code. Please check the code or request a new one."
+        )
+
+    return {
+        "success": True,
+        "message": "Identity verified successfully. You may now set your new password."
+    }
+
+@router.post("/reset-password")
+def reset_password(req: ResetPasswordRequest):
+    clean_cid = req.companyId.strip().upper()
+    clean_email = req.email.strip().lower()
+
+    user = db.get_user_by_email(clean_cid, clean_email)
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No registered account found with email '{clean_email}' in organization '{clean_cid}'."
+        )
+
+    # If an OTP is provided, verify it
+    if req.otp:
+        key = f"{clean_cid}:{clean_email}"
+        entry = OTP_STORE.get(key)
+        if entry:
+            if entry["otp"] != req.otp.strip():
+                raise HTTPException(
+                    status_code=400,
+                    detail="Invalid verification code provided."
+                )
+            OTP_STORE.pop(key, None)
 
     user["password"] = req.newPassword
     db.update_user(user["id"], {"password": req.newPassword})
+    
+    db.log_event(
+        company_id=clean_cid,
+        user_name=user.get("name", "User"),
+        user_role=user.get("role", "STAFF"),
+        action="Password Reset Completed",
+        resource=f"{user.get('name')} ({clean_email})",
+        details="User updated account password successfully."
+    )
+
     return {
         "success": True,
         "message": f"Password for {user['name']} ({user['email']}) has been successfully updated."

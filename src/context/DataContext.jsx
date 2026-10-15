@@ -40,12 +40,21 @@ export function DataProvider({ children }) {
     return saved ? JSON.parse(saved) : INITIAL_AUDIT_LOGS;
   });
 
-  // Query History & Saved Queries
+  // Query History & Saved Queries partitioned by active company
   const [savedQueries, setSavedQueries] = useState(() => {
-    const saved = localStorage.getItem('lakehouse_saved_queries');
+    const saved = localStorage.getItem(`lakehouse_saved_queries_${companyId}`);
     if (saved) return JSON.parse(saved);
     return MOCK_ASK_QUESTIONS[companyId] || [];
   });
+
+  useEffect(() => {
+    const saved = localStorage.getItem(`lakehouse_saved_queries_${companyId}`);
+    if (saved) {
+      setSavedQueries(JSON.parse(saved));
+    } else {
+      setSavedQueries(MOCK_ASK_QUESTIONS[companyId] || []);
+    }
+  }, [companyId]);
 
   useEffect(() => {
     localStorage.setItem('lakehouse_datasets', JSON.stringify(datasets));
@@ -64,12 +73,8 @@ export function DataProvider({ children }) {
   }, [auditLogs]);
 
   useEffect(() => {
-    localStorage.setItem('lakehouse_saved_queries', JSON.stringify(savedQueries));
-  }, [savedQueries]);
-
-  useEffect(() => {
-    localStorage.setItem('lakehouse_saved_queries', JSON.stringify(savedQueries));
-  }, [savedQueries]);
+    localStorage.setItem(`lakehouse_saved_queries_${companyId}`, JSON.stringify(savedQueries));
+  }, [savedQueries, companyId]);
 
   // Sync state with FastAPI backend when company changes
   useEffect(() => {
@@ -94,8 +99,17 @@ export function DataProvider({ children }) {
         }
         if (chRes.status === 'fulfilled' && chRes.value?.charts) {
           setCharts((prev) => {
+            const apiCharts = chRes.value.charts.map((c) => {
+              if (!c.data || !Array.isArray(c.data) || c.data.length === 0) {
+                const existing = prev.find((p) => p.id === c.id) || INITIAL_CHARTS.find((p) => p.id === c.id);
+                if (existing?.data) {
+                  return { ...c, data: existing.data };
+                }
+              }
+              return c;
+            });
             const otherCompanies = prev.filter((c) => c.companyId !== companyId);
-            return [...chRes.value.charts, ...otherCompanies];
+            return [...apiCharts, ...otherCompanies];
           });
         }
         if (dbRes.status === 'fulfilled' && dbRes.value?.dashboards) {

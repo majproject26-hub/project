@@ -24,20 +24,9 @@ class ApiService {
     if (!isFormData) {
       headers['Content-Type'] = 'application/json';
     }
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
-    }
-    // Also include active user ID header for rapid developer context switching
-    const currentUser = localStorage.getItem('lakehouse_current_user');
-    if (currentUser) {
-      try {
-        const parsed = JSON.parse(currentUser);
-        if (parsed.id) {
-          headers['X-User-Id'] = parsed.id;
-        }
-      } catch (e) {
-        // ignore
-      }
+    const token = this.token || localStorage.getItem('lakehouse_token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
     return headers;
   }
@@ -62,6 +51,11 @@ class ApiService {
       }
 
       if (!response.ok) {
+        if (response.status === 401 && !endpoint.includes('/api/auth/login')) {
+          // Token expired or invalid
+          this.setToken(null);
+          localStorage.removeItem('lakehouse_current_user');
+        }
         const errorMsg = data?.detail || data?.error || (typeof data === 'string' ? data : 'API Request failed');
         throw new Error(errorMsg);
       }
@@ -88,15 +82,6 @@ class ApiService {
     return res;
   }
 
-  async quickLogin(userId) {
-    const res = await this.request('/api/auth/quick-login', {
-      method: 'POST',
-      body: JSON.stringify({ userId }),
-    });
-    if (res.token) this.setToken(res.token);
-    return res;
-  }
-
   async register(registrationData) {
     return this.request('/api/auth/register', {
       method: 'POST',
@@ -113,10 +98,24 @@ class ApiService {
     return res;
   }
 
-  async resetPassword(companyId, email, newPassword) {
+  async requestOtp(companyId, email) {
+    return this.request('/api/auth/forgot-password/request-otp', {
+      method: 'POST',
+      body: JSON.stringify({ companyId, email }),
+    });
+  }
+
+  async verifyOtp(companyId, email, otp) {
+    return this.request('/api/auth/forgot-password/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify({ companyId, email, otp }),
+    });
+  }
+
+  async resetPassword(companyId, email, newPassword, otp = null) {
     return this.request('/api/auth/reset-password', {
       method: 'POST',
-      body: JSON.stringify({ companyId, email, newPassword }),
+      body: JSON.stringify({ companyId, email, newPassword, otp }),
     });
   }
 

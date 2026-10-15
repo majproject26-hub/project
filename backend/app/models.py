@@ -24,13 +24,20 @@ class RegisterCompanyRequest(BaseModel):
     adminPassword: str
     storageTier: Optional[str] = "Enterprise Lakehouse (50 TB)"
 
+class RequestOtpRequest(BaseModel):
+    companyId: str
+    email: str
+
+class VerifyOtpRequest(BaseModel):
+    companyId: str
+    email: str
+    otp: str
+
 class ResetPasswordRequest(BaseModel):
     companyId: str
     email: str
     newPassword: str
-
-class QuickLoginRequest(BaseModel):
-    userId: str
+    otp: Optional[str] = None
 
 class UserProfileUpdate(BaseModel):
     name: Optional[str] = None
@@ -119,13 +126,17 @@ class AskDataResponse(BaseModel):
 # --- Chart Schemas ---
 class ChartCreate(BaseModel):
     title: str
+    subtitle: Optional[str] = ""
     datasetId: str
     datasetName: str
     chartType: str
-    xAxis: str
-    yAxis: str
+    xAxis: Optional[str] = None
+    yAxis: Optional[str] = None
+    aggregation: Optional[str] = "COUNT"
+    colorPalette: Optional[str] = "teal"
     color: Optional[str] = "#3b82f6"
     isPinned: Optional[bool] = False
+    data: Optional[List[Dict[str, Any]]] = []
 
 # --- Dashboard Schemas ---
 class DashboardCreate(BaseModel):

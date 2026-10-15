@@ -295,35 +295,41 @@ export function DashboardPage() {
                   </Badge>
                 </div>
                 <div className="h-56">
-                  <ResponsiveContainer width="100%" height="100%">
-                    {ch.chartType === 'line' ? (
-                      <LineChart data={ch.data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                        <XAxis dataKey={ch.xAxis} tick={{ fontSize: 10 }} />
-                        <YAxis tick={{ fontSize: 10 }} />
-                        <Tooltip />
-                        <Line type="monotone" dataKey={ch.yAxis} stroke="#4D5A2A" strokeWidth={2.5} dot={{ r: 3 }} />
-                      </LineChart>
-                    ) : ch.chartType === 'pie' ? (
-                      <PieChart>
-                        <Pie data={ch.data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70}>
-                          {ch.data.map((_, i) => (
-                            <Cell key={i} fill={['#4D5A2A', '#748447', '#DCE4C2', '#25291D'][i % 4]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend wrapperStyle={{ fontSize: '10px' }} />
-                      </PieChart>
-                    ) : (
-                      <BarChart data={ch.data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                        <XAxis dataKey={ch.xAxis} tick={{ fontSize: 10 }} />
-                        <YAxis tick={{ fontSize: 10 }} />
-                        <Tooltip />
-                        <Bar dataKey={ch.yAxis} fill="#748447" radius={[4, 4, 0, 0]} />
-                      </BarChart>
-                    )}
-                  </ResponsiveContainer>
+                  {(!ch.data || !Array.isArray(ch.data) || ch.data.length === 0) ? (
+                    <div className="h-full flex items-center justify-center text-xs text-slate-400">
+                      No data points available for this chart
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      {ch.chartType === 'line' ? (
+                        <LineChart data={ch.data || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                          <XAxis dataKey={ch.xAxis} tick={{ fontSize: 10 }} />
+                          <YAxis tick={{ fontSize: 10 }} />
+                          <Tooltip />
+                          <Line type="monotone" dataKey={ch.yAxis} stroke="#4D5A2A" strokeWidth={2.5} dot={{ r: 3 }} />
+                        </LineChart>
+                      ) : ch.chartType === 'pie' ? (
+                        <PieChart>
+                          <Pie data={ch.data || []} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70}>
+                            {(ch.data || []).map((_, i) => (
+                              <Cell key={i} fill={['#4D5A2A', '#748447', '#DCE4C2', '#25291D'][i % 4]} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                          <Legend wrapperStyle={{ fontSize: '10px' }} />
+                        </PieChart>
+                      ) : (
+                        <BarChart data={ch.data || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                          <XAxis dataKey={ch.xAxis} tick={{ fontSize: 10 }} />
+                          <YAxis tick={{ fontSize: 10 }} />
+                          <Tooltip />
+                          <Bar dataKey={ch.yAxis} fill="#748447" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      )}
+                    </ResponsiveContainer>
+                  )}
                 </div>
               </Card>
             ))}

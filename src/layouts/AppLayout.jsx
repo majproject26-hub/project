@@ -39,7 +39,6 @@ export function AppLayout() {
     logout,
     sessionExpired,
     setSessionExpired,
-    quickLogin,
   } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const { notifications, unreadCount, markAllAsRead, markAsRead } = useNotifications();

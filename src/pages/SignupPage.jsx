@@ -40,7 +40,7 @@ export function SignupPage({ defaultMode = 'company' }) {
   const [confirmAdminPassword, setConfirmAdminPassword] = useState('');
 
   // Mode 2: Join Existing Company State
-  const [joinCompanyId, setJoinCompanyId] = useState('ACME-001');
+  const [joinCompanyId, setJoinCompanyId] = useState('');
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
@@ -70,7 +70,7 @@ export function SignupPage({ defaultMode = 'company' }) {
   };
 
   // Handle Register New Company Submit
-  const handleCompanySubmit = (e) => {
+  const handleCompanySubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -113,8 +113,8 @@ export function SignupPage({ defaultMode = 'company' }) {
 
     setLoading(true);
 
-    setTimeout(() => {
-      const result = registerCompany({
+    try {
+      const result = await registerCompany({
         companyName,
         companyId: formattedId,
         industry,
@@ -136,11 +136,14 @@ export function SignupPage({ defaultMode = 'company' }) {
       } else {
         setError(result.error);
       }
-    }, 350);
+    } catch (err) {
+      setLoading(false);
+      setError(err.message || 'Failed to register company workspace.');
+    }
   };
 
   // Handle Join Existing Company Submit
-  const handleUserSubmit = (e) => {
+  const handleUserSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -173,8 +176,8 @@ export function SignupPage({ defaultMode = 'company' }) {
 
     setLoading(true);
 
-    setTimeout(() => {
-      const result = register({
+    try {
+      const result = await register({
         companyId: formattedId,
         name: userName,
         email: userEmail,
@@ -189,7 +192,10 @@ export function SignupPage({ defaultMode = 'company' }) {
       } else {
         setError(result.error);
       }
-    }, 300);
+    } catch (err) {
+      setLoading(false);
+      setError(err.message || 'Failed to submit registration request.');
+    }
   };
 
   return (

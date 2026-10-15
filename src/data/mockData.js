@@ -643,6 +643,61 @@ ORDER BY battery_soc_pct ASC;`,
       ],
       date: 'Yesterday at 11:20 AM'
     }
+  ],
+  'IEDC-001': [
+    {
+      id: 'q-iedc-1',
+      question: 'What is the average base salary and employee count by department?',
+      interpreted: 'Calculates the arithmetic mean of employee compensation and count of records grouped by department hierarchy.',
+      datasetId: 'ds-1792057376282',
+      datasetName: 'iedc-001_employee_salaries_q4parquet.parquet',
+      sql: `SELECT 
+  department,
+  ROUND(AVG(base_salary), 2) AS avg_base_salary,
+  COUNT(*) AS headcount
+FROM read_parquet('s3://lakehouse-iedc-001/iedc-001_employee_salaries_q4parquet.parquet')
+GROUP BY department
+ORDER BY avg_base_salary DESC;`,
+      chartType: 'bar',
+      xAxis: 'department',
+      yAxis: 'avg_base_salary',
+      summary: 'Chemical Engineering commands the highest average compensation ($178,000), followed by R&D ($165,000) and Finance ($142,000). Investigations and Operations represent stable organizational functions.',
+      results: [
+        { department: 'Chemical Engineering', avg_base_salary: 178000, headcount: 1 },
+        { department: 'R&D', avg_base_salary: 165000, headcount: 1 },
+        { department: 'Finance', avg_base_salary: 142000, headcount: 1 },
+        { department: 'Investigations', avg_base_salary: 120000, headcount: 1 },
+        { department: 'Operations', avg_base_salary: 98000, headcount: 1 }
+      ],
+      date: 'Just now'
+    },
+    {
+      id: 'q-iedc-2',
+      question: 'Who are the highest compensated staff in the company?',
+      interpreted: 'Queries individual employee base salaries and performance bands sorted in descending order.',
+      datasetId: 'ds-1792057376282',
+      datasetName: 'iedc-001_employee_salaries_q4parquet.parquet',
+      sql: `SELECT 
+  full_name,
+  department,
+  base_salary,
+  performance_band
+FROM read_parquet('s3://lakehouse-iedc-001/iedc-001_employee_salaries_q4parquet.parquet')
+ORDER BY base_salary DESC
+LIMIT 5;`,
+      chartType: 'bar',
+      xAxis: 'full_name',
+      yAxis: 'base_salary',
+      summary: 'Walter White ($178,000 in Chemical Engineering) and Dana Scully ($165,000 in R&D) are top earners with Band 5 ratings.',
+      results: [
+        { full_name: 'Walter White', department: 'Chemical Engineering', base_salary: 178000, performance_band: 'Band 5 (Top 5%)' },
+        { full_name: 'Dana Scully', department: 'R&D', base_salary: 165000, performance_band: 'Band 5 (Top 5%)' },
+        { full_name: 'Claire Underwood', department: 'Finance', base_salary: 142000, performance_band: 'Band 4 (Exceeds)' },
+        { full_name: 'Fox Mulder', department: 'Investigations', base_salary: 120000, performance_band: 'Band 4 (Exceeds)' },
+        { full_name: 'Tyler Durden', department: 'Operations', base_salary: 98000, performance_band: 'Band 3 (Meets)' }
+      ],
+      date: 'Today at 02:15 PM'
+    }
   ]
 };
 

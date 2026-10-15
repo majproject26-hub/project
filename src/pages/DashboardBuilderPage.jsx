@@ -332,35 +332,41 @@ export function DashboardBuilderPage() {
 
                     {/* Chart Canvas */}
                     <div className="h-64 w-full pt-2">
-                      <ResponsiveContainer width="100%" height="100%">
-                        {chartObj.chartType === 'line' ? (
-                          <LineChart data={chartObj.data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                            <XAxis dataKey={chartObj.xAxis || 'name'} tick={{ fontSize: 10 }} />
-                            <YAxis tick={{ fontSize: 10 }} />
-                            <Tooltip />
-                            <Line type="monotone" dataKey={chartObj.yAxis || 'value'} stroke="#4D5A2A" strokeWidth={2.5} dot={{ r: 3 }} />
-                          </LineChart>
-                        ) : chartObj.chartType === 'pie' ? (
-                          <PieChart>
-                            <Pie data={chartObj.data} dataKey={chartObj.yAxis || 'value'} nameKey={chartObj.xAxis || 'name'} cx="50%" cy="50%" outerRadius={75}>
-                              {chartObj.data.map((_, i) => (
-                                <Cell key={i} fill={['#4D5A2A', '#748447', '#DCE4C2', '#25291D', '#93A65E'][i % 5]} />
-                              ))}
-                            </Pie>
-                            <Tooltip />
-                            <Legend wrapperStyle={{ fontSize: '10px' }} />
-                          </PieChart>
-                        ) : (
-                          <BarChart data={chartObj.data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                            <XAxis dataKey={chartObj.xAxis || 'name'} tick={{ fontSize: 10 }} />
-                            <YAxis tick={{ fontSize: 10 }} />
-                            <Tooltip />
-                            <Bar dataKey={chartObj.yAxis || 'value'} fill="#748447" radius={[4, 4, 0, 0]} />
-                          </BarChart>
-                        )}
-                      </ResponsiveContainer>
+                      {(!chartObj.data || !Array.isArray(chartObj.data) || chartObj.data.length === 0) ? (
+                        <div className="h-full flex items-center justify-center text-xs text-slate-400">
+                          No data points configured for this tile
+                        </div>
+                      ) : (
+                        <ResponsiveContainer width="100%" height="100%">
+                          {chartObj.chartType === 'line' ? (
+                            <LineChart data={chartObj.data || []} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                              <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                              <XAxis dataKey={chartObj.xAxis || 'name'} tick={{ fontSize: 10 }} />
+                              <YAxis tick={{ fontSize: 10 }} />
+                              <Tooltip />
+                              <Line type="monotone" dataKey={chartObj.yAxis || 'value'} stroke="#4D5A2A" strokeWidth={2.5} dot={{ r: 3 }} />
+                            </LineChart>
+                          ) : chartObj.chartType === 'pie' ? (
+                            <PieChart>
+                              <Pie data={chartObj.data || []} dataKey={chartObj.yAxis || 'value'} nameKey={chartObj.xAxis || 'name'} cx="50%" cy="50%" outerRadius={75}>
+                                {(chartObj.data || []).map((_, i) => (
+                                  <Cell key={i} fill={['#4D5A2A', '#748447', '#DCE4C2', '#25291D', '#93A65E'][i % 5]} />
+                                ))}
+                              </Pie>
+                              <Tooltip />
+                              <Legend wrapperStyle={{ fontSize: '10px' }} />
+                            </PieChart>
+                          ) : (
+                            <BarChart data={chartObj.data || []} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                              <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                              <XAxis dataKey={chartObj.xAxis || 'name'} tick={{ fontSize: 10 }} />
+                              <YAxis tick={{ fontSize: 10 }} />
+                              <Tooltip />
+                              <Bar dataKey={chartObj.yAxis || 'value'} fill="#748447" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                          )}
+                        </ResponsiveContainer>
+                      )}
                     </div>
                   </div>
 

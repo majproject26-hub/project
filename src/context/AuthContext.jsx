@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { INITIAL_USERS, INITIAL_COMPANIES } from '../data/mockData';
 import { api } from '../services/api';
 
 const AuthContext = createContext();
@@ -7,27 +6,28 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [companies, setCompanies] = useState(() => {
     const saved = localStorage.getItem('lakehouse_companies');
-    return saved ? JSON.parse(saved) : INITIAL_COMPANIES;
+    return saved ? JSON.parse(saved) : {};
   });
 
   const [users, setUsers] = useState(() => {
     const saved = localStorage.getItem('lakehouse_users');
-    return saved ? JSON.parse(saved) : INITIAL_USERS;
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [currentUser, setCurrentUser] = useState(() => {
+    const token = localStorage.getItem('lakehouse_token');
     const saved = localStorage.getItem('lakehouse_current_user');
-    if (saved) {
+    if (token && saved) {
       try {
         return JSON.parse(saved);
       } catch (e) {
-        return INITIAL_USERS[0];
+        return null;
       }
     }
-    // Default logged in user is Acme Admin (Sarah Jenkins)
-    return INITIAL_USERS[0];
+    return null;
   });
 
+  const [authLoading, setAuthLoading] = useState(true);
   const [sessionExpired, setSessionExpired] = useState(false);
 
   useEffect(() => {
@@ -46,36 +46,91 @@ export function AuthProvider({ children }) {
     }
   }, [currentUser]);
 
-  // Initial sync with backend auth registry
+  // On mount: verify JWT token with backend /api/auth/me
   useEffect(() => {
     let isMounted = true;
-    async function syncAuthRegistry() {
-      try {
-        const [compRes, userRes] = await Promise.allSettled([
-          api.getCompanies(),
-          api.getUsers(),
-        ]);
-        if (!isMounted) return;
-        if (compRes.status === 'fulfilled' && compRes.value?.companies) {
-          setCompanies((prev) => ({ ...prev, ...compRes.value.companies }));
+    async function verifyAuth() {
+      const token = localStorage.getItem('lakehouse_token');
+      if (!token) {
+        if (isMounted) {
+          setCurrentUser(null);
+          setAuthLoading(false);
         }
-        if (userRes.status === 'fulfilled' && userRes.value?.users) {
-          setUsers((prev) => {
-            const apiUsers = userRes.value.users;
-            const existingIds = new Set(apiUsers.map((u) => u.id));
-            const remaining = prev.filter((u) => !existingIds.has(u.id));
-            return [...apiUsers, ...remaining];
-          });
+        return;
+      }
+
+      try {
+        const res = await api.getMe();
+        if (!isMounted) return;
+        if (res && res.user) {
+          setCurrentUser(res.user);
+          localStorage.setItem('lakehouse_current_user', JSON.stringify(res.user));
+          if (res.company) {
+            setCompanies((prev) => ({
+              ...prev,
+              [res.company.id]: res.company,
+            }));
+          }
+        } else {
+          api.setToken(null);
+          localStorage.removeItem('lakehouse_current_user');
+          setCurrentUser(null);
         }
       } catch (err) {
-        console.warn('Auth registry initial sync fallback:', err);
+        if (!isMounted) return;
+        console.warn('Session verification failed, logging out:', err.message);
+        api.setToken(null);
+        localStorage.removeItem('lakehouse_current_user');
+        setCurrentUser(null);
+      } finally {
+        if (isMounted) setAuthLoading(false);
       }
     }
-    syncAuthRegistry();
+
+    verifyAuth();
     return () => {
       isMounted = false;
     };
   }, []);
+
+  // Sync public companies registry from backend
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchCompanies() {
+      try {
+        const res = await api.getCompanies();
+        if (isMounted && res?.companies) {
+          setCompanies((prev) => ({ ...prev, ...res.companies }));
+        }
+      } catch (err) {
+        console.warn('Companies registry initial sync fallback:', err.message);
+      }
+    }
+    fetchCompanies();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Fetch users when authenticated admin is active
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchUsers() {
+      if (!currentUser || currentUser.role !== 'ADMIN') return;
+      try {
+        const res = await api.getUsers();
+        if (isMounted && res?.users) {
+          setUsers(res.users);
+        }
+      } catch (err) {
+        console.warn('Users registry initial sync fallback:', err.message);
+      }
+    }
+    fetchUsers();
+    return () => {
+      isMounted = false;
+    };
+  }, [currentUser]);
 
   // Current company derived from active user or fallback
   const currentCompany = currentUser ? companies[currentUser.companyId] : null;
@@ -83,97 +138,31 @@ export function AuthProvider({ children }) {
   const login = async (companyId, email, password) => {
     try {
       const res = await api.login(companyId, email, password);
-      if (res && res.user) {
+      if (res && res.user && res.token) {
+        api.setToken(res.token);
         setCurrentUser(res.user);
+        localStorage.setItem('lakehouse_current_user', JSON.stringify(res.user));
+        if (res.company) {
+          setCompanies((prev) => ({
+            ...prev,
+            [res.company.id]: res.company,
+          }));
+        }
         setSessionExpired(false);
-        return { success: true, user: res.user };
+        return { success: true, user: res.user, company: res.company, token: res.token };
       }
+      return { success: false, error: 'Invalid response from authentication server.' };
     } catch (err) {
-      if (
-        err.message &&
-        (err.message.includes('password') ||
-          err.message.includes('pending') ||
-          err.message.includes('rejected') ||
-          err.message.includes('deactivated') ||
-          err.message.includes('Company ID') ||
-          err.message.includes('account'))
-      ) {
-        return { success: false, error: err.message };
-      }
+      return { success: false, error: err.message || 'Login failed. Please verify your credentials.' };
     }
-
-    // Local / Offline fallback
-    const comp = companies[companyId];
-    if (!comp) {
-      return { success: false, error: `Invalid Company ID '${companyId}'. Please verify your organization code.` };
-    }
-
-    const user = users.find(
-      (u) => u.companyId === companyId && u.email.toLowerCase() === email.toLowerCase()
-    );
-
-    if (!user) {
-      return { success: false, error: 'No account found matching this Company ID and Email address.' };
-    }
-
-    if (user.password !== password) {
-      return { success: false, error: 'Incorrect password. Please verify your credentials and try again.' };
-    }
-
-    if (user.status === 'PENDING') {
-      return {
-        success: false,
-        error:
-          'Your registration is currently pending review by your company lakehouse administrator. You will receive an alert once approved.',
-        status: 'PENDING',
-      };
-    }
-
-    if (user.status === 'REJECTED') {
-      return {
-        success: false,
-        error: `Your access request was rejected: "${user.rejectionReason || 'Non-compliance with company lakehouse policy'}". Contact your administrator.`,
-        status: 'REJECTED',
-      };
-    }
-
-    if (user.status === 'DEACTIVATED') {
-      return {
-        success: false,
-        error: 'This account has been deactivated by the company administrator. Please contact IT Security to reinstate access.',
-        status: 'DEACTIVATED',
-      };
-    }
-
-    setCurrentUser(user);
-    setSessionExpired(false);
-    return { success: true, user };
-  };
-
-  const quickLogin = async (userId) => {
-    try {
-      const res = await api.quickLogin(userId);
-      if (res && res.user) {
-        setCurrentUser(res.user);
-        setSessionExpired(false);
-        return { success: true, user: res.user };
-      }
-    } catch (err) {
-      // fallback
-    }
-
-    const user = users.find((u) => u.id === userId);
-    if (user) {
-      setCurrentUser(user);
-      setSessionExpired(false);
-      return { success: true, user };
-    }
-    return { success: false, error: 'Demo user not found' };
   };
 
   const logout = () => {
     api.setToken(null);
+    localStorage.removeItem('lakehouse_token');
+    localStorage.removeItem('lakehouse_current_user');
     setCurrentUser(null);
+    setSessionExpired(false);
   };
 
   const register = async ({ companyId, name, email, password, requestedRole }) => {
@@ -183,43 +172,10 @@ export function AuthProvider({ children }) {
         setUsers((prev) => [res.user, ...prev]);
         return { success: true, user: res.user };
       }
+      return { success: false, error: 'Registration failed.' };
     } catch (err) {
-      if (err.message && (err.message.includes('already registered') || err.message.includes('does not exist'))) {
-        return { success: false, error: err.message };
-      }
+      return { success: false, error: err.message || 'Failed to submit registration request.' };
     }
-
-    // Validate company ID fallback
-    const comp = companies[companyId];
-    if (!comp) {
-      return { success: false, error: `Company ID '${companyId}' does not exist in the lakehouse registry.` };
-    }
-
-    // Check duplicate email
-    const existing = users.find(
-      (u) => u.companyId === companyId && u.email.toLowerCase() === email.toLowerCase()
-    );
-    if (existing) {
-      return { success: false, error: 'An account with this email address is already registered in this company.' };
-    }
-
-    const newUser = {
-      id: `u-${Date.now()}`,
-      companyId,
-      name,
-      email,
-      password,
-      role: requestedRole || 'STAFF',
-      title: requestedRole === 'HR' ? 'People Analytics Specialist' : 'Data Specialist',
-      avatar: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80`,
-      status: 'PENDING',
-      joinDate: new Date().toISOString().split('T')[0],
-      lastActive: 'Pending Review',
-      voiceLanguage: 'en-US',
-    };
-
-    setUsers((prev) => [newUser, ...prev]);
-    return { success: true, user: newUser };
   };
 
   const registerCompany = async ({
@@ -245,76 +201,22 @@ export function AuthProvider({ children }) {
         adminPassword,
         storageTier,
       });
-      if (res && res.company && res.user) {
+      if (res && res.company && res.user && res.token) {
+        api.setToken(res.token);
         setCompanies((prev) => ({
           ...prev,
           [formattedId]: res.company,
         }));
         setUsers((prev) => [res.user, ...prev]);
         setCurrentUser(res.user);
+        localStorage.setItem('lakehouse_current_user', JSON.stringify(res.user));
         setSessionExpired(false);
-        return { success: true, company: res.company, user: res.user };
+        return { success: true, company: res.company, user: res.user, token: res.token };
       }
+      return { success: false, error: 'Company creation failed.' };
     } catch (err) {
-      if (err.message && err.message.includes('already exists')) {
-        return { success: false, error: err.message };
-      }
+      return { success: false, error: err.message || 'Failed to register company workspace.' };
     }
-
-    // Check if companyId already exists fallback
-    if (companies[formattedId]) {
-      return {
-        success: false,
-        error: `Company ID '${formattedId}' already exists. Please choose a unique organization ID (e.g. ${formattedId}-001).`,
-      };
-    }
-
-    const newCompany = {
-      id: formattedId,
-      name: companyName.trim(),
-      tagline: tagline || `${industry || 'Enterprise'} Cloud Lakehouse`,
-      industry: industry || 'Technology & Cloud SaaS',
-      timezone: 'America/New_York (EST)',
-      logo: '🏢',
-      createdDate: new Date().toISOString().split('T')[0],
-      storageTier,
-      defaultAccess: 'Public to Company',
-      allowedRegistrationRoles: ['HR', 'STAFF'],
-      dataRetentionDays: 365,
-      autoArchiveParquet: true,
-    };
-
-    const adminUser = {
-      id: `u-${Date.now()}`,
-      companyId: formattedId,
-      name: adminName.trim(),
-      email: adminEmail.trim(),
-      password: adminPassword,
-      role: 'ADMIN',
-      title: 'Company Administrator',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-      status: 'ACTIVE',
-      joinDate: new Date().toISOString().split('T')[0],
-      lastActive: 'Just now',
-      voiceLanguage: 'en-US',
-    };
-
-    setCompanies((prev) => ({
-      ...prev,
-      [formattedId]: newCompany,
-    }));
-
-    setUsers((prev) => [adminUser, ...prev]);
-
-    // Automatically log in the new company administrator
-    setCurrentUser(adminUser);
-    setSessionExpired(false);
-
-    return {
-      success: true,
-      company: newCompany,
-      user: adminUser,
-    };
   };
 
   const approveUser = (userId) => {
@@ -372,46 +274,22 @@ export function AuthProvider({ children }) {
     );
   };
 
-  const resetPasswordByEmail = async (companyId, email, newPassword) => {
+  const resetPasswordByEmail = async (companyId, email, newPassword, otp = null) => {
     const formattedId = (companyId || '').trim().toUpperCase();
     const cleanEmail = (email || '').trim().toLowerCase();
 
     try {
-      const res = await api.resetPassword(formattedId, cleanEmail, newPassword);
+      const res = await api.resetPassword(formattedId, cleanEmail, newPassword, otp);
       if (res && res.success) {
         setUsers((prev) =>
           prev.map((u) => (u.email.toLowerCase() === cleanEmail ? { ...u, password: newPassword } : u))
         );
         return { success: true, message: res.message };
       }
+      return { success: false, error: 'Failed to reset password.' };
     } catch (err) {
-      if (err.message && (err.message.includes('No registered account') || err.message.includes('not exist'))) {
-        return { success: false, error: err.message };
-      }
+      return { success: false, error: err.message || 'Failed to reset password.' };
     }
-
-    const comp = companies[formattedId];
-    if (!comp) {
-      return { success: false, error: `Company ID '${formattedId}' does not exist in the lakehouse registry.` };
-    }
-
-    const user = users.find(
-      (u) => u.companyId === formattedId && u.email.toLowerCase() === cleanEmail
-    );
-
-    if (!user) {
-      return { success: false, error: `No registered account found with email '${email}' in organization '${formattedId}'.` };
-    }
-
-    setUsers((prev) =>
-      prev.map((u) => (u.id === user.id ? { ...u, password: newPassword } : u))
-    );
-
-    return {
-      success: true,
-      message: `Password for ${user.name} (${user.email}) has been successfully updated.`,
-      user,
-    };
   };
 
   const updateProfile = (updates) => {
@@ -438,20 +316,6 @@ export function AuthProvider({ children }) {
     setSessionExpired(true);
   };
 
-  const resetToDemoDefaults = () => {
-    localStorage.removeItem('lakehouse_companies');
-    localStorage.removeItem('lakehouse_users');
-    localStorage.removeItem('lakehouse_datasets');
-    localStorage.removeItem('lakehouse_charts');
-    localStorage.removeItem('lakehouse_dashboards');
-    localStorage.removeItem('lakehouse_audits');
-    localStorage.removeItem('lakehouse_notifs');
-    setCompanies(INITIAL_COMPANIES);
-    setUsers(INITIAL_USERS);
-    setCurrentUser(INITIAL_USERS[0]);
-    window.location.reload();
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -459,8 +323,8 @@ export function AuthProvider({ children }) {
         currentCompany,
         companies,
         users,
+        authLoading,
         login,
-        quickLogin,
         logout,
         register,
         registerCompany,
@@ -476,7 +340,6 @@ export function AuthProvider({ children }) {
         sessionExpired,
         setSessionExpired,
         triggerSessionTimeout,
-        resetToDemoDefaults,
       }}
     >
       {children}

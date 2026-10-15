@@ -34,6 +34,42 @@
       "dataRetentionDays": 730,
       "autoArchiveParquet": true,
       "_mongo_id": "6ad0761fe6cfe92714734011"
+    },
+    "APEX-001": {
+      "id": "APEX-001",
+      "allowedRegistrationRoles": [
+        "HR",
+        "STAFF"
+      ],
+      "autoArchiveParquet": true,
+      "createdDate": "2026-10-15",
+      "dataRetentionDays": 365,
+      "defaultAccess": "Public to Company",
+      "industry": "Enterprise Software & SaaS",
+      "logo": "\ud83c\udfe2",
+      "name": "Apex Cloud Innovations",
+      "storageTier": "Enterprise Lakehouse (50 TB)",
+      "tagline": "Enterprise Software & SaaS Cloud Lakehouse",
+      "timezone": "America/New_York (EST)",
+      "_mongo_id": "6ad092b3328f7428dd46112d"
+    },
+    "IEDC-001": {
+      "id": "IEDC-001",
+      "allowedRegistrationRoles": [
+        "HR",
+        "STAFF"
+      ],
+      "autoArchiveParquet": true,
+      "createdDate": "2026-10-15",
+      "dataRetentionDays": 365,
+      "defaultAccess": "Public to Company",
+      "industry": "Enterprise Software & SaaS",
+      "logo": "\ud83c\udfe2",
+      "name": "iedc",
+      "storageTier": "Enterprise Lakehouse (50 TB)",
+      "tagline": "Enterprise Software & SaaS Cloud Lakehouse",
+      "timezone": "America/New_York (EST)",
+      "_mongo_id": "6ad09356328f7428dd46113a"
     }
   },
   "users": [
@@ -79,7 +115,7 @@
       "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
       "status": "ACTIVE",
       "joinDate": "2023-08-20",
-      "lastActive": "1 hour ago",
+      "lastActive": "Just now",
       "voiceLanguage": "en-US",
       "_mongo_id": "6ad0761fe6cfe92714734014"
     },
@@ -103,7 +139,7 @@
       "companyId": "ACME-001",
       "name": "Sarah Jenkins",
       "email": "sarah.admin@acme.io",
-      "password": "password123",
+      "password": "Password@2026",
       "role": "ADMIN",
       "title": "VP of Data Architecture",
       "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
@@ -187,6 +223,51 @@
       "lastActive": "Pending approval",
       "voiceLanguage": "en-US",
       "_mongo_id": "6ad0761fe6cfe9271473401a"
+    },
+    {
+      "id": "u-1792053939079",
+      "companyId": "APEX-001",
+      "name": "Jordan Bell",
+      "email": "jordan@apexcloud.io",
+      "password": "password123",
+      "role": "ADMIN",
+      "title": "Company Administrator",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      "status": "ACTIVE",
+      "joinDate": "2026-10-15",
+      "lastActive": "Just now",
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad092b30cf47c31c7afdf74"
+    },
+    {
+      "id": "u-1792054319614",
+      "companyId": "IEDC-001",
+      "name": "SHEHZADA",
+      "email": "fathimathulshehzada@gmail.com",
+      "password": "12345678",
+      "role": "STAFF",
+      "title": "Data Specialist",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "status": "ACTIVE",
+      "joinDate": "2026-10-15",
+      "lastActive": "Just now",
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0942f0cf47c31c7afdf78"
+    },
+    {
+      "id": "u-1792054101767",
+      "companyId": "IEDC-001",
+      "name": "pournami",
+      "email": "pournamiek22@gmail.com",
+      "password": "12345678",
+      "role": "ADMIN",
+      "title": "Company Administrator",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      "status": "ACTIVE",
+      "joinDate": "2026-10-15",
+      "lastActive": "Just now",
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad093550cf47c31c7afdf76"
     }
   ],
   "datasets": [
@@ -1290,6 +1371,522 @@
         }
       ],
       "_mongo_id": "6ad07620e6cfe92714734020"
+    },
+    {
+      "id": "ds-1792057108410",
+      "accessLevel": "All",
+      "colCount": 1,
+      "columnStats": [],
+      "companyId": "IEDC-001",
+      "compressionRatio": "0% (vs CSV)",
+      "description": "Ingested dataset with 21 records, transformed to Parquet format.",
+      "displayName": "servo",
+      "format": "Parquet (Snappy)",
+      "history": [
+        {
+          "id": "v-1792057108410",
+          "version": "v1.0",
+          "author": "pournami",
+          "action": "Initial Ingestion",
+          "date": "2026-10-15 15:08",
+          "comment": "Uploaded raw CSV (497 B) and converted to compressed Parquet."
+        }
+      ],
+      "name": "iedc-001_servoparquet.parquet",
+      "previewData": [
+        {
+          "#include <Servo.h>": "Servo servo;"
+        },
+        {
+          "#include <Servo.h>": "int angle = 10;"
+        },
+        {
+          "#include <Servo.h>": "void setup() {"
+        },
+        {
+          "#include <Servo.h>": "  servo.attach(8);"
+        },
+        {
+          "#include <Servo.h>": "  servo.write(angle);"
+        },
+        {
+          "#include <Servo.h>": "}"
+        },
+        {
+          "#include <Servo.h>": "void loop() "
+        },
+        {
+          "#include <Servo.h>": "{ "
+        },
+        {
+          "#include <Servo.h>": " // scan from 0 to 180 degrees"
+        },
+        {
+          "#include <Servo.h>": "  for(angle = 45; angle < 180; angle++)  "
+        },
+        {
+          "#include <Servo.h>": "  {                                  "
+        },
+        {
+          "#include <Servo.h>": "    servo.write(angle);               "
+        },
+        {
+          "#include <Servo.h>": "    delay(8);                   "
+        },
+        {
+          "#include <Servo.h>": "  } "
+        },
+        {
+          "#include <Servo.h>": "  // now scan back from 180 to 0 degrees"
+        }
+      ],
+      "rowCount": 21,
+      "schema": [
+        {
+          "column": "#include <Servo.h>",
+          "type": "VARCHAR(64)",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 19,
+          "sample": "Servo servo;"
+        }
+      ],
+      "size": "1.9 KB",
+      "tags": [
+        "sales",
+        "revenue",
+        "lakehouse"
+      ],
+      "uploadDate": "2026-10-15",
+      "uploaderEmail": "pournamiek22@gmail.com",
+      "uploaderId": "u-1792054101767",
+      "uploaderName": "pournami",
+      "uploaderRole": "ADMIN",
+      "_mongo_id": "6ad09f14328f7428dd46121a"
+    },
+    {
+      "id": "ds-1792057256785",
+      "accessLevel": "HR+Admin",
+      "colCount": 1,
+      "columnStats": [
+        {
+          "column": "#include <LiquidCrystal_I2C.h>",
+          "uniqueCount": 3,
+          "distribution": [
+            {
+              "label": " 0)",
+              "value": 2
+            },
+            {
+              "label": " 1)",
+              "value": 2
+            },
+            {
+              "label": " 2); ",
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "companyId": "IEDC-001",
+      "compressionRatio": "0% (vs CSV)",
+      "description": "Ingested dataset with 21 records, transformed to Parquet format.",
+      "displayName": "lcd",
+      "format": "Parquet (Snappy)",
+      "history": [
+        {
+          "id": "v-1792057256785",
+          "version": "v1.0",
+          "author": "pournami",
+          "action": "Initial Ingestion",
+          "date": "2026-10-15 15:10",
+          "comment": "Uploaded raw CSV (838 B) and converted to compressed Parquet."
+        }
+      ],
+      "name": "iedc-001_lcdparquet.parquet",
+      "previewData": [
+        {
+          "#include <LiquidCrystal_I2C.h>": " 2); "
+        },
+        {
+          "#include <LiquidCrystal_I2C.h>": ""
+        },
+        {
+          "#include <LiquidCrystal_I2C.h>": ""
+        },
+        {
+          "#include <LiquidCrystal_I2C.h>": ""
+        },
+        {
+          "#include <LiquidCrystal_I2C.h>": ""
+        },
+        {
+          "#include <LiquidCrystal_I2C.h>": ""
+        },
+        {
+          "#include <LiquidCrystal_I2C.h>": ""
+        },
+        {
+          "#include <LiquidCrystal_I2C.h>": ""
+        },
+        {
+          "#include <LiquidCrystal_I2C.h>": ""
+        },
+        {
+          "#include <LiquidCrystal_I2C.h>": " 0)"
+        },
+        {
+          "#include <LiquidCrystal_I2C.h>": ""
+        },
+        {
+          "#include <LiquidCrystal_I2C.h>": " 1)"
+        },
+        {
+          "#include <LiquidCrystal_I2C.h>": ""
+        },
+        {
+          "#include <LiquidCrystal_I2C.h>": ""
+        },
+        {
+          "#include <LiquidCrystal_I2C.h>": ""
+        }
+      ],
+      "rowCount": 21,
+      "schema": [
+        {
+          "column": "#include <LiquidCrystal_I2C.h>",
+          "type": "VARCHAR(64)",
+          "nullCount": 16,
+          "nullPct": "76.19%",
+          "uniqueCount": 3,
+          "sample": " 2); "
+        }
+      ],
+      "size": "3.3 KB",
+      "tags": [
+        "sales",
+        "revenue",
+        "lakehouse"
+      ],
+      "uploadDate": "2026-10-15",
+      "uploaderEmail": "pournamiek22@gmail.com",
+      "uploaderId": "u-1792054101767",
+      "uploaderName": "pournami",
+      "uploaderRole": "ADMIN",
+      "_mongo_id": "6ad09fa9328f7428dd461225"
+    },
+    {
+      "id": "ds-1792057376282",
+      "accessLevel": "All",
+      "colCount": 7,
+      "columnStats": [
+        {
+          "column": "employee_id",
+          "uniqueCount": 5,
+          "distribution": [
+            {
+              "label": "EMP-8821",
+              "value": 1
+            },
+            {
+              "label": "EMP-8822",
+              "value": 1
+            },
+            {
+              "label": "EMP-8823",
+              "value": 1
+            },
+            {
+              "label": "EMP-8824",
+              "value": 1
+            },
+            {
+              "label": "EMP-8825",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "column": "full_name",
+          "uniqueCount": 5,
+          "distribution": [
+            {
+              "label": "Claire Underwood",
+              "value": 1
+            },
+            {
+              "label": "Tyler Durden",
+              "value": 1
+            },
+            {
+              "label": "Dana Scully",
+              "value": 1
+            },
+            {
+              "label": "Fox Mulder",
+              "value": 1
+            },
+            {
+              "label": "Walter White",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "column": "department",
+          "uniqueCount": 5,
+          "distribution": [
+            {
+              "label": "Finance",
+              "value": 1
+            },
+            {
+              "label": "Operations",
+              "value": 1
+            },
+            {
+              "label": "R&D",
+              "value": 1
+            },
+            {
+              "label": "Investigations",
+              "value": 1
+            },
+            {
+              "label": "Chemical Engineering",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "column": "base_salary",
+          "min": 98000.0,
+          "max": 178000.0,
+          "mean": 140600.0,
+          "stdDev": 32539.21,
+          "distribution": [
+            {
+              "label": "98000.0-118000.0",
+              "value": 1
+            },
+            {
+              "label": "118000.0-138000.0",
+              "value": 1
+            },
+            {
+              "label": "138000.0-158000.0",
+              "value": 1
+            },
+            {
+              "label": "158000.0-178000.0",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "column": "bonus_pct",
+          "min": 10.0,
+          "max": 22.0,
+          "mean": 15.5,
+          "stdDev": 4.85,
+          "distribution": [
+            {
+              "label": "10.0-13.0",
+              "value": 2
+            },
+            {
+              "label": "13.0-16.0",
+              "value": 1
+            },
+            {
+              "label": "16.0-19.0",
+              "value": 1
+            },
+            {
+              "label": "19.0-22.0",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "column": "hire_date",
+          "uniqueCount": 5,
+          "distribution": [
+            {
+              "label": "2022-04-10",
+              "value": 1
+            },
+            {
+              "label": "2023-01-15",
+              "value": 1
+            },
+            {
+              "label": "2021-08-20",
+              "value": 1
+            },
+            {
+              "label": "2022-11-01",
+              "value": 1
+            },
+            {
+              "label": "2020-05-18",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "column": "performance_band",
+          "uniqueCount": 3,
+          "distribution": [
+            {
+              "label": "Band 4 (Exceeds)",
+              "value": 2
+            },
+            {
+              "label": "Band 5 (Top 5%)",
+              "value": 2
+            },
+            {
+              "label": "Band 3 (Meets)",
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "companyId": "IEDC-001",
+      "compressionRatio": "0% (vs CSV)",
+      "description": "Ingested dataset with 2,450 records, transformed to Parquet format.",
+      "displayName": "employee salaries q4",
+      "format": "Parquet (Snappy)",
+      "history": [
+        {
+          "id": "v-1792057376282",
+          "version": "v1.0",
+          "author": "pournami",
+          "action": "Initial Ingestion",
+          "date": "2026-10-15 15:12",
+          "comment": "Uploaded raw CSV (446 B) and converted to compressed Parquet."
+        }
+      ],
+      "name": "iedc-001_employee_salaries_q4parquet.parquet",
+      "previewData": [
+        {
+          "employee_id": "EMP-8821",
+          "full_name": "Claire Underwood",
+          "department": "Finance",
+          "base_salary": 142000,
+          "bonus_pct": 15.0,
+          "hire_date": "2022-04-10",
+          "performance_band": "Band 4 (Exceeds)"
+        },
+        {
+          "employee_id": "EMP-8822",
+          "full_name": "Tyler Durden",
+          "department": "Operations",
+          "base_salary": 98000,
+          "bonus_pct": 10.0,
+          "hire_date": "2023-01-15",
+          "performance_band": "Band 3 (Meets)"
+        },
+        {
+          "employee_id": "EMP-8823",
+          "full_name": "Dana Scully",
+          "department": "R&D",
+          "base_salary": 165000,
+          "bonus_pct": 18.5,
+          "hire_date": "2021-08-20",
+          "performance_band": "Band 5 (Top 5%)"
+        },
+        {
+          "employee_id": "EMP-8824",
+          "full_name": "Fox Mulder",
+          "department": "Investigations",
+          "base_salary": 120000,
+          "bonus_pct": 12.0,
+          "hire_date": "2022-11-01",
+          "performance_band": "Band 4 (Exceeds)"
+        },
+        {
+          "employee_id": "EMP-8825",
+          "full_name": "Walter White",
+          "department": "Chemical Engineering",
+          "base_salary": 178000,
+          "bonus_pct": 22.0,
+          "hire_date": "2020-05-18",
+          "performance_band": "Band 5 (Top 5%)"
+        }
+      ],
+      "rowCount": 5,
+      "schema": [
+        {
+          "column": "employee_id",
+          "type": "VARCHAR(64)",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 5,
+          "sample": "EMP-8821"
+        },
+        {
+          "column": "full_name",
+          "type": "VARCHAR(64)",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 5,
+          "sample": "Claire Underwood"
+        },
+        {
+          "column": "department",
+          "type": "VARCHAR(64)",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 5,
+          "sample": "Finance"
+        },
+        {
+          "column": "base_salary",
+          "type": "INTEGER",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 5,
+          "sample": "142000"
+        },
+        {
+          "column": "bonus_pct",
+          "type": "FLOAT",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 5,
+          "sample": "15.0"
+        },
+        {
+          "column": "hire_date",
+          "type": "VARCHAR(64)",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 5,
+          "sample": "2022-04-10"
+        },
+        {
+          "column": "performance_band",
+          "type": "VARCHAR(64)",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 3,
+          "sample": "Band 4 (Exceeds)"
+        }
+      ],
+      "size": "5.2 KB",
+      "tags": [
+        "sales",
+        "revenue",
+        "lakehouse"
+      ],
+      "uploadDate": "2026-10-15",
+      "uploaderEmail": "pournamiek22@gmail.com",
+      "uploaderId": "u-1792054101767",
+      "uploaderName": "pournami",
+      "uploaderRole": "ADMIN",
+      "_mongo_id": "6ad0a020328f7428dd46122c"
     }
   ],
   "charts": [
@@ -1385,14 +1982,26 @@
   ],
   "audit_logs": [
     {
-      "id": "aud-1792046999702",
-      "companyId": "ACME-001",
-      "timestamp": "12:19 PM 10/15/2026",
-      "userName": "Sarah Jenkins",
-      "userRole": "ADMIN",
-      "action": "Query Executed",
-      "resource": "SQL Studio",
-      "details": "Returned 8 rows in 178 ms.",
+      "id": "aud-1792060246294",
+      "companyId": "IEDC-001",
+      "timestamp": "04:00 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Saved",
+      "resource": "What is the average base_salary by department?",
+      "details": "Saved analytical query to library.",
+      "ip": "127.0.0.1",
+      "status": "Success"
+    },
+    {
+      "id": "aud-1792060246291",
+      "companyId": "IEDC-001",
+      "timestamp": "04:00 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Saved",
+      "resource": "What is the average base_salary by department?",
+      "details": "Saved analytical query to organization library.",
       "ip": "127.0.0.1",
       "status": "Success"
     },
@@ -1423,6 +2032,344 @@
       "_mongo_id": "6ad07620e6cfe92714734028"
     },
     {
+      "id": "aud-1792059021771",
+      "companyId": "ACME-001",
+      "timestamp": "03:40 PM 10/15/2026",
+      "userName": "Maya Patel",
+      "userRole": "STAFF",
+      "action": "Query Saved",
+      "resource": "Show sales by product line",
+      "details": "Saved analytical query to organization library.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0a68d5998edafc1605240"
+    },
+    {
+      "id": "aud-1792059021769",
+      "companyId": "ACME-001",
+      "timestamp": "03:40 PM 10/15/2026",
+      "userName": "Maya Patel",
+      "userRole": "STAFF",
+      "action": "Query Saved",
+      "resource": "Show sales by product line",
+      "details": "Saved analytical query to library.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0a68d5998edafc160523f"
+    },
+    {
+      "id": "aud-1792058910096",
+      "companyId": "ACME-001",
+      "timestamp": "03:38 PM 10/15/2026",
+      "userName": "Maya Patel",
+      "userRole": "STAFF",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 8 rows in 90 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0a61e5998edafc160523d"
+    },
+    {
+      "id": "aud-1792058597188",
+      "companyId": "ACME-001",
+      "timestamp": "03:33 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 83 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0a4e55998edafc160523b"
+    },
+    {
+      "id": "aud-1792058174081",
+      "companyId": "ACME-001",
+      "timestamp": "03:26 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 118 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0a33e5998edafc1605236"
+    },
+    {
+      "id": "aud-1792055584778",
+      "companyId": "ACME-001",
+      "timestamp": "02:43 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Password Reset Completed",
+      "resource": "Sarah Jenkins (sarah.admin@acme.io)",
+      "details": "User updated account password successfully.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad09920b609c9728d978725"
+    },
+    {
+      "id": "aud-1792055525113",
+      "companyId": "ACME-001",
+      "timestamp": "02:42 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Password Reset Requested",
+      "resource": "Sarah Jenkins (sarah.admin@acme.io)",
+      "details": "Generated security OTP for identity verification.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad098e5b609c9728d978724"
+    },
+    {
+      "id": "aud-1792055008420",
+      "companyId": "ACME-001",
+      "timestamp": "02:33 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Password Reset Requested",
+      "resource": "Sarah Jenkins (sarah.admin@acme.io)",
+      "details": "Generated security OTP for identity verification.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad096e0b609c9728d978723"
+    },
+    {
+      "id": "aud-1792052465020",
+      "companyId": "ACME-001",
+      "timestamp": "01:51 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Saved",
+      "resource": "Who are the highest rated staff in Engineering?",
+      "details": "Saved analytical query to library.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad08cf11b0136eeb89e138b"
+    },
+    {
+      "id": "aud-1792052465001",
+      "companyId": "ACME-001",
+      "timestamp": "01:51 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Saved",
+      "resource": "Who are the highest rated staff in Engineering?",
+      "details": "Saved analytical query to organization library.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad08cf11b0136eeb89e138a"
+    },
+    {
+      "id": "aud-1792052420962",
+      "companyId": "ACME-001",
+      "timestamp": "01:50 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 102 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad08cc41b0136eeb89e1388"
+    },
+    {
+      "id": "aud-1792052407213",
+      "companyId": "ACME-001",
+      "timestamp": "01:50 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 100 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad08cb71b0136eeb89e1387"
+    },
+    {
+      "id": "aud-1792052233028",
+      "companyId": "ACME-001",
+      "timestamp": "01:47 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 135 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad08c09ededd9bfebd3ad7f"
+    },
+    {
+      "id": "aud-1792052158960",
+      "companyId": "ACME-001",
+      "timestamp": "01:45 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 117 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad08bbeededd9bfebd3ad7e"
+    },
+    {
+      "id": "aud-1792052092062",
+      "companyId": "ACME-001",
+      "timestamp": "01:44 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 122 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad08b7cededd9bfebd3ad7d"
+    },
+    {
+      "id": "aud-1792052048156",
+      "companyId": "ACME-001",
+      "timestamp": "01:44 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 90 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad08b50ededd9bfebd3ad7c"
+    },
+    {
+      "id": "aud-1792052008593",
+      "companyId": "ACME-001",
+      "timestamp": "01:43 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 453 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad08b28ededd9bfebd3ad7b"
+    },
+    {
+      "id": "aud-1792051799833",
+      "companyId": "ACME-001",
+      "timestamp": "01:39 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 97 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad08a57ededd9bfebd3ad7a"
+    },
+    {
+      "id": "aud-1792051716925",
+      "companyId": "ACME-001",
+      "timestamp": "01:38 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 98 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad08a04ededd9bfebd3ad79"
+    },
+    {
+      "id": "aud-1792051624833",
+      "companyId": "ACME-001",
+      "timestamp": "01:37 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 95 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad089a8ededd9bfebd3ad78"
+    },
+    {
+      "id": "aud-1792051533287",
+      "companyId": "ACME-001",
+      "timestamp": "01:35 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 85 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0894dededd9bfebd3ad77"
+    },
+    {
+      "id": "aud-1792051521761",
+      "companyId": "ACME-001",
+      "timestamp": "01:35 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 82 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad08941ededd9bfebd3ad76"
+    },
+    {
+      "id": "aud-1792051510752",
+      "companyId": "ACME-001",
+      "timestamp": "01:35 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 5 rows in 81 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad08936ededd9bfebd3ad75"
+    },
+    {
+      "id": "aud-1792051437150",
+      "companyId": "ACME-001",
+      "timestamp": "01:33 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 111 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad088edededd9bfebd3ad74"
+    },
+    {
+      "id": "aud-1792051376859",
+      "companyId": "ACME-001",
+      "timestamp": "01:32 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 191 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad088b0ededd9bfebd3ad73"
+    },
+    {
+      "id": "aud-1792046999702",
+      "companyId": "ACME-001",
+      "timestamp": "12:19 PM 10/15/2026",
+      "userName": "Sarah Jenkins",
+      "userRole": "ADMIN",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 8 rows in 178 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad07797c01987b4d4711fc6"
+    },
+    {
       "id": "aud-1",
       "companyId": "ACME-001",
       "timestamp": "10:14 AM 10/14/2026",
@@ -1447,9 +2394,363 @@
       "ip": "10.0.4.12",
       "status": "Success",
       "_mongo_id": "6ad07620e6cfe9271473402a"
+    },
+    {
+      "id": "aud-1792053939223",
+      "companyId": "APEX-001",
+      "timestamp": "02:15 PM 10/15/2026",
+      "userName": "Jordan Bell",
+      "userRole": "ADMIN",
+      "action": "Company Provisioned",
+      "resource": "APEX-001",
+      "details": "Organization Apex Cloud Innovations created with storage tier Enterprise Lakehouse (50 TB).",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad092b30cf47c31c7afdf75"
+    },
+    {
+      "id": "aud-1792059323446",
+      "companyId": "IEDC-001",
+      "timestamp": "03:45 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 102 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0a7bb5998edafc1605241"
+    },
+    {
+      "id": "aud-1792058668860",
+      "companyId": "IEDC-001",
+      "timestamp": "03:34 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 106 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0a52c5998edafc160523c"
+    },
+    {
+      "id": "aud-1792058463023",
+      "companyId": "IEDC-001",
+      "timestamp": "03:31 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 109 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0a45f5998edafc160523a"
+    },
+    {
+      "id": "aud-1792058312265",
+      "companyId": "IEDC-001",
+      "timestamp": "03:28 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 8 rows in 115 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0a3c85998edafc1605239"
+    },
+    {
+      "id": "aud-1792058291961",
+      "companyId": "IEDC-001",
+      "timestamp": "03:28 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 107 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0a3b35998edafc1605238"
+    },
+    {
+      "id": "aud-1792058286293",
+      "companyId": "IEDC-001",
+      "timestamp": "03:28 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Executed",
+      "resource": "SQL Studio",
+      "details": "Returned 10 rows in 96 ms.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0a3ae5998edafc1605237"
+    },
+    {
+      "id": "aud-1792057493231",
+      "companyId": "IEDC-001",
+      "timestamp": "03:14 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Saved",
+      "resource": "what will be the average salary after 12 years",
+      "details": "Saved analytical query to organization library.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0a0955998edafc1605235"
+    },
+    {
+      "id": "aud-1792057493221",
+      "companyId": "IEDC-001",
+      "timestamp": "03:14 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Query Saved",
+      "resource": "what will be the average salary after 12 years",
+      "details": "Saved analytical query to library.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0a0955998edafc1605234"
+    },
+    {
+      "id": "aud-1792057376447",
+      "companyId": "IEDC-001",
+      "timestamp": "03:12 PM 10/15/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Dataset Upload",
+      "resource": "iedc-001_employee_salaries_q4parquet.parquet",
+      "details": "Uploaded and converted to Parquet (5 rows).",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0a0205998edafc1605232"
+    },
+    {
+      "id": "aud-1792057376333",
+      "companyId": "IEDC-001",
+      "timestamp": "03:12 PM 10/15/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Dataset Upload",
+      "resource": "iedc-001_employee_salaries_q4parquet.parquet",
+      "details": "Uploaded and converted to Parquet (5 rows).",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0a0205998edafc1605231"
+    },
+    {
+      "id": "aud-1792057256936",
+      "companyId": "IEDC-001",
+      "timestamp": "03:10 PM 10/15/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Dataset Upload",
+      "resource": "iedc-001_lcdparquet.parquet",
+      "details": "Uploaded and converted to Parquet (21 rows).",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad09fa85998edafc1605230"
+    },
+    {
+      "id": "aud-1792057256837",
+      "companyId": "IEDC-001",
+      "timestamp": "03:10 PM 10/15/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Dataset Upload",
+      "resource": "iedc-001_lcdparquet.parquet",
+      "details": "Uploaded and converted to Parquet (21 rows).",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad09fa85998edafc160522f"
+    },
+    {
+      "id": "aud-1792057108543",
+      "companyId": "IEDC-001",
+      "timestamp": "03:08 PM 10/15/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Dataset Upload",
+      "resource": "iedc-001_servoparquet.parquet",
+      "details": "Uploaded and converted to Parquet (21 rows).",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad09f145998edafc160522e"
+    },
+    {
+      "id": "aud-1792057108456",
+      "companyId": "IEDC-001",
+      "timestamp": "03:08 PM 10/15/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Dataset Upload",
+      "resource": "iedc-001_servoparquet.parquet",
+      "details": "Uploaded and converted to Parquet (21 rows).",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad09f145998edafc160522d"
+    },
+    {
+      "id": "aud-1792056688965",
+      "companyId": "IEDC-001",
+      "timestamp": "03:01 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Password Reset Requested",
+      "resource": "SHEHZADA (fathimathulshehzada@gmail.com)",
+      "details": "Generated security OTP for identity verification. Email sent: False (SMTP credentials (SMTP_USER and SMTP_PASSWORD) not configured in backend/.env.)",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad09d705998edafc160522c"
+    },
+    {
+      "id": "aud-1792056475121",
+      "companyId": "IEDC-001",
+      "timestamp": "02:57 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Password Reset Requested",
+      "resource": "SHEHZADA (fathimathulshehzada@gmail.com)",
+      "details": "Generated security OTP for identity verification. Email sent: False (SMTP credentials (SMTP_USER and SMTP_PASSWORD) not configured in backend/.env.)",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad09c9b895253d6fd6e82c9"
+    },
+    {
+      "id": "aud-1792056394104",
+      "companyId": "IEDC-001",
+      "timestamp": "02:56 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Password Reset Requested",
+      "resource": "SHEHZADA (fathimathulshehzada@gmail.com)",
+      "details": "Generated security OTP for identity verification. Email sent: False (SMTP credentials (SMTP_USER and SMTP_PASSWORD) not configured in backend/.env.)",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad09c4a895253d6fd6e82c8"
+    },
+    {
+      "id": "aud-1792056361586",
+      "companyId": "IEDC-001",
+      "timestamp": "02:56 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Password Reset Requested",
+      "resource": "SHEHZADA (fathimathulshehzada@gmail.com)",
+      "details": "Generated security OTP for identity verification. Email sent: False (SMTP credentials (SMTP_USER and SMTP_PASSWORD) not configured in backend/.env.)",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad09c29895253d6fd6e82c7"
+    },
+    {
+      "id": "aud-1792055803640",
+      "companyId": "IEDC-001",
+      "timestamp": "02:46 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Password Reset Requested",
+      "resource": "SHEHZADA (fathimathulshehzada@gmail.com)",
+      "details": "Generated security OTP for identity verification.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad099fbb609c9728d978727"
+    },
+    {
+      "id": "aud-1792055761566",
+      "companyId": "IEDC-001",
+      "timestamp": "02:46 PM 10/15/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Password Reset Requested",
+      "resource": "pournami (pournamiek22@gmail.com)",
+      "details": "Generated security OTP for identity verification.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad099d1b609c9728d978726"
+    },
+    {
+      "id": "aud-1792054361208",
+      "companyId": "IEDC-001",
+      "timestamp": "02:22 PM 10/15/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "User Approved",
+      "resource": "SHEHZADA (fathimathulshehzada@gmail.com)",
+      "details": "Approved access request with role STAFF.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad094590cf47c31c7afdf7a"
+    },
+    {
+      "id": "aud-1792054319674",
+      "companyId": "IEDC-001",
+      "timestamp": "02:21 PM 10/15/2026",
+      "userName": "SHEHZADA",
+      "userRole": "STAFF",
+      "action": "Registration Submitted",
+      "resource": "SHEHZADA (fathimathulshehzada@gmail.com)",
+      "details": "Submitted access request pending admin approval.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad0942f0cf47c31c7afdf79"
+    },
+    {
+      "id": "aud-1792054101862",
+      "companyId": "IEDC-001",
+      "timestamp": "02:18 PM 10/15/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Company Provisioned",
+      "resource": "IEDC-001",
+      "details": "Organization iedc created with storage tier Enterprise Lakehouse (50 TB).",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad093550cf47c31c7afdf77"
     }
   ],
   "saved_queries": [
+    {
+      "id": "q-1792060246246",
+      "question": "What is the average base_salary by department?",
+      "interpreted": "Group records by department, calculate average base_salary, count headcount, and sort descending.",
+      "datasetId": "ds-1792057376282",
+      "datasetName": "iedc-001_employee_salaries_q4parquet.parquet",
+      "sql": "SELECT \"department\", ROUND(AVG(\"base_salary\"), 2) as avg_base_salary, COUNT(*) as headcount FROM \"iedc_001_employee_salaries_q4parquet\" GROUP BY \"department\" ORDER BY avg_base_salary DESC LIMIT 8;",
+      "chartType": "bar",
+      "xAxis": "department",
+      "yAxis": "avg_base_salary",
+      "summary": "Executed analytical query on employee salaries q4. Returned 5 rows. Peak aggregation observed for 'Chemical Engineering' (178,000.0).",
+      "results": [
+        {
+          "department": "Chemical Engineering",
+          "avg_base_salary": 178000,
+          "headcount": 1
+        },
+        {
+          "department": "R&D",
+          "avg_base_salary": 165000,
+          "headcount": 1
+        },
+        {
+          "department": "Finance",
+          "avg_base_salary": 142000,
+          "headcount": 1
+        },
+        {
+          "department": "Investigations",
+          "avg_base_salary": 120000,
+          "headcount": 1
+        },
+        {
+          "department": "Operations",
+          "avg_base_salary": 98000,
+          "headcount": 1
+        }
+      ],
+      "date": "Just now",
+      "companyId": "IEDC-001",
+      "savedAt": "2026-10-15 16:00"
+    },
     {
       "id": "q-1",
       "question": "Show top 5 departments by average employee salary",

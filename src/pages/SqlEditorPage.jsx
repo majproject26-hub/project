@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Terminal,
@@ -42,7 +42,22 @@ export function SqlEditorPage() {
   // Check URL query parameters for initial dataset
   const searchParams = new URLSearchParams(location.search);
   const initialDatasetId = searchParams.get('dataset');
-  const initialDataset = datasets.find((d) => d.id === initialDatasetId) || datasets[0];
+  const tabularDataset = datasets.find((d) => (d.schema || []).length > 2) || datasets[0];
+  const initialDataset = datasets.find((d) => d.id === initialDatasetId) || tabularDataset || datasets[0];
+
+  const buildDepartmentQuery = (ds) => {
+    if (!ds) return 'SELECT 1;';
+    const cols = ds.schema || [];
+    const deptCol = cols.find((c) => /dept|department|team|group|category/i.test(c.column))?.column;
+    const salaryCol = cols.find((c) => /salary|comp|wage|pay|deal|revenue|amount/i.test(c.column))?.column;
+    if (deptCol && salaryCol) {
+      return `SELECT \n  "${deptCol}",\n  COUNT(*) as headcount,\n  ROUND(AVG("${salaryCol}"), 2) as avg_compensation\nFROM read_parquet('s3://lakehouse-${companyId.toLowerCase()}/${ds.name}')\nGROUP BY "${deptCol}"\nORDER BY avg_compensation DESC;`;
+    }
+    if (cols.length >= 2) {
+      return `SELECT \n  "${cols[0].column}",\n  COUNT(*) as count_records\nFROM read_parquet('s3://lakehouse-${companyId.toLowerCase()}/${ds.name}')\nGROUP BY "${cols[0].column}"\nORDER BY count_records DESC\nLIMIT 10;`;
+    }
+    return `SELECT * FROM read_parquet('s3://lakehouse-${companyId.toLowerCase()}/${ds.name}') LIMIT 10;`;
+  };
 
   // Editor Tabs
   const [tabs, setTabs] = useState([
@@ -50,22 +65,13 @@ export function SqlEditorPage() {
       id: 'tab-1',
       title: 'Query 1',
       sql: initialDataset
-        ? `SELECT 
-  *
-FROM read_parquet('s3://lakehouse-${companyId.toLowerCase()}/${initialDataset.name}')
-LIMIT 10;`
+        ? `SELECT \n  *\nFROM read_parquet('s3://lakehouse-${companyId.toLowerCase()}/${initialDataset.name}')\nLIMIT 10;`
         : 'SELECT 1;',
     },
     {
       id: 'tab-2',
       title: 'Department Aggregates',
-      sql: `SELECT 
-  department,
-  COUNT(*) as headcount,
-  ROUND(AVG(salary), 2) as avg_compensation
-FROM read_parquet('s3://lakehouse-${companyId.toLowerCase()}/acme_employees_2025.parquet')
-GROUP BY department
-ORDER BY headcount DESC;`,
+      sql: buildDepartmentQuery(initialDataset),
     },
   ]);
 
@@ -75,8 +81,37 @@ ORDER BY headcount DESC;`,
   // Execution state
   const [isExecuting, setIsExecuting] = useState(false);
   const [queryResults, setQueryResults] = useState(null);
+  const [queryError, setQueryError] = useState(null);
   const [executionTelemetry, setExecutionTelemetry] = useState(null);
   const [destructiveWarning, setDestructiveWarning] = useState(null);
+  const resultsRef = useRef(null);
+
+  // Sync tabs when datasets load
+  useEffect(() => {
+    if (datasets && datasets.length > 0) {
+      const best = datasets.find((d) => (d.schema || []).length > 2) || datasets[0];
+      setTabs((prev) => {
+        const needsFix = prev.some(
+          (t) => (t.id === 'tab-2' && t.sql.includes('acme_employees_2025') && companyId !== 'ACME-001') ||
+                 (t.id === 'tab-1' && t.sql.includes('SELECT 1;'))
+        );
+        if (!needsFix) return prev;
+        return [
+          {
+            id: 'tab-1',
+            title: best.displayName || best.name,
+            sql: `SELECT \n  *\nFROM read_parquet('s3://lakehouse-${companyId.toLowerCase()}/${best.name}')\nLIMIT 10;`,
+          },
+          {
+            id: 'tab-2',
+            title: 'Aggregates & Metrics',
+            sql: buildDepartmentQuery(best),
+          },
+          ...prev.filter((t) => t.id !== 'tab-1' && t.id !== 'tab-2'),
+        ];
+      });
+    }
+  }, [datasets, companyId]);
 
   const activeTab = tabs.find((t) => t.id === activeTabId) || tabs[0];
 
@@ -134,33 +169,49 @@ ORDER BY headcount DESC;`,
     // Check destructive query block for STAFF
     const isDestructive = /\b(DROP|DELETE|UPDATE|TRUNCATE|ALTER)\b/i.test(activeTab.sql);
     if (isStaff && isDestructive) {
+      const errMsg = 'Security policy violation: STAFF users cannot run destructive modifications.';
+      setQueryError(errMsg);
+      setQueryResults(null);
       toast({
         title: 'Action Blocked by Lakehouse RBAC',
-        message: 'Security policy violation: STAFF users cannot run destructive modifications.',
+        message: errMsg,
         type: 'error',
       });
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
       return;
     }
 
     setIsExecuting(true);
+    setQueryError(null);
     const startTime = performance.now();
 
     try {
       const res = await api.runSql(activeTab.sql, 500);
       setIsExecuting(false);
       if (res && res.success) {
+        setQueryError(null);
         setQueryResults(res.rows || []);
         setExecutionTelemetry(res.telemetry || {
           latency: `${Math.round(performance.now() - startTime)} ms`,
           rowCount: (res.rows || []).length,
           scannedBytes: '2.4 MB'
         });
+        setTimeout(() => {
+          resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
         toast({
           title: 'DuckDB Query Executed',
           message: `Returned ${(res.rows || []).length} rows in ${res.telemetry?.latency || 'fast'} time.`,
           type: 'success',
         });
       } else {
+        setQueryResults(null);
+        setQueryError(res?.error || 'SQL execution failed.');
+        setTimeout(() => {
+          resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
         toast({
           title: 'Query Error',
           message: res?.error || 'SQL execution failed.',
@@ -168,24 +219,30 @@ ORDER BY headcount DESC;`,
         });
       }
     } catch (err) {
-      // Graceful fallback to client simulation if backend is not yet reachable
       setIsExecuting(false);
-      const latencyMs = Math.round(performance.now() - startTime + 45);
-      const matchedDs = datasets.find((d) => activeTab.sql.includes(d.name)) || initialDataset || datasets[0];
-      const rows = matchedDs ? matchedDs.previewData || [] : [];
-      setQueryResults(rows);
-      setExecutionTelemetry({
-        latency: `${latencyMs} ms`,
-        rowCount: rows.length,
-        scannedBytes: matchedDs ? matchedDs.size : '1.4 MB',
-      });
+      setQueryResults(null);
+      setQueryError(err.message || 'Connection error to lakehouse execution cluster.');
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
       toast({
-        title: 'Query Executed',
-        message: `Returned ${rows.length} rows in ${latencyMs} ms.`,
-        type: 'success',
+        title: 'Query Execution Failed',
+        message: err.message || 'SQL execution failed.',
+        type: 'error',
       });
     }
   };
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handleRunQuery();
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [activeTab.sql, isStaff]);
 
   const handleSaveCurrentQuery = () => {
     saveQuery({
@@ -412,6 +469,7 @@ ORDER BY headcount DESC;`,
             <SqlCodeEditor
               value={activeTab.sql}
               onChange={handleUpdateActiveSql}
+              onRun={handleRunQuery}
               tables={datasets}
               height="260px"
               destructiveWarning={destructiveWarning}
@@ -440,8 +498,24 @@ ORDER BY headcount DESC;`,
           </Card>
 
           {/* Results Area */}
-          {queryResults ? (
-            <Card className="space-y-4 p-5">
+          {queryError ? (
+            <div ref={resultsRef} className="scroll-mt-6">
+              <Card className="space-y-3 p-5 border-rose-500/30 bg-rose-50/60 dark:bg-rose-950/20">
+                <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-semibold text-sm">
+                  <AlertTriangle className="w-5 h-5 shrink-0" />
+                  <span>SQL Execution Error</span>
+                </div>
+                <div className="text-xs text-rose-800 dark:text-rose-200 font-mono bg-white/80 dark:bg-slate-900/80 p-3.5 rounded-xl border border-rose-200 dark:border-rose-900/60 leading-relaxed whitespace-pre-wrap">
+                  {queryError}
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Tip: Verify column names in the Lakehouse Schema Browser on the left, or confirm that your role has access to the target dataset.
+                </p>
+              </Card>
+            </div>
+          ) : queryResults ? (
+            <div ref={resultsRef} className="scroll-mt-6">
+              <Card className="space-y-4 p-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white">
@@ -464,13 +538,20 @@ ORDER BY headcount DESC;`,
                 </div>
               </div>
 
-              <Table
-                columns={resultColumns}
-                data={queryResults}
-                defaultPageSize={8}
-                searchPlaceholder="Search in results..."
-              />
+              {queryResults.length > 0 ? (
+                <Table
+                  columns={resultColumns}
+                  data={queryResults}
+                  defaultPageSize={8}
+                  searchPlaceholder="Search in results..."
+                />
+              ) : (
+                <div className="py-8 text-center text-xs text-slate-400">
+                  Query executed successfully, but 0 records matched your query filters.
+                </div>
+              )}
             </Card>
+          </div>
           ) : (
             <Card className="p-8 text-center text-slate-400 text-xs">
               <Play className="w-6 h-6 mx-auto mb-2 text-slate-500 opacity-60" />

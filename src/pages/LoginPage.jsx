@@ -8,10 +8,6 @@ import {
   Eye,
   EyeOff,
   AlertCircle,
-  Sparkles,
-  Shield,
-  User,
-  ArrowRight,
   CheckCircle2,
   KeyRound,
   RefreshCw,
@@ -19,20 +15,20 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 import { useToast } from '../components/common/Toast';
 import { Button } from '../components/common/Button';
-import { Badge } from '../components/common/Badge';
 import { Modal } from '../components/common/Modal';
 
 export function LoginPage() {
-  const { login, quickLogin, users, resetPasswordByEmail } = useAuth();
+  const { login, resetPasswordByEmail } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [companyId, setCompanyId] = useState('ACME-001');
-  const [email, setEmail] = useState('sarah.admin@acme.io');
-  const [password, setPassword] = useState('password123');
+  const [companyId, setCompanyId] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -42,7 +38,7 @@ export function LoginPage() {
   const [forgotStep, setForgotStep] = useState(1); // 1: identify, 2: verify OTP, 3: set password, 4: complete
   const [forgotCompanyId, setForgotCompanyId] = useState('');
   const [forgotEmail, setForgotEmail] = useState('');
-  const [otpCode, setOtpCode] = useState('');
+  const [emailSent, setEmailSent] = useState(null);
   const [otpInput, setOtpInput] = useState('');
   const [resendTimer, setResendTimer] = useState(0);
   const [newPassword, setNewPassword] = useState('');
@@ -67,7 +63,7 @@ export function LoginPage() {
     setForgotCompanyId(companyId);
     setForgotEmail(email);
     setForgotStep(1);
-    setOtpCode('');
+    setEmailSent(null);
     setOtpInput('');
     setNewPassword('');
     setConfirmNewPassword('');
@@ -77,7 +73,7 @@ export function LoginPage() {
     setIsForgotModalOpen(true);
   };
 
-  const handleRequestOtp = (e) => {
+  const handleRequestOtp = async (e) => {
     e.preventDefault();
     setForgotError('');
 
@@ -93,32 +89,26 @@ export function LoginPage() {
       return;
     }
 
-    const matchedUser = users.find(
-      (u) => u.companyId === formattedId && u.email.toLowerCase() === cleanEmail
-    );
-
-    if (!matchedUser) {
-      setForgotError(`No registered account found matching '${forgotEmail}' in organization '${formattedId}'.`);
-      return;
-    }
-
     setForgotLoading(true);
-    setTimeout(() => {
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      setOtpCode(code);
+    try {
+      const res = await api.requestOtp(formattedId, cleanEmail);
+      setForgotLoading(false);
       setOtpInput('');
       setResendTimer(60);
+      setEmailSent(res.email_sent);
       setForgotStep(2);
-      setForgotLoading(false);
       toast({
         title: 'Verification Code Dispatched',
-        message: `A 6-digit OTP code has been sent to ${forgotEmail}.`,
+        message: res.message || `A 6-digit OTP code has been sent to ${forgotEmail}.`,
         type: 'info',
       });
-    }, 350);
+    } catch (err) {
+      setForgotLoading(false);
+      setForgotError(err.message || `No registered account found matching '${forgotEmail}' in organization '${formattedId}'.`);
+    }
   };
 
-  const handleVerifyOtp = (e) => {
+  const handleVerifyOtp = async (e) => {
     e.preventDefault();
     setForgotError('');
 
@@ -128,36 +118,46 @@ export function LoginPage() {
       return;
     }
 
+    const formattedId = forgotCompanyId.trim().toUpperCase();
+    const cleanEmail = forgotEmail.trim().toLowerCase();
+
     setForgotLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await api.verifyOtp(formattedId, cleanEmail, inputClean);
       setForgotLoading(false);
-      if (inputClean === otpCode) {
-        toast({
-          title: 'Identity Verified',
-          message: 'OTP validated successfully! Please set your new password.',
-          type: 'success',
-        });
-        setForgotStep(3);
-      } else {
-        setForgotError('Incorrect verification code. Please check the code or request a new one.');
-      }
-    }, 300);
+      toast({
+        title: 'Identity Verified',
+        message: res.message || 'OTP validated successfully! Please set your new password.',
+        type: 'success',
+      });
+      setForgotStep(3);
+    } catch (err) {
+      setForgotLoading(false);
+      setForgotError(err.message || 'Incorrect verification code. Please check the code or request a new one.');
+    }
   };
 
-  const handleResendOtp = () => {
+  const handleResendOtp = async () => {
     if (resendTimer > 0) return;
     setForgotError('');
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    setOtpCode(code);
-    setResendTimer(60);
-    toast({
-      title: 'New Code Sent',
-      message: `A fresh 6-digit OTP has been sent to ${forgotEmail}.`,
-      type: 'info',
-    });
+    const formattedId = forgotCompanyId.trim().toUpperCase();
+    const cleanEmail = forgotEmail.trim().toLowerCase();
+
+    try {
+      const res = await api.requestOtp(formattedId, cleanEmail);
+      setResendTimer(60);
+      setEmailSent(res.email_sent);
+      toast({
+        title: 'New Code Sent',
+        message: res.message || `A fresh 6-digit OTP has been sent to ${forgotEmail}.`,
+        type: 'info',
+      });
+    } catch (err) {
+      setForgotError(err.message || 'Failed to resend OTP.');
+    }
   };
 
-  const handleSetNewPassword = (e) => {
+  const handleSetNewPassword = async (e) => {
     e.preventDefault();
     setForgotError('');
 
@@ -171,10 +171,10 @@ export function LoginPage() {
     }
 
     setForgotLoading(true);
-    setTimeout(() => {
-      const res = resetPasswordByEmail(forgotCompanyId, forgotEmail, newPassword);
+    try {
+      const res = await resetPasswordByEmail(forgotCompanyId, forgotEmail, newPassword, otpInput.trim());
       setForgotLoading(false);
-      if (res.success) {
+      if (res && res.success) {
         setForgotSuccess(res.message);
         setCompanyId(forgotCompanyId.trim().toUpperCase());
         setEmail(forgotEmail.trim());
@@ -187,9 +187,12 @@ export function LoginPage() {
           type: 'success',
         });
       } else {
-        setForgotError(res.error);
+        setForgotError(res?.error || 'Failed to update password.');
       }
-    }, 350);
+    } catch (err) {
+      setForgotLoading(false);
+      setForgotError(err.message || 'Failed to update password.');
+    }
   };
 
   const from = location.state?.from?.pathname || '/dashboard';
@@ -210,20 +213,6 @@ export function LoginPage() {
     } catch (err) {
       setLoading(false);
       setError({ success: false, error: err.message || 'Login failed' });
-    }
-  };
-
-  const fillCredentials = (comp, mail, pass = 'password123') => {
-    setCompanyId(comp);
-    setEmail(mail);
-    setPassword(pass);
-    setError(null);
-  };
-
-  const handleQuickSignIn = async (userId) => {
-    const res = await quickLogin(userId);
-    if (res && res.success) {
-      navigate('/dashboard', { replace: true });
     }
   };
 
@@ -333,9 +322,6 @@ export function LoginPage() {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
-                <span>Default demo: <code className="text-slate-400">password123</code></span>
-              </div>
             </div>
 
             <div className="pt-2">
@@ -352,162 +338,6 @@ export function LoginPage() {
                 Sign Up
               </NavLink>
             </p>
-          </div>
-        </div>
-
-        {/* 1-Click Demo Accounts Quick-Fill Box */}
-        <div className="p-5 rounded-3xl bg-slate-950/70 border border-slate-800 backdrop-blur-md space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-teal-400" />
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-300">
-                1-Click Demo Logins (ACME-001 & NOVA-002)
-              </h3>
-            </div>
-            <span className="text-[10px] text-slate-500">Instant Role Switch</span>
-          </div>
-
-          {/* ACME-001 Quick-Fill Buttons */}
-          <div>
-            <div className="text-[11px] font-mono text-teal-400 font-semibold mb-2 flex items-center gap-1.5">
-              <span>ACME-001</span>
-              <span className="text-slate-500">• Acme Technologies Inc.</span>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  fillCredentials('ACME-001', 'sarah.admin@acme.io');
-                  handleQuickSignIn('u-acme-1');
-                }}
-                className="p-2.5 rounded-xl border border-purple-900/60 bg-purple-950/30 hover:bg-purple-900/50 text-left transition-all group"
-              >
-                <div className="flex justify-between items-center mb-1">
-                  <Badge variant="ADMIN" size="xs">ADMIN</Badge>
-                  <ArrowRight className="w-3 h-3 text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <p className="text-xs font-medium text-white truncate">Sarah Jenkins</p>
-                <p className="text-[10px] text-slate-400 truncate">VP Lakehouse Arch</p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  fillCredentials('ACME-001', 'david.hr@acme.io');
-                  handleQuickSignIn('u-acme-2');
-                }}
-                className="p-2.5 rounded-xl border border-emerald-900/60 bg-emerald-950/30 hover:bg-emerald-900/50 text-left transition-all group"
-              >
-                <div className="flex justify-between items-center mb-1">
-                  <Badge variant="HR" size="xs">HR</Badge>
-                  <ArrowRight className="w-3 h-3 text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <p className="text-xs font-medium text-white truncate">David Chen</p>
-                <p className="text-[10px] text-slate-400 truncate">HR Operations Lead</p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  fillCredentials('ACME-001', 'maya.staff@acme.io');
-                  handleQuickSignIn('u-acme-3');
-                }}
-                className="p-2.5 rounded-xl border border-sky-900/60 bg-sky-950/30 hover:bg-sky-900/50 text-left transition-all group"
-              >
-                <div className="flex justify-between items-center mb-1">
-                  <Badge variant="STAFF" size="xs">STAFF</Badge>
-                  <ArrowRight className="w-3 h-3 text-sky-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <p className="text-xs font-medium text-white truncate">Maya Patel</p>
-                <p className="text-[10px] text-slate-400 truncate">Revenue Analyst</p>
-              </button>
-            </div>
-          </div>
-
-          {/* NOVA-002 Quick-Fill Buttons */}
-          <div>
-            <div className="text-[11px] font-mono text-teal-400 font-semibold mb-2 flex items-center gap-1.5">
-              <span>NOVA-002</span>
-              <span className="text-slate-500">• Nova Dynamics Global</span>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  fillCredentials('NOVA-002', 'alex.admin@nova.space');
-                  handleQuickSignIn('u-nova-1');
-                }}
-                className="p-2.5 rounded-xl border border-purple-900/60 bg-purple-950/30 hover:bg-purple-900/50 text-left transition-all group"
-              >
-                <div className="flex justify-between items-center mb-1">
-                  <Badge variant="ADMIN" size="xs">ADMIN</Badge>
-                  <ArrowRight className="w-3 h-3 text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <p className="text-xs font-medium text-white truncate">Dr. Alex Vance</p>
-                <p className="text-[10px] text-slate-400 truncate">Chief Architect</p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  fillCredentials('NOVA-002', 'elena.hr@nova.space');
-                  handleQuickSignIn('u-nova-2');
-                }}
-                className="p-2.5 rounded-xl border border-emerald-900/60 bg-emerald-950/30 hover:bg-emerald-900/50 text-left transition-all group"
-              >
-                <div className="flex justify-between items-center mb-1">
-                  <Badge variant="HR" size="xs">HR</Badge>
-                  <ArrowRight className="w-3 h-3 text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <p className="text-xs font-medium text-white truncate">Elena Rostova</p>
-                <p className="text-[10px] text-slate-400 truncate">Talent Director</p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  fillCredentials('NOVA-002', 'liam.staff@nova.space');
-                  handleQuickSignIn('u-nova-3');
-                }}
-                className="p-2.5 rounded-xl border border-sky-900/60 bg-sky-950/30 hover:bg-sky-900/50 text-left transition-all group"
-              >
-                <div className="flex justify-between items-center mb-1">
-                  <Badge variant="STAFF" size="xs">STAFF</Badge>
-                  <ArrowRight className="w-3 h-3 text-sky-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <p className="text-xs font-medium text-white truncate">Liam O'Connor</p>
-                <p className="text-[10px] text-slate-400 truncate">Telemetry Eng</p>
-              </button>
-            </div>
-          </div>
-
-          {/* Test Error States Simulation buttons */}
-          <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-            <span className="text-slate-400">Test Account Error States:</span>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  fillCredentials('ACME-001', 'robert.taylor@acme.io');
-                  const res = login('ACME-001', 'robert.taylor@acme.io', 'password123');
-                  setError(res);
-                }}
-                className="px-2 py-1 rounded-lg bg-amber-950/80 text-amber-300 border border-amber-800 hover:bg-amber-900/80 transition-colors"
-              >
-                Test Pending Status
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  fillCredentials('ACME-001', 'kevin.rejected@external.com');
-                  const res = login('ACME-001', 'kevin.rejected@external.com', 'password123');
-                  setError(res);
-                }}
-                className="px-2 py-1 rounded-lg bg-rose-950/80 text-rose-300 border border-rose-800 hover:bg-rose-900/80 transition-colors"
-              >
-                Test Rejected Status
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -580,41 +410,6 @@ export function LoginPage() {
               </div>
             </div>
 
-            <div className="p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl text-[11px] text-slate-400">
-              <span className="block font-medium text-slate-300 mb-0.5">Quick Demo Accounts:</span>
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setForgotCompanyId('ACME-001');
-                    setForgotEmail('sarah.admin@acme.io');
-                  }}
-                  className="px-2 py-0.5 rounded bg-slate-800 text-teal-300 hover:bg-slate-700 text-[10px] font-mono"
-                >
-                  ACME-001 (Admin)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setForgotCompanyId('ACME-001');
-                    setForgotEmail('david.hr@acme.io');
-                  }}
-                  className="px-2 py-0.5 rounded bg-slate-800 text-teal-300 hover:bg-slate-700 text-[10px] font-mono"
-                >
-                  ACME-001 (HR)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setForgotCompanyId('ACME-001');
-                    setForgotEmail('alex.staff@acme.io');
-                  }}
-                  className="px-2 py-0.5 rounded bg-slate-800 text-teal-300 hover:bg-slate-700 text-[10px] font-mono"
-                >
-                  ACME-001 (Staff)
-                </button>
-              </div>
-            </div>
 
             <div className="pt-2 flex items-center gap-3">
               <Button
@@ -642,30 +437,20 @@ export function LoginPage() {
         {/* STEP 2: Verify OTP */}
         {forgotStep === 2 && (
           <form onSubmit={handleVerifyOtp} className="space-y-4">
-            {/* Demo Simulation Alert with OTP code */}
-            <div className="p-3.5 rounded-xl bg-sky-950/70 border border-sky-800/80 text-xs text-sky-200 space-y-2">
+            {/* Real Security Email Dispatch Notice */}
+            <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-sky-300 flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-sky-400" />
-                  <span>OTP Sent to {forgotEmail}</span>
+                <span className="font-semibold text-teal-300 flex items-center gap-1.5">
+                  <Mail className="w-4 h-4 text-teal-400" />
+                  <span>Security Code Dispatched</span>
                 </span>
-                <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-sky-900 border border-sky-700 text-sky-300">
-                  Demo Simulation
+                <span className="text-[11px] font-mono text-slate-400">
+                  {forgotEmail}
                 </span>
               </div>
-              <p className="text-[11px] text-sky-300/80">
-                For quick testing without email delay, your 6-digit verification code is:
+              <p className="text-slate-400 text-xs leading-relaxed">
+                A 6-digit one-time password has been sent to your email address. Please check your inbox and spam folder.
               </p>
-              <div className="flex items-center justify-between bg-slate-950/80 px-3 py-2 rounded-lg border border-sky-900/60 font-mono">
-                <span className="text-base font-bold tracking-widest text-teal-300">{otpCode}</span>
-                <button
-                  type="button"
-                  onClick={() => setOtpInput(otpCode)}
-                  className="text-xs text-sky-400 hover:text-sky-300 font-semibold underline"
-                >
-                  Auto-fill code
-                </button>
-              </div>
             </div>
 
             <div>
@@ -789,20 +574,6 @@ export function LoginPage() {
                   minLength={6}
                 />
               </div>
-            </div>
-
-            <div className="p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl text-[11px] text-slate-400 flex items-center justify-between">
-              <span>Demo default: <strong className="text-slate-300 font-mono">password123</strong></span>
-              <button
-                type="button"
-                onClick={() => {
-                  setNewPassword('password123');
-                  setConfirmNewPassword('password123');
-                }}
-                className="text-teal-400 hover:text-teal-300 font-semibold underline ml-2"
-              >
-                Use default
-              </button>
             </div>
 
             <div className="pt-2 flex items-center gap-3">

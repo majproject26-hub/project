@@ -54,23 +54,38 @@ export function AskYourDataPage() {
 
   const companyId = currentUser ? currentUser.companyId : 'ACME-001';
 
-  // Selection states
-  const [selectedDatasetId, setSelectedDatasetId] = useState(datasets[0]?.id || '');
+  // Selection states: prioritize rich tabular datasets with multiple columns
+  const richDataset = datasets.find((d) => (d.schema || []).length > 2) || datasets[0];
+  const [selectedDatasetId, setSelectedDatasetId] = useState(richDataset?.id || '');
   const [inputText, setInputText] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [speechTranscript, setSpeechTranscript] = useState('');
   const [historySearch, setHistorySearch] = useState('');
 
-  // Active conversational answers stream
-  const [activeQuery, setActiveQuery] = useState(() => savedQueries[0] || null);
+  // Active conversational answers stream: find query matching current company datasets
+  const [activeQuery, setActiveQuery] = useState(() => {
+    const match = savedQueries.find((sq) => datasets.some((d) => d.name === sq.datasetName || d.id === sq.datasetId));
+    return match || null;
+  });
   const [collapsedSql, setCollapsedSql] = useState({});
   const [feedbackGiven, setFeedbackGiven] = useState({});
   const [copiedQueryId, setCopiedQueryId] = useState(null);
 
   const recognitionRef = useRef(null);
+  const resultsRef = useRef(null);
 
   // Selected dataset object
-  const currentDataset = datasets.find((d) => d.id === selectedDatasetId) || datasets[0];
+  const currentDataset = datasets.find((d) => d.id === selectedDatasetId) || richDataset || datasets[0];
+
+  // Sync selected dataset when datasets change
+  useEffect(() => {
+    if (datasets.length > 0) {
+      if (!selectedDatasetId || !datasets.some((d) => d.id === selectedDatasetId)) {
+        const best = datasets.find((d) => (d.schema || []).length > 2) || datasets[0];
+        setSelectedDatasetId(best?.id || '');
+      }
+    }
+  }, [datasets, selectedDatasetId]);
 
   // Example question chips tailored to active dataset
   const exampleChips = {
@@ -101,13 +116,34 @@ export function AskYourDataPage() {
     ],
   };
 
-  const currentChips = currentDataset
-    ? exampleChips[currentDataset.name] || [
-        `What are the top 5 records in ${currentDataset.displayName || currentDataset.name}?`,
-        `Calculate averages for numeric columns in this dataset`,
-        `Show category counts for this table`,
-      ]
-    : [];
+  const generateDynamicChips = (ds) => {
+    if (!ds) return [];
+    if (exampleChips[ds.name]) return exampleChips[ds.name];
+
+    const cols = ds.schema || [];
+    const deptCol = cols.find((c) => /dept|department|team|group|category/i.test(c.column))?.column;
+    const salaryCol = cols.find((c) => /salary|comp|wage|pay|deal|revenue|amount/i.test(c.column))?.column;
+    const nameCol = cols.find((c) => /name|full_name|employee|user/i.test(c.column))?.column;
+
+    const chips = [];
+    if (deptCol && salaryCol) {
+      chips.push(`What is the average ${salaryCol} by ${deptCol}?`);
+      chips.push(`Show headcount and ${salaryCol} across all departments`);
+    } else if (deptCol) {
+      chips.push(`Show record count grouped by ${deptCol}`);
+    }
+
+    if (salaryCol && nameCol) {
+      chips.push(`Who has the highest ${salaryCol}?`);
+    } else if (salaryCol) {
+      chips.push(`Show top records sorted by ${salaryCol}`);
+    }
+
+    chips.push(`What are the top records in ${ds.displayName || ds.name}?`);
+    return chips.slice(0, 3);
+  };
+
+  const currentChips = generateDynamicChips(currentDataset);
 
   // Setup Web Speech API with fallback
   useEffect(() => {
@@ -182,26 +218,37 @@ export function AskYourDataPage() {
     const q = (questionText || inputText).trim();
     if (!q) return;
 
-    // Check if matching mock question exists
+    // Check if matching saved question exists for this company/dataset
     const existing = savedQueries.find(
-      (sq) => sq.question.toLowerCase() === q.toLowerCase()
+      (sq) =>
+        sq.question.toLowerCase() === q.toLowerCase() &&
+        (sq.datasetId === currentDataset?.id || sq.datasetName === currentDataset?.name)
     );
 
     if (existing) {
       setActiveQuery(existing);
       setInputText('');
       setSpeechTranscript('');
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
       return;
     }
 
     try {
       const apiRes = await api.askQuestion(q, currentDataset?.id);
       if (apiRes && apiRes.results) {
+        // If engine selected a better matching dataset, sync it
+        const targetMatchedDs = datasets.find((d) => d.name === apiRes.datasetName) || currentDataset;
+        if (targetMatchedDs && targetMatchedDs.id !== selectedDatasetId) {
+          setSelectedDatasetId(targetMatchedDs.id);
+        }
+
         const newQueryObj = {
           id: `q-${Date.now()}`,
           question: apiRes.question || q,
           interpreted: apiRes.interpreted,
-          datasetId: currentDataset.id,
+          datasetId: targetMatchedDs?.id || currentDataset.id,
           datasetName: apiRes.datasetName || currentDataset.name,
           sql: apiRes.sql,
           chartType: apiRes.suggestedChart || 'bar',
@@ -216,10 +263,13 @@ export function AskYourDataPage() {
         setActiveQuery(newQueryObj);
         setInputText('');
         setSpeechTranscript('');
+        setTimeout(() => {
+          resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
 
         toast({
           title: 'Query Synthesized by Engine',
-          message: 'DuckDB executed analytical query and generated chart.',
+          message: `DuckDB returned ${apiRes.results.length} records and generated visualization.`,
           type: 'success',
         });
         return;
@@ -266,6 +316,9 @@ LIMIT 8;`;
     setActiveQuery(newQueryObj);
     setInputText('');
     setSpeechTranscript('');
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
 
     toast({
       title: 'Query Generated',
@@ -489,7 +542,7 @@ LIMIT 8;`;
 
           {/* Active Query Card Result */}
           {activeQuery ? (
-            <div className="space-y-4">
+            <div ref={resultsRef} className="space-y-4 scroll-mt-6">
               <Card className="p-5 space-y-4 border-slate-200 dark:border-slate-800">
                 {/* Header info */}
                 <div className="flex items-start justify-between gap-4">
@@ -596,42 +649,48 @@ LIMIT 8;`;
                     </div>
 
                     <div className="h-64 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-4">
-                      <ResponsiveContainer width="100%" height="100%">
-                        {activeQuery.chartType === 'line' ? (
-                          <LineChart data={activeQuery.results} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                            <XAxis dataKey={activeQuery.xAxis || Object.keys(activeQuery.results[0])[0]} tick={{ fontSize: 10 }} />
-                            <YAxis tick={{ fontSize: 10 }} />
-                            <Tooltip />
-                            <Line type="monotone" dataKey={activeQuery.yAxis || Object.keys(activeQuery.results[0])[1]} stroke="#4D5A2A" strokeWidth={2.5} dot={{ r: 4 }} />
-                          </LineChart>
-                        ) : activeQuery.chartType === 'pie' ? (
-                          <PieChart>
-                            <Pie
-                              data={activeQuery.results}
-                              dataKey={activeQuery.yAxis || Object.keys(activeQuery.results[0])[1]}
-                              nameKey={activeQuery.xAxis || Object.keys(activeQuery.results[0])[0]}
-                              cx="50%"
-                              cy="50%"
-                              outerRadius={75}
-                            >
-                              {activeQuery.results.map((_, i) => (
-                                <Cell key={i} fill={['#4D5A2A', '#748447', '#DCE4C2', '#25291D', '#93A65E'][i % 5]} />
-                              ))}
-                            </Pie>
-                            <Tooltip />
-                            <Legend wrapperStyle={{ fontSize: '10px' }} />
-                          </PieChart>
-                        ) : (
-                          <BarChart data={activeQuery.results} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                            <XAxis dataKey={activeQuery.xAxis || Object.keys(activeQuery.results[0])[0]} tick={{ fontSize: 10 }} />
-                            <YAxis tick={{ fontSize: 10 }} />
-                            <Tooltip />
-                            <Bar dataKey={activeQuery.yAxis || Object.keys(activeQuery.results[0])[1]} fill="#748447" radius={[4, 4, 0, 0]} />
-                          </BarChart>
-                        )}
-                      </ResponsiveContainer>
+                      {(!activeQuery.results || !Array.isArray(activeQuery.results) || activeQuery.results.length === 0) ? (
+                        <div className="h-full flex items-center justify-center text-xs text-slate-400">
+                          No data points available for this visualization
+                        </div>
+                      ) : (
+                        <ResponsiveContainer width="100%" height="100%">
+                          {activeQuery.chartType === 'line' ? (
+                            <LineChart data={activeQuery.results} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                              <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                              <XAxis dataKey={activeQuery.xAxis || Object.keys(activeQuery.results[0] || {})[0] || 'dimension'} tick={{ fontSize: 10 }} />
+                              <YAxis tick={{ fontSize: 10 }} />
+                              <Tooltip />
+                              <Line type="monotone" dataKey={activeQuery.yAxis || Object.keys(activeQuery.results[0] || {})[1] || 'value'} stroke="#4D5A2A" strokeWidth={2.5} dot={{ r: 4 }} />
+                            </LineChart>
+                          ) : activeQuery.chartType === 'pie' ? (
+                            <PieChart>
+                              <Pie
+                                data={activeQuery.results}
+                                dataKey={activeQuery.yAxis || Object.keys(activeQuery.results[0] || {})[1] || 'value'}
+                                nameKey={activeQuery.xAxis || Object.keys(activeQuery.results[0] || {})[0] || 'dimension'}
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={75}
+                              >
+                                {activeQuery.results.map((_, i) => (
+                                  <Cell key={i} fill={['#4D5A2A', '#748447', '#DCE4C2', '#25291D', '#93A65E'][i % 5]} />
+                                ))}
+                              </Pie>
+                              <Tooltip />
+                              <Legend wrapperStyle={{ fontSize: '10px' }} />
+                            </PieChart>
+                          ) : (
+                            <BarChart data={activeQuery.results} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                              <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                              <XAxis dataKey={activeQuery.xAxis || Object.keys(activeQuery.results[0] || {})[0] || 'dimension'} tick={{ fontSize: 10 }} />
+                              <YAxis tick={{ fontSize: 10 }} />
+                              <Tooltip />
+                              <Bar dataKey={activeQuery.yAxis || Object.keys(activeQuery.results[0] || {})[1] || 'value'} fill="#748447" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                          )}
+                        </ResponsiveContainer>
+                      )}
                     </div>
                   </div>
                 )}
@@ -642,30 +701,36 @@ LIMIT 8;`;
                     <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                       Query Result Records ({activeQuery.results.length} rows)
                     </span>
-                    <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
-                      <table className="w-full text-left text-xs">
-                        <thead className="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800">
-                          <tr>
-                            {Object.keys(activeQuery.results[0] || {}).map((col, idx) => (
-                              <th key={idx} className="py-2.5 px-3 font-semibold font-mono">
-                                {col}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                          {activeQuery.results.map((row, rIdx) => (
-                            <tr key={rIdx} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                              {Object.keys(row).map((k, cIdx) => (
-                                <td key={cIdx} className="py-2 px-3 text-slate-800 dark:text-slate-200 font-mono">
-                                  {typeof row[k] === 'number' ? row[k].toLocaleString() : String(row[k])}
-                                </td>
+                    {activeQuery.results.length > 0 ? (
+                      <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800">
+                            <tr>
+                              {Object.keys(activeQuery.results[0] || {}).map((col, idx) => (
+                                <th key={idx} className="py-2.5 px-3 font-semibold font-mono">
+                                  {col}
+                                </th>
                               ))}
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                            {activeQuery.results.map((row, rIdx) => (
+                              <tr key={rIdx} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                                {Object.keys(row).map((k, cIdx) => (
+                                  <td key={cIdx} className="py-2 px-3 text-slate-800 dark:text-slate-200 font-mono">
+                                    {typeof row[k] === 'number' ? row[k].toLocaleString() : String(row[k] ?? '—')}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-center text-xs text-slate-400">
+                        No records returned for this query filter. Try asking a broader question.
+                      </div>
+                    )}
                   </div>
                 )}
 

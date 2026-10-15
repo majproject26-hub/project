@@ -45,38 +45,40 @@ def decode_access_token(token: str) -> Optional[dict]:
 
 def get_current_user(
     auth: Optional[HTTPAuthorizationCredentials] = Depends(security),
-    x_user_id: Optional[str] = Header(None, alias="X-User-Id")
 ) -> Dict[str, Any]:
     """
-    Extract authenticated user.
-    1. If Bearer JWT token is provided, decode sub -> user_id.
-    2. Fallback to X-User-Id header for fast development / demo mode.
-    3. Fallback to default Sarah Jenkins (Acme Admin) if unauthenticated dev mode.
+    Extract and validate authenticated user from JWT Bearer token.
+    Raises 401 if missing, invalid, expired, or user not found.
+    Raises 403 if user account is deactivated.
     """
-    user_id = None
+    if not auth or not auth.credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication token required. Please sign in to access this resource."
+        )
 
-    if auth and auth.credentials:
-        payload = decode_access_token(auth.credentials)
-        if payload and "sub" in payload:
-            user_id = payload["sub"]
+    payload = decode_access_token(auth.credentials)
+    if not payload or "sub" not in payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired session token. Please sign in again."
+        )
 
-    if not user_id and x_user_id:
-        user_id = x_user_id
+    user_id = payload["sub"]
+    user = db.get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Account not found or session revoked."
+        )
 
-    if user_id:
-        user = db.get_user_by_id(user_id)
-        if user:
-            return user
+    if user.get("status") == "DEACTIVATED":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This account has been deactivated by the company administrator."
+        )
 
-    # If unauthenticated, default to the first active admin user for seamless testing
-    for u in db.users:
-        if u.get("status") == "ACTIVE" and u.get("role") == "ADMIN":
-            return u
-
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Authentication required to perform this action."
-    )
+    return user
 
 def require_roles(allowed_roles: List[str]):
     def role_checker(current_user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
