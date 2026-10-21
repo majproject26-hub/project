@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   TrendingUp,
   Sparkles,
@@ -21,12 +21,18 @@ import {
   BarChart3,
   Award,
   Zap,
+  Eye,
+  BarChart2,
+  ArrowRight,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
   ComposedChart,
   Line,
   Area,
+  BarChart,
+  Bar,
+  Cell,
   XAxis,
   YAxis,
   Tooltip,
@@ -44,6 +50,7 @@ import { api } from '../services/api';
 export function PredictiveAiPage() {
   const { currentUser } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const urlDatasetId = searchParams.get('dataset');
 
@@ -62,8 +69,10 @@ export function PredictiveAiPage() {
   // Execution & Results State
   const [forecasting, setForecasting] = useState(false);
   const [forecastResult, setForecastResult] = useState(null);
+  const [xaiAttribution, setXaiAttribution] = useState(null);
   const [copiedQuery, setCopiedQuery] = useState(false);
   const [chartViewMode, setChartViewMode] = useState('combined'); // 'combined' | 'forecast_only'
+
 
   // Fetch Eligible Time Series Datasets on mount
   useEffect(() => {
@@ -146,6 +155,15 @@ export function PredictiveAiPage() {
 
       const result = await api.runForecast(payload);
       setForecastResult(result);
+
+      // Fetch Explainable AI (XAI) feature attribution breakdown
+      try {
+        const xaiRes = await api.explainForecast(payload);
+        setXaiAttribution(xaiRes.xai || null);
+      } catch (xErr) {
+        console.warn('XAI attribution fallback:', xErr);
+      }
+
       toast?.success(
         `Forecast generated using ${result.selectedModel} (${result.autoSelected ? 'Auto-Selected Winner' : 'Selected Model'})!`
       );
@@ -156,6 +174,7 @@ export function PredictiveAiPage() {
       setForecasting(false);
     }
   };
+
 
   // Selected dataset object
   const activeDataset = datasets.find((d) => d.id === selectedDatasetId);
@@ -514,23 +533,30 @@ export function PredictiveAiPage() {
                     Forecast Horizon
                   </label>
                   <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 font-mono">
-                    {horizonDays} Days Ahead
+                    {horizonDays >= 365 ? `${(horizonDays / 365).toFixed(1)} Years (${horizonDays}d)` : `${horizonDays} Days Ahead`}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-5 gap-1">
-                  {[7, 14, 30, 60, 90].map((days) => (
+                <div className="grid grid-cols-6 gap-1">
+                  {[
+                    { label: '14d', days: 14 },
+                    { label: '30d', days: 30 },
+                    { label: '90d', days: 90 },
+                    { label: '180d', days: 180 },
+                    { label: '1 Year', days: 365 },
+                    { label: '2 Years', days: 730 },
+                  ].map(({ label, days }) => (
                     <button
                       key={days}
                       type="button"
                       onClick={() => setHorizonDays(days)}
-                      className={`py-1.5 text-xs font-semibold rounded-lg border transition-all ${
+                      className={`py-1.5 text-[11px] font-semibold rounded-lg border transition-all ${
                         horizonDays === days
-                          ? 'bg-indigo-50 border-indigo-500 text-indigo-700 dark:bg-indigo-950/50 dark:border-indigo-500 dark:text-indigo-300'
+                          ? 'bg-indigo-50 border-indigo-500 text-indigo-700 dark:bg-indigo-950/50 dark:border-indigo-500 dark:text-indigo-300 shadow-xs'
                           : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                       }`}
                     >
-                      {days}d
+                      {label}
                     </button>
                   ))}
                 </div>
@@ -538,8 +564,8 @@ export function PredictiveAiPage() {
                 <input
                   type="range"
                   min="7"
-                  max="90"
-                  step="1"
+                  max="730"
+                  step="7"
                   value={horizonDays}
                   onChange={(e) => setHorizonDays(Number(e.target.value))}
                   className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-600"
@@ -931,10 +957,125 @@ export function PredictiveAiPage() {
             </div>
           )}
 
+          {/* Explainable AI (XAI) Attribution & Transparency Card */}
+          {xaiAttribution?.waterfall && (
+            <Card className="shadow-sm border-slate-200/80 dark:border-slate-800 bg-gradient-to-br from-indigo-50/30 via-white to-purple-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/20">
+              <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                <div className="space-y-0.5">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-indigo-500" />
+                    Explainable AI (XAI): SHAP Feature Driver Attribution
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Transparent decomposition explaining why the model predicted{' '}
+                    <span className="font-mono text-indigo-600 dark:text-indigo-400 font-bold">
+                      {xaiAttribution.projectedValue?.toLocaleString()}
+                    </span>{' '}
+                    on {xaiAttribution.targetDate}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Badge variant="purple" size="xs">
+                    Additive SHAP
+                  </Badge>
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    onClick={() => navigate(`/xai?mode=forecast&dataset=${selectedDatasetId}`)}
+                    className="flex items-center gap-1 font-bold text-[11px] text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800"
+                  >
+                    <span>Open Full XAI Studio</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </Button>
+                </div>
+              </CardHeader>
+
+              <CardContent className="pt-4 space-y-4">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                  {/* Left: Waterfall Chart */}
+                  <div className="lg:col-span-7 h-56 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={xaiAttribution.waterfall}
+                        layout="vertical"
+                        margin={{ top: 5, right: 20, left: 15, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                        <XAxis
+                          type="number"
+                          tick={{ fontSize: 10, fill: '#94a3b8' }}
+                          tickFormatter={(v) => v.toLocaleString()}
+                        />
+                        <YAxis
+                          type="category"
+                          dataKey="name"
+                          width={130}
+                          tick={{ fontSize: 10, fill: '#64748b' }}
+                        />
+                        <Tooltip
+                          formatter={(v, name, item) => [
+                            `${v > 0 ? '+' : ''}${v?.toLocaleString()} (${item.payload.type})`,
+                            'Attribution Impact',
+                          ]}
+                          contentStyle={{
+                            backgroundColor: '#0f172a',
+                            border: '1px solid #334155',
+                            borderRadius: '0.75rem',
+                            color: '#f8fafc',
+                            fontSize: '11px',
+                          }}
+                        />
+                        <ReferenceLine x={0} stroke="#64748b" />
+                        <Bar dataKey="value" radius={[3, 3, 3, 3]}>
+                          {xaiAttribution.waterfall.map((entry, index) => {
+                            let fillColor = '#6366f1';
+                            if (entry.type === 'positive') fillColor = '#10b981';
+                            if (entry.type === 'negative') fillColor = '#ef4444';
+                            if (entry.type === 'total') fillColor = '#8b5cf6';
+                            return <Cell key={`xai-wf-${index}`} fill={fillColor} />;
+                          })}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* Right: Feature Weights */}
+                  <div className="lg:col-span-5 space-y-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                      Feature Driver Impact Breakdown
+                    </span>
+                    {xaiAttribution.featureImportance?.map((f) => (
+                      <div
+                        key={f.feature}
+                        className="flex items-center justify-between text-xs p-2 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/60 dark:border-slate-800"
+                      >
+                        <span className="text-slate-700 dark:text-slate-300 font-medium">{f.feature}</span>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`text-[10px] font-bold ${
+                              f.impactDirection === 'Positive' ? 'text-emerald-500' : 'text-rose-500'
+                            }`}
+                          >
+                            {f.impactDirection === 'Positive' ? '+ Boost' : '- Damp'}
+                          </span>
+                          <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                            {f.importance}%
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Model Tournament & Performance Telemetry Card */}
           {forecastResult?.comparison && forecastResult.comparison.length > 0 && (
             <Card className="shadow-sm border-slate-200/80 dark:border-slate-800">
               <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800/80">
+
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">

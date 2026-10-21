@@ -342,7 +342,38 @@ class ApiService {
       body: JSON.stringify(params),
     });
   }
+
+  // --- Explainable AI (XAI) & Model Transparency ---
+  async getXaiOverview() {
+    return this.request('/api/xai/overview');
+  }
+
+  async getVisualPresets() {
+    return this.request('/api/xai/visual/presets');
+  }
+
+  async runVisualGradCam(params) {
+    return this.request('/api/xai/visual/gradcam', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  }
+
+  async explainForecast(params) {
+    return this.request('/api/xai/forecast/explain', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  }
+
+  async explainTabular(params) {
+    return this.request('/api/xai/tabular/explain', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  }
 }
 
 export const api = new ApiService();
+
 

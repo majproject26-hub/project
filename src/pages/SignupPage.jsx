@@ -19,6 +19,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/common/Toast';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
+import { QuerixLogo } from '../components/common/QuerixLogo';
 
 export function SignupPage({ defaultMode = 'company' }) {
   const [searchParams] = useSearchParams();
@@ -206,13 +207,10 @@ export function SignupPage({ defaultMode = 'company' }) {
 
       {/* Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-xl relative z-10 text-center space-y-2">
-        <NavLink to="/" className="inline-flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#4D5A2A] via-[#748447] to-[#DCE4C2] flex items-center justify-center text-[#F7F4E8] shadow-lg shadow-[#4D5A2A]/25">
-            <Database className="w-6 h-6 stroke-[2.2]" />
-          </div>
-          <span className="text-xl font-bold text-white tracking-tight">Lakehouse Cloud</span>
+        <NavLink to="/" className="inline-flex items-center justify-center mb-2 group">
+          <QuerixLogo size="lg" showText={true} showTagline={true} variant="dark" />
         </NavLink>
-        <h2 className="text-2xl sm:text-3xl font-bold text-white">Sign Up for Lakehouse</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-white">Sign Up for QUERIX</h2>
         <p className="text-xs sm:text-sm text-slate-400">
           Create a new company workspace or request access to join an existing organization.
         </p>

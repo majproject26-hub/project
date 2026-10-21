@@ -122,6 +122,8 @@ class AskDataResponse(BaseModel):
     xAxis: Optional[str] = None
     yAxis: Optional[str] = None
     summary: str
+    isForecast: Optional[bool] = False
+    forecastDetails: Optional[Dict[str, Any]] = None
 
 # --- Chart Schemas ---
 class ChartCreate(BaseModel):
@@ -170,4 +172,25 @@ class ForecastRequest(BaseModel):
     modelType: Optional[str] = "auto"
     horizonDays: Optional[int] = 14
     confidenceLevel: Optional[float] = 0.95
+
+# --- Explainable AI (XAI) Schemas ---
+class XaiGradCamRequest(BaseModel):
+    presetId: Optional[str] = None
+    imageBase64: Optional[str] = None
+    targetClassIdx: Optional[int] = None
+    colormap: Optional[str] = "jet"
+    opacity: Optional[float] = 0.55
+
+class XaiForecastExplainRequest(BaseModel):
+    datasetId: str
+    dateColumn: str
+    metricColumn: str
+    selectedDate: Optional[str] = None
+    horizonDays: Optional[int] = 14
+    modelType: Optional[str] = "auto"
+
+class XaiTabularExplainRequest(BaseModel):
+    datasetId: Optional[str] = None
+    recordIndex: Optional[int] = 0
+
 

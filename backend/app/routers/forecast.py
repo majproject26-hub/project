@@ -45,7 +45,7 @@ def generate_forecast(
     if not req.datasetId or not req.dateColumn or not req.metricColumn:
         raise HTTPException(status_code=400, detail="datasetId, dateColumn, and metricColumn are required.")
 
-    horizon = max(7, min(90, req.horizonDays or 14))
+    horizon = max(7, min(730, req.horizonDays or 14))
     ci = max(0.80, min(0.99, req.confidenceLevel or 0.95))
     model_type = (req.modelType or "auto").lower()
 

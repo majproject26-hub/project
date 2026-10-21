@@ -25,6 +25,7 @@ import {
   Building2,
   Lock,
   TrendingUp,
+  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -32,6 +33,7 @@ import { useNotifications } from '../context/NotificationContext';
 import { Badge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
 import { Modal } from '../components/common/Modal';
+import { QuerixLogo } from '../components/common/QuerixLogo';
 
 export function AppLayout() {
   const {
@@ -60,11 +62,13 @@ export function AppLayout() {
     { name: 'Upload Dataset', path: '/upload', icon: UploadCloud, roles: ['ADMIN', 'HR', 'STAFF'] },
     { name: 'Ask Your Data', path: '/ask', icon: MessageSquareCode, roles: ['ADMIN', 'HR', 'STAFF'] },
     { name: 'Predictive AI', path: '/predict', icon: TrendingUp, roles: ['ADMIN', 'HR', 'STAFF'] },
+    { name: 'Explainable AI (XAI)', path: '/xai', icon: Sparkles, roles: ['ADMIN', 'HR', 'STAFF'] },
     { name: 'SQL Editor', path: '/sql', icon: Terminal, roles: ['ADMIN', 'HR', 'STAFF'] },
     { name: 'User Management', path: '/users', icon: Users, roles: ['ADMIN'] },
     { name: 'Audit Log', path: '/audit', icon: ScrollText, roles: ['ADMIN'] },
     { name: 'Company Settings', path: '/settings', icon: Settings, roles: ['ADMIN'] },
   ];
+
 
   const permittedNav = navItems.filter((item) => item.roles.includes(role));
 
@@ -88,18 +92,7 @@ export function AppLayout() {
           </button>
 
           <NavLink to="/dashboard" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#4D5A2A] via-[#748447] to-[#DCE4C2] flex items-center justify-center text-[#F7F4E8] shadow-md shadow-[#4D5A2A]/25 group-hover:scale-105 transition-transform">
-              <Database className="w-5 h-5 stroke-[2.2]" />
-            </div>
-            <div className="hidden sm:block">
-              <span className="font-bold text-sm tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5">
-                Lakehouse
-                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-[#DCE4C2] dark:bg-[#4D5A2A]/40 text-[#25291D] dark:text-[#DCE4C2]">
-                  Cloud
-                </span>
-              </span>
-              <p className="text-[10px] text-slate-400 font-mono -mt-0.5">Enterprise Multi-Tenant</p>
-            </div>
+            <QuerixLogo size="md" showText={true} showTagline={true} tagline="Unified Multi-Tenant Analytics" />
           </NavLink>
         </div>
 
@@ -327,10 +320,7 @@ export function AppLayout() {
             />
             <div className="relative w-64 max-w-xs bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 flex flex-col z-10 shadow-2xl">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2">
-                  <Database className="w-5 h-5 text-sky-500" />
-                  <span className="font-bold text-sm text-slate-900 dark:text-white">Lakehouse</span>
-                </div>
+                <QuerixLogo size="sm" showText={true} />
                 <button
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-1 rounded-lg text-slate-400 hover:text-slate-600"

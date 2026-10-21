@@ -15,7 +15,8 @@ from app.routers import (
     charts,
     dashboards,
     audit,
-    forecast
+    forecast,
+    xai
 )
 
 @asynccontextmanager
@@ -23,12 +24,12 @@ async def lifespan(app: FastAPI):
     # Initialize physical Parquets and seed database on startup
     db.load()
     db.initialize_seed_parquets()
-    print("[INFO] SHEGU Data Lakehouse Engine ready. DuckDB & Parquet storage online.")
+    print("[INFO] QUERIX Lakehouse Engine ready. DuckDB & Parquet storage online.")
     yield
 
 app = FastAPI(
-    title="SHEGU Enterprise Data Lakehouse API",
-    description="Multi-tenant cloud data lakehouse backend with DuckDB query studio, Parquet Snappy storage, RBAC, and AI querying.",
+    title="QUERIX — A Unified Multi-Tenant Lakehouse Analytics API",
+    description="Multi-tenant cloud data lakehouse backend with DuckDB query studio, Parquet Snappy storage, RBAC, AI querying, and predictive analytics.",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -53,6 +54,8 @@ app.include_router(charts.router)
 app.include_router(dashboards.router)
 app.include_router(audit.router)
 app.include_router(forecast.router)
+app.include_router(xai.router)
+
 
 from app.mongodb import mongo
 
@@ -73,7 +76,7 @@ def health_check():
 @app.get("/", tags=["Root"])
 def root():
     return {
-        "message": "Welcome to SHEGU Enterprise Lakehouse API",
+        "message": "Welcome to QUERIX — A Unified Multi-Tenant Lakehouse Analytics API",
         "docs": "/docs",
         "health": "/api/health"
     }

@@ -243,9 +243,10 @@ def request_password_reset_otp(req: RequestOtpRequest):
 
     return {
         "success": True,
-        "message": f"A 6-digit verification code has been dispatched to {clean_email}.",
+        "message": f"A 6-digit verification code has been dispatched to {clean_email}." if email_sent else f"Notice: Email could not be sent ({email_msg}). Dev OTP: {otp_code}",
         "email_sent": email_sent,
-        "status_detail": email_msg
+        "status_detail": email_msg,
+        "dev_otp": otp_code if not email_sent else None
     }
 
 @router.post("/forgot-password/verify-otp")

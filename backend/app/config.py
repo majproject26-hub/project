@@ -23,13 +23,16 @@ SECRET_KEY = os.getenv("SECRET_KEY", "lakehouse-super-secret-cryptographic-jwt-k
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 
-# Email / SMTP Configuration
+# Email Configuration (Resend API & SMTP Fallback)
+RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip()
+RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL", "onboarding@resend.dev").strip()
+
 SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com").strip()
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587").strip() or 587)
 SMTP_USER = os.getenv("SMTP_USER", "").strip()
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "").strip()
 SMTP_FROM_EMAIL = os.getenv("SMTP_FROM_EMAIL", "").strip() or SMTP_USER
-SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "Lakehouse Cloud Security").strip()
+SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "QUERIX Security").strip()
 SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "true").strip().lower() in ("true", "1", "yes")
 
 # CORS

@@ -2267,6 +2267,30 @@
   ],
   "audit_logs": [
     {
+      "id": "aud-1792464939789",
+      "companyId": "IEDC-001",
+      "timestamp": "08:25 AM 10/20/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Password Reset Requested",
+      "resource": "pournami (pournamiek22@gmail.com)",
+      "details": "Generated security OTP for identity verification. Email sent: False (Resend API error: You can only send testing emails to your own email address (majproject26@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.)",
+      "ip": "127.0.0.1",
+      "status": "Success"
+    },
+    {
+      "id": "aud-1792464802404",
+      "companyId": "IEDC-001",
+      "timestamp": "08:23 AM 10/20/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Password Reset Requested",
+      "resource": "pournami (pournamiek22@gmail.com)",
+      "details": "Generated security OTP for identity verification. Email sent: False (Resend API error: You can only send testing emails to your own email address (majproject26@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.)",
+      "ip": "127.0.0.1",
+      "status": "Success"
+    },
+    {
       "id": "aud-3",
       "companyId": "ACME-001",
       "timestamp": "04:15 PM 10/13/2026",
@@ -2668,6 +2692,58 @@
       "ip": "127.0.0.1",
       "status": "Success",
       "_mongo_id": "6ad092b30cf47c31c7afdf75"
+    },
+    {
+      "id": "aud-1792463074438",
+      "companyId": "IEDC-001",
+      "timestamp": "07:54 AM 10/20/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Password Reset Requested",
+      "resource": "pournami (pournamiek22@gmail.com)",
+      "details": "Generated security OTP for identity verification. Email sent: False (Resend API error: You can only send testing emails to your own email address (majproject26@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.)",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad6d0e2b1e2f370a85a022e"
+    },
+    {
+      "id": "aud-1792433827634",
+      "companyId": "IEDC-001",
+      "timestamp": "11:47 PM 10/19/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Password Reset Requested",
+      "resource": "pournami (pournamiek22@gmail.com)",
+      "details": "Generated security OTP for identity verification. Email sent: False (SMTP credentials (SMTP_USER and SMTP_PASSWORD) not configured in backend/.env.)",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad65ea34bd9920f9156d6a1"
+    },
+    {
+      "id": "aud-1792432742895",
+      "companyId": "IEDC-001",
+      "timestamp": "11:29 PM 10/19/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Query Saved",
+      "resource": "if there is 1000 rs hike next year what will be the average salary",
+      "details": "Saved analytical query to library.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad65a666c24d652d7023c6d"
+    },
+    {
+      "id": "aud-1792432742895",
+      "companyId": "IEDC-001",
+      "timestamp": "11:29 PM 10/19/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Query Saved",
+      "resource": "if there is 1000 rs hike next year what will be the average salary",
+      "details": "Saved analytical query to organization library.",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad65a666c24d652d7023c6c"
     },
     {
       "id": "aud-1792060853562",
