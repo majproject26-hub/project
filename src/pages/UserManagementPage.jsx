@@ -272,11 +272,17 @@ export function UserManagementPage() {
                           </td>
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-2.5">
-                              <img
-                                src={user.avatar}
-                                alt={user.name}
-                                className="w-8 h-8 rounded-full object-cover"
-                              />
+                              {user.avatar ? (
+                                <img
+                                  src={user.avatar}
+                                  alt={user.name}
+                                  className="w-8 h-8 rounded-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                  {user.name?.charAt(0) || <User className="w-4 h-4" />}
+                                </div>
+                              )}
                               <div>
                                 <span className="font-semibold text-slate-900 dark:text-white block">
                                   {user.name}
@@ -382,11 +388,17 @@ export function UserManagementPage() {
                     <tr key={user.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2.5">
-                          <img
-                            src={user.avatar}
-                            alt={user.name}
-                            className="w-8 h-8 rounded-full object-cover"
-                          />
+                          {user.avatar ? (
+                            <img
+                              src={user.avatar}
+                              alt={user.name}
+                              className="w-8 h-8 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-semibold text-slate-700 dark:text-slate-300">
+                              {user.name?.charAt(0) || <User className="w-4 h-4" />}
+                            </div>
+                          )}
                           <div>
                             <span className="font-semibold text-slate-900 dark:text-white block">
                               {user.name}
@@ -477,11 +489,17 @@ export function UserManagementPage() {
                       <tr key={user.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2.5">
-                            <img
-                              src={user.avatar}
-                              alt={user.name}
-                              className="w-8 h-8 rounded-full object-cover grayscale"
-                            />
+                            {user.avatar ? (
+                              <img
+                                src={user.avatar}
+                                alt={user.name}
+                                className="w-8 h-8 rounded-full object-cover grayscale"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                {user.name?.charAt(0) || <User className="w-4 h-4" />}
+                              </div>
+                            )}
                             <div>
                               <span className="font-semibold text-slate-900 dark:text-white block">
                                 {user.name}

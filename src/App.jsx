@@ -19,8 +19,6 @@ import { DatasetExplorerPage } from './pages/DatasetExplorerPage';
 import { DatasetDetailPage } from './pages/DatasetDetailPage';
 import { DatasetUploadPage } from './pages/DatasetUploadPage';
 import { AskYourDataPage } from './pages/AskYourDataPage';
-import { PredictiveAiPage } from './pages/PredictiveAiPage';
-import { ExplainableAiPage } from './pages/ExplainableAiPage';
 import { SqlEditorPage } from './pages/SqlEditorPage';
 import { DashboardBuilderPage } from './pages/DashboardBuilderPage';
 import { UserManagementPage } from './pages/UserManagementPage';
@@ -62,9 +60,9 @@ export function App() {
                     <Route path="/datasets" element={<DatasetExplorerPage />} />
                     <Route path="/datasets/:id" element={<DatasetDetailPage />} />
                     <Route path="/ask" element={<AskYourDataPage />} />
-                    <Route path="/predict" element={<PredictiveAiPage />} />
-                    <Route path="/xai" element={<ExplainableAiPage />} />
-                    <Route path="/explainable-ai" element={<Navigate to="/xai" replace />} />
+                    <Route path="/predict" element={<Navigate to="/ask" replace />} />
+                    <Route path="/xai" element={<Navigate to="/ask" replace />} />
+                    <Route path="/explainable-ai" element={<Navigate to="/ask" replace />} />
                     <Route path="/sql" element={<SqlEditorPage />} />
                     <Route path="/visualizations" element={<Navigate to="/dashboard" replace />} />
                     <Route path="/dashboards" element={<DashboardBuilderPage />} />

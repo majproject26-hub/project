@@ -1,7 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { UploadCloud, FileSpreadsheet, Sparkles, CheckCircle2 } from 'lucide-react';
-import { PRESET_CSV_FILES } from '../../data/mockData';
-import { Button } from './Button';
+import { UploadCloud, FileSpreadsheet } from 'lucide-react';
 
 export function FileDropzone({
   onFileSelect,
@@ -70,17 +68,6 @@ export function FileDropzone({
     }
   };
 
-  const handleLoadPreset = (preset) => {
-    setError(null);
-    onFileSelect({
-      name: preset.name,
-      size: preset.size,
-      rowCount: preset.rowCount,
-      headers: preset.headers,
-      sampleRows: preset.sampleRows,
-      isPreset: true,
-    });
-  };
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -125,41 +112,6 @@ export function FileDropzone({
             {error}
           </p>
         )}
-      </div>
-
-      {/* Preset datasets for immediate 1-click testing */}
-      <div className="pt-2">
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="w-4 h-4 text-amber-500" />
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Or test with realistic preset sample datasets
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {PRESET_CSV_FILES.map((preset, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => handleLoadPreset(preset)}
-              className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-teal-500 dark:hover:border-teal-500 text-left transition-all hover:-translate-y-0.5 shadow-sm group"
-            >
-              <div className="p-2 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 group-hover:scale-105 transition-transform">
-                <FileSpreadsheet className="w-4 h-4" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-teal-600 dark:group-hover:text-teal-400">
-                  {preset.name}
-                </div>
-                <div className="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5">
-                  <span>{preset.size}</span>
-                  <span>•</span>
-                  <span>{preset.rowCount.toLocaleString()} rows</span>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
       </div>
     </div>
   );

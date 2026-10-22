@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   User,
   Mail,
@@ -13,6 +13,10 @@ import {
   Database,
   FileSpreadsheet,
   Terminal,
+  Upload,
+  Camera,
+  Trash2,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -35,8 +39,64 @@ export function ProfilePage() {
   const [name, setName] = useState(currentUser?.name || '');
   const [email, setEmail] = useState(currentUser?.email || '');
   const [title, setTitle] = useState(currentUser?.title || '');
-  const [avatar, setAvatar] = useState(currentUser?.avatar || '');
-  const [voiceLang, setVoiceLang] = useState(currentUser?.voiceLanguage || 'en-US');
+  const [photo, setPhoto] = useState(currentUser?.avatar || '');
+  const [isDraggingPhoto, setIsDraggingPhoto] = useState(false);
+  const fileInputRef = useRef(null);
+
+  // Photo file processing
+  const handlePhotoSelect = (file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: 'Unsupported File',
+        message: 'Please choose an image file (PNG, JPG, JPEG, or WebP).',
+        type: 'error',
+      });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'File Too Large',
+        message: 'Photo size should be less than 5 MB.',
+        type: 'error',
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.onload = () => {
+        // Optimize down to crisp 400x400 max
+        const maxDim = 400;
+        let width = img.width;
+        let height = img.height;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        setPhoto(dataUrl);
+        toast({
+          title: 'Photo Uploaded',
+          message: 'Profile photo updated. Click Save to persist.',
+          type: 'success',
+        });
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Password state
   const [oldPassword, setOldPassword] = useState('');
@@ -53,12 +113,12 @@ export function ProfilePage() {
       name,
       email,
       title,
-      avatar,
-      voiceLanguage: voiceLang,
+      avatar: photo,
+      voiceLanguage: 'en-US',
     });
     toast({
       title: 'Profile Updated',
-      message: 'Account details and voice preferences saved.',
+      message: 'Account details and preferences saved.',
       type: 'success',
     });
   };
@@ -108,7 +168,7 @@ export function ProfilePage() {
             Profile & Account Settings
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Manage your personal identity, voice recognition language, and view saved assets.
+            Manage your personal identity, theme appearance, and view saved assets.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -133,23 +193,109 @@ export function ProfilePage() {
               className="p-0 pb-4 border-none"
             />
 
-            {/* Avatar Preview & URL */}
-            <div className="flex items-center gap-4">
-              <img
-                src={avatar}
-                alt={name}
-                className="w-16 h-16 rounded-2xl object-cover ring-2 ring-sky-500/20"
-              />
-              <div className="flex-1">
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Avatar Image URL
-                </label>
+            {/* Profile Photo Upload */}
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDraggingPhoto(true);
+              }}
+              onDragLeave={() => setIsDraggingPhoto(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setIsDraggingPhoto(false);
+                if (e.dataTransfer.files?.[0]) {
+                  handlePhotoSelect(e.dataTransfer.files[0]);
+                }
+              }}
+              className={`flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 p-4 rounded-2xl border transition-all ${
+                isDraggingPhoto
+                  ? 'border-teal-500 bg-teal-50/50 dark:bg-teal-950/20 ring-2 ring-teal-500/20'
+                  : 'border-slate-200/90 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/40'
+              }`}
+            >
+              {/* Photo Preview & Quick-Click Container */}
+              <div className="relative group shrink-0 self-start sm:self-center">
+                {photo ? (
+                  <img
+                    src={photo}
+                    alt={name || 'Profile'}
+                    className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover ring-2 ring-teal-500/30 dark:ring-teal-400/30 shadow-md"
+                  />
+                ) : (
+                  <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 ring-2 ring-slate-300 dark:ring-slate-700 shadow-xs">
+                    <User className="w-9 h-9" />
+                  </div>
+                )}
+
+                {/* Hover overlay with camera icon to trigger file picker */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute inset-0 rounded-2xl bg-black/55 text-white opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 cursor-pointer"
+                  title="Click to choose a photo"
+                >
+                  <Camera className="w-5 h-5 text-white" />
+                  <span className="text-[10px] font-medium tracking-tight">Change</span>
+                </button>
+              </div>
+
+              {/* Upload Controls & Information */}
+              <div className="flex-1 space-y-2">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-900 dark:text-white">
+                    Profile Photo
+                  </label>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Upload a high-resolution photo from your device. Supported: PNG, JPG, JPEG, WebP (max 5 MB).
+                  </p>
+                </div>
+
+                {/* Hidden File Input */}
                 <input
-                  type="text"
-                  value={avatar}
-                  onChange={(e) => setAvatar(e.target.value)}
-                  className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png, image/jpeg, image/jpg, image/webp"
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) {
+                      handlePhotoSelect(e.target.files[0]);
+                    }
+                  }}
+                  className="hidden"
                 />
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <Button
+                    type="button"
+                    variant="primary"
+                    size="sm"
+                    icon={Upload}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-xs"
+                  >
+                    {photo ? 'Change Photo' : 'Upload Photo'}
+                  </Button>
+
+                  {photo && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      icon={Trash2}
+                      onClick={() => {
+                        setPhoto('');
+                        toast({
+                          title: 'Photo Cleared',
+                          message: 'Profile photo removed. Click "Save Profile Changes" below to apply.',
+                          type: 'info',
+                        });
+                      }}
+                      className="text-xs text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                    >
+                      Remove Photo
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -196,52 +342,71 @@ export function ProfilePage() {
 
           <Card className="p-6 space-y-4">
             <CardHeader
-              title="Interface & Voice Input Preferences"
-              subtitle="Customize theme appearance and speech recognition engine parameters"
+              title="Theme & Interface Preferences"
+              subtitle="Customize your workspace appearance and color palette"
               className="p-0 pb-4 border-none"
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Voice Language Selector */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
-                  <Mic className="w-4 h-4 text-sky-500" />
-                  <span>Speech-to-Text Language</span>
-                </label>
-                <select
-                  value={voiceLang}
-                  onChange={(e) => setVoiceLang(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                >
-                  <option value="en-US">English (United States)</option>
-                  <option value="en-GB">English (United Kingdom)</option>
-                  <option value="es-ES">Spanish (Español)</option>
-                  <option value="fr-FR">French (Français)</option>
-                  <option value="de-DE">German (Deutsch)</option>
-                  <option value="hi-IN">Hindi (India)</option>
-                  <option value="ja-JP">Japanese (日本語)</option>
-                </select>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Used by Web Speech API in the Ask Your Data interface.
-                </p>
-              </div>
-
-              {/* Theme Toggle */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Theme Appearance
-                </label>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2.5">
+                Theme Appearance
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Light Mode Tile */}
                 <button
                   type="button"
-                  onClick={toggleTheme}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm text-slate-800 dark:text-slate-200 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                  onClick={() => {
+                    if (isDark) toggleTheme();
+                  }}
+                  className={`p-4 rounded-2xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
+                    !isDark
+                      ? 'border-[#4D5A2A] bg-white ring-2 ring-[#4D5A2A]/25 shadow-sm'
+                      : 'border-slate-800 bg-slate-900/60 hover:border-slate-700 opacity-70 hover:opacity-100'
+                  }`}
                 >
-                  <span className="capitalize">{isDark ? 'Dark Mode' : 'Light Mode'}</span>
-                  {isDark ? <Moon className="w-4 h-4 text-sky-400" /> : <Sun className="w-4 h-4 text-amber-500" />}
+                  <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500 shrink-0">
+                    <Sun className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-900 dark:text-white">Light Theme</span>
+                      {!isDark && (
+                        <span className="w-2 h-2 rounded-full bg-[#4D5A2A]" />
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      Warm Ivory & Olive brand theme
+                    </p>
+                  </div>
                 </button>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Instant real-time palette toggle.
-                </p>
+
+                {/* Dark Mode Tile */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!isDark) toggleTheme();
+                  }}
+                  className={`p-4 rounded-2xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
+                    isDark
+                      ? 'border-[#748447] bg-slate-900 ring-2 ring-[#748447]/30 shadow-sm'
+                      : 'border-slate-200 bg-slate-50 hover:border-slate-300 opacity-70 hover:opacity-100'
+                  }`}
+                >
+                  <div className="p-2 rounded-xl bg-sky-500/10 text-sky-400 shrink-0">
+                    <Moon className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-900 dark:text-white">Dark Theme</span>
+                      {isDark && (
+                        <span className="w-2 h-2 rounded-full bg-[#748447]" />
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      Deep Olive & Sage contrast theme
+                    </p>
+                  </div>
+                </button>
               </div>
             </div>
           </Card>

@@ -372,6 +372,18 @@ class ApiService {
       body: JSON.stringify(params),
     });
   }
+
+  async transcribeVoice(audioBlob, filename = 'recording.webm', language = 'en') {
+    const formData = new FormData();
+    formData.append('file', audioBlob, filename);
+    if (language) {
+      formData.append('language', language);
+    }
+    return this.request('/api/ask/transcribe', {
+      method: 'POST',
+      body: formData,
+    });
+  }
 }
 
 export const api = new ApiService();

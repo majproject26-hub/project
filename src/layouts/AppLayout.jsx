@@ -61,8 +61,6 @@ export function AppLayout() {
     { name: 'Datasets', path: '/datasets', icon: Database, roles: ['ADMIN', 'HR', 'STAFF'] },
     { name: 'Upload Dataset', path: '/upload', icon: UploadCloud, roles: ['ADMIN', 'HR', 'STAFF'] },
     { name: 'Ask Your Data', path: '/ask', icon: MessageSquareCode, roles: ['ADMIN', 'HR', 'STAFF'] },
-    { name: 'Predictive AI', path: '/predict', icon: TrendingUp, roles: ['ADMIN', 'HR', 'STAFF'] },
-    { name: 'Explainable AI (XAI)', path: '/xai', icon: Sparkles, roles: ['ADMIN', 'HR', 'STAFF'] },
     { name: 'SQL Editor', path: '/sql', icon: Terminal, roles: ['ADMIN', 'HR', 'STAFF'] },
     { name: 'User Management', path: '/users', icon: Users, roles: ['ADMIN'] },
     { name: 'Audit Log', path: '/audit', icon: ScrollText, roles: ['ADMIN'] },
@@ -210,11 +208,17 @@ export function AppLayout() {
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               className="flex items-center gap-2 p-1 pl-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
-              <img
-                src={currentUser?.avatar}
-                alt={currentUser?.name}
-                className="w-8 h-8 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700"
-              />
+              {currentUser?.avatar ? (
+                <img
+                  src={currentUser.avatar}
+                  alt={currentUser?.name}
+                  className="w-8 h-8 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-700 dark:text-slate-300 ring-1 ring-slate-300 dark:ring-slate-600">
+                  {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
+                </div>
+              )}
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block" />
             </button>
 

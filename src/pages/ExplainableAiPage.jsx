@@ -333,15 +333,6 @@ export function ExplainableAiPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/predict')}
-            className="flex items-center gap-1.5 text-xs font-semibold"
-          >
-            <TrendingUp className="w-3.5 h-3.5 text-indigo-500" />
-            Predictive AI Studio
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
             onClick={() => navigate('/ask')}
             className="flex items-center gap-1.5 text-xs font-semibold"
           >

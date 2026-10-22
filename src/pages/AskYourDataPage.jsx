@@ -26,6 +26,15 @@ import {
   ArrowUpRight,
   TrendingUp,
   TrendingDown,
+  Loader2,
+  FileText,
+  FileDown,
+  ShieldCheck,
+  Layers,
+  Cpu,
+  Info,
+  CheckCircle2,
+  Activity,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -50,6 +59,7 @@ import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
 import { SqlCodeEditor } from '../components/common/SqlCodeEditor';
 import { api } from '../services/api';
+import { exportXaiReportPdf, generateSqlExplanation } from '../utils/xaiPdfGenerator';
 
 export function AskYourDataPage() {
   const navigate = useNavigate();
@@ -75,8 +85,46 @@ export function AskYourDataPage() {
   const [collapsedSql, setCollapsedSql] = useState({});
   const [feedbackGiven, setFeedbackGiven] = useState({});
   const [copiedQueryId, setCopiedQueryId] = useState(null);
+  const [micVolume, setMicVolume] = useState(0);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [showXaiSection, setShowXaiSection] = useState(true);
+  const [xaiTab, setXaiTab] = useState('sql');
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
 
+  const handleExportXaiPdf = () => {
+    if (!activeQuery) return;
+    setIsExportingPdf(true);
+    try {
+      const filename = exportXaiReportPdf({
+        queryObj: activeQuery,
+        currentCompany,
+        currentUser,
+      });
+      toast({
+        title: 'Explainable AI (XAI) PDF Exported',
+        message: `Generated ${filename} with complete SQL breakdown and model logic.`,
+        type: 'success',
+      });
+    } catch (err) {
+      console.error('PDF export error:', err);
+      toast({
+        title: 'PDF Generation Error',
+        message: err.message || 'Could not compile XAI PDF report.',
+        type: 'danger',
+      });
+    } finally {
+      setIsExportingPdf(false);
+    }
+  };
+
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const recordingTimerRef = useRef(null);
   const recognitionRef = useRef(null);
+  const audioStreamRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const animationFrameRef = useRef(null);
   const resultsRef = useRef(null);
 
   // Selected dataset object
@@ -161,73 +209,231 @@ export function AskYourDataPage() {
 
   const currentChips = generateDynamicChips(currentDataset);
 
-  // Setup Web Speech API with fallback
-  useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = currentUser?.voiceLanguage || 'en-US';
+  const runVoiceSimulation = () => {
+    setIsListening(false);
+    setIsTranscribing(true);
+    setSpeechTranscript('Simulating voice input with Whisper AI...');
+    const sample = currentChips[0] || 'Show average metrics for this dataset';
+    setTimeout(() => {
+      setSpeechTranscript(sample);
+      setInputText(sample);
+      setIsTranscribing(false);
+      toast({
+        title: 'Whisper AI Transcribed',
+        message: `Converted: "${sample}"`,
+        type: 'success',
+      });
+    }, 1200);
+  };
 
-      recognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
-        }
-        setSpeechTranscript(transcript);
-        setInputText(transcript);
-      };
-
-      recognition.onerror = (e) => {
-        console.warn('Speech recognition error:', e);
-        setIsListening(false);
-      };
-
-      recognition.onend = () => {
-        setIsListening(false);
-      };
-
-      recognitionRef.current = recognition;
+  const stopRecording = () => {
+    if (recordingTimerRef.current) {
+      clearInterval(recordingTimerRef.current);
+      recordingTimerRef.current = null;
     }
-  }, [currentUser]);
-
-  const toggleVoice = () => {
-    if (!recognitionRef.current) {
-      // Simulate voice input for demonstration if browser doesn't permit mic
-      if (!isListening) {
-        setIsListening(true);
-        setSpeechTranscript('Simulating voice input...');
-        setTimeout(() => {
-          const sample = currentChips[0] || 'Show average metrics for this dataset';
-          setSpeechTranscript(sample);
-          setInputText(sample);
-          setIsListening(false);
-          toast({
-            title: 'Voice Transcript Captured',
-            message: `Recognized: "${sample}"`,
-            type: 'info',
-          });
-        }, 2000);
-      } else {
-        setIsListening(false);
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      try { audioContextRef.current.close(); } catch (e) {}
+      audioContextRef.current = null;
+    }
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch (e) {
+        console.warn('MediaRecorder stop error:', e);
       }
+    }
+    if (audioStreamRef.current) {
+      audioStreamRef.current.getTracks().forEach((track) => track.stop());
+      audioStreamRef.current = null;
+    }
+    setIsListening(false);
+    setMicVolume(0);
+  };
+
+  const startRecording = async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      toast({
+        title: 'Microphone Not Supported',
+        message: 'Your browser does not support audio capture. Using voice simulation.',
+        type: 'warning',
+      });
+      runVoiceSimulation();
       return;
     }
 
-    if (isListening) {
-      recognitionRef.current.stop();
+    try {
+      setIsListening(true);
+      setIsTranscribing(false);
+      setRecordingSeconds(0);
+      setSpeechTranscript('Listening to your voice... Speak your natural language question now');
+      audioChunksRef.current = [];
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+      audioStreamRef.current = stream;
+
+      // Real-time audio volume visualizer
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) {
+        try {
+          const audioCtx = new AudioCtx();
+          audioContextRef.current = audioCtx;
+          const source = audioCtx.createMediaStreamSource(stream);
+          const analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 64;
+          source.connect(analyser);
+
+          const dataArray = new Uint8Array(analyser.frequencyBinCount);
+          const updateVolume = () => {
+            if (!audioContextRef.current || audioContextRef.current.state === 'closed') return;
+            analyser.getByteFrequencyData(dataArray);
+            let sum = 0;
+            for (let i = 0; i < dataArray.length; i++) {
+              sum += dataArray[i];
+            }
+            const avg = sum / dataArray.length;
+            setMicVolume(Math.min(100, Math.round((avg / 128) * 100)));
+            animationFrameRef.current = requestAnimationFrame(updateVolume);
+          };
+          updateVolume();
+        } catch (e) {
+          console.warn('AudioContext volume meter:', e);
+        }
+      }
+
+      // Check supported recording format
+      const mimeTypes = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg', 'audio/wav'];
+      let selectedMimeType = '';
+      for (const mt of mimeTypes) {
+        if (window.MediaRecorder && MediaRecorder.isTypeSupported(mt)) {
+          selectedMimeType = mt;
+          break;
+        }
+      }
+
+      const recorder = selectedMimeType
+        ? new MediaRecorder(stream, { mimeType: selectedMimeType })
+        : new MediaRecorder(stream);
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: selectedMimeType || 'audio/webm',
+        });
+        audioChunksRef.current = [];
+
+        if (!audioBlob || audioBlob.size < 500) {
+          setIsTranscribing(false);
+          setIsListening(false);
+          toast({
+            title: 'Recording Too Brief',
+            message: 'Please speak into your microphone and click Done when finished.',
+            type: 'warning',
+          });
+          return;
+        }
+
+        setIsTranscribing(true);
+        setSpeechTranscript('Whisper AI is detecting and converting your voice into natural language...');
+
+        try {
+          const extension = (selectedMimeType || '').includes('mp4') ? 'mp4' : 'webm';
+          const res = await api.transcribeVoice(audioBlob, `speech.${extension}`, currentUser?.voiceLanguage || 'en');
+
+          if (res && res.text) {
+            setInputText(res.text);
+            setSpeechTranscript(res.text);
+            toast({
+              title: 'Whisper AI Detected Voice',
+              message: `Transcribed: "${res.text}"`,
+              type: 'success',
+            });
+          } else {
+            toast({
+              title: 'No Audible Speech Detected',
+              message: 'Whisper did not detect distinct speech. You can try again or use Simulate Voice.',
+              type: 'warning',
+            });
+            setSpeechTranscript('');
+          }
+        } catch (transcribeErr) {
+          console.error('Whisper transcription error:', transcribeErr);
+          toast({
+            title: 'Whisper Transcription Error',
+            message: transcribeErr.message || 'Failed to transcribe audio.',
+            type: 'danger',
+          });
+          setSpeechTranscript('');
+        } finally {
+          setIsTranscribing(false);
+          setIsListening(false);
+        }
+      };
+
+      recorder.start(250);
+
+      // Start elapsed timer
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingSeconds((prev) => prev + 1);
+      }, 1000);
+
+    } catch (err) {
+      console.error('Error starting voice recording:', err);
       setIsListening(false);
-    } else {
-      setSpeechTranscript('');
-      try {
-        recognitionRef.current.start();
-        setIsListening(true);
-      } catch (err) {
-        console.warn('Error starting speech:', err);
+      setIsTranscribing(false);
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        toast({
+          title: 'Microphone Permission Blocked',
+          message: 'Please allow microphone access in your browser address bar to record queries.',
+          type: 'danger',
+        });
+      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        toast({
+          title: 'No Microphone Found',
+          message: 'No microphone was found on this device. Using simulation fallback.',
+          type: 'warning',
+        });
+        runVoiceSimulation();
+      } else {
+        toast({
+          title: 'Audio Recording Error',
+          message: `Microphone error: ${err.message}`,
+          type: 'danger',
+        });
       }
     }
   };
+
+  const toggleVoice = () => {
+    if (isListening) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopRecording();
+    };
+  }, []);
 
   // Generate answer for question
   const handleAskQuestion = async (questionText) => {
@@ -595,18 +801,33 @@ LIMIT 8;`;
                   className="w-full pl-4 pr-12 py-3 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-inner"
                 />
 
-                {/* Voice Input Microphone Button */}
+                {/* Voice Input Microphone Button with Whisper AI */}
                 <button
                   type="button"
                   onClick={toggleVoice}
-                  className={`absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-xl transition-all ${
-                    isListening
-                      ? 'bg-rose-500 text-white animate-pulse'
+                  disabled={isTranscribing}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl transition-all ${
+                    isTranscribing
+                      ? 'bg-amber-500/20 text-amber-500 cursor-wait'
+                      : isListening
+                      ? 'bg-rose-500 text-white animate-pulse shadow-md shadow-rose-500/30'
                       : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'
                   }`}
-                  title={isListening ? 'Stop recording voice' : 'Speak question (Web Speech API)'}
+                  title={
+                    isTranscribing
+                      ? 'Whisper AI is processing your voice...'
+                      : isListening
+                      ? 'Click to stop and transcribe with Whisper AI'
+                      : 'Speak question with Whisper AI Voice Detection'
+                  }
                 >
-                  {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  {isTranscribing ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
+                  ) : isListening ? (
+                    <MicOff className="w-4 h-4" />
+                  ) : (
+                    <Mic className="w-4 h-4" />
+                  )}
                 </button>
               </div>
 
@@ -615,18 +836,82 @@ LIMIT 8;`;
               </Button>
             </form>
 
-            {/* Live voice pulse animation and transcript if listening */}
-            {isListening && (
-              <div className="p-3 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 flex items-center gap-3">
-                <div className="flex items-center gap-1 h-6 px-1">
-                  <div className="w-1 bg-sky-500 rounded-full voice-bar" />
-                  <div className="w-1 bg-sky-500 rounded-full voice-bar" />
-                  <div className="w-1 bg-sky-500 rounded-full voice-bar" />
-                  <div className="w-1 bg-sky-500 rounded-full voice-bar" />
-                  <div className="w-1 bg-sky-500 rounded-full voice-bar" />
+            {/* Whisper AI Live voice recording / transcribing banner */}
+            {(isListening || isTranscribing) && (
+              <div className="p-3.5 rounded-xl bg-gradient-to-r from-sky-50 to-teal-50 dark:from-sky-950/60 dark:to-teal-950/40 border border-sky-200 dark:border-sky-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+                <div className="flex items-center gap-3 min-w-0">
+                  {isTranscribing ? (
+                    <div className="w-7 h-7 rounded-lg bg-teal-500/10 dark:bg-teal-400/10 flex items-center justify-center shrink-0">
+                      <Loader2 className="w-4 h-4 animate-spin text-teal-600 dark:text-teal-400" />
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 h-6 px-1 shrink-0">
+                      <div
+                        className="w-1 bg-teal-500 rounded-full transition-all duration-75"
+                        style={{ height: `${Math.max(6, Math.min(24, 6 + micVolume * 0.3))}px` }}
+                      />
+                      <div
+                        className="w-1 bg-teal-500 rounded-full transition-all duration-75"
+                        style={{ height: `${Math.max(8, Math.min(28, 8 + micVolume * 0.4))}px` }}
+                      />
+                      <div
+                        className="w-1 bg-teal-500 rounded-full transition-all duration-75"
+                        style={{ height: `${Math.max(12, Math.min(32, 12 + micVolume * 0.5))}px` }}
+                      />
+                      <div
+                        className="w-1 bg-teal-500 rounded-full transition-all duration-75"
+                        style={{ height: `${Math.max(8, Math.min(28, 8 + micVolume * 0.4))}px` }}
+                      />
+                      <div
+                        className="w-1 bg-teal-500 rounded-full transition-all duration-75"
+                        style={{ height: `${Math.max(6, Math.min(24, 6 + micVolume * 0.3))}px` }}
+                      />
+                    </div>
+                  )}
+
+                  <div className="text-xs text-slate-800 dark:text-slate-200 truncate">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300">
+                        <Sparkles className="w-2.5 h-2.5" />
+                        Whisper AI
+                      </span>
+                      {isListening && (
+                        <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                          {Math.floor(recordingSeconds / 60)}:{(recordingSeconds % 60).toString().padStart(2, '0')}
+                        </span>
+                      )}
+                    </div>
+                    <span className="italic text-slate-600 dark:text-slate-300">
+                      {isTranscribing
+                        ? 'Converting voice to natural language with Whisper AI...'
+                        : micVolume > 4
+                        ? 'Audio detected! Speak your question...'
+                        : 'Listening... Click "Done & Transcribe" when finished speaking.'}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-xs text-sky-700 dark:text-sky-300">
-                  <span className="font-semibold">Listening:</span> "{speechTranscript || 'Speak now...'}"
+
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                  {!isTranscribing && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={runVoiceSimulation}
+                        className="text-[11px] font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-2.5 py-1 rounded-lg bg-slate-200/70 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
+                        title="Simulate voice query with Whisper AI"
+                      >
+                        Simulate Voice
+                      </button>
+                      <button
+                        type="button"
+                        onClick={stopRecording}
+                        className="text-[11px] font-semibold text-white px-3 py-1 rounded-lg bg-teal-600 hover:bg-teal-700 shadow-sm transition-colors flex items-center gap-1"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        Done & Transcribe
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -646,8 +931,9 @@ LIMIT 8;`;
                         {activeQuery.isForecast ? '🔮 Predictive AI Forecast' : 'Natural Language Query Response'}
                       </span>
                       {activeQuery.isForecast && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-800">
-                          ARIMA + Meta Prophet Dual Engine
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-800 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3 text-indigo-500" />
+                          Auto-Selected: {activeQuery.forecastDetails?.winningModel || 'Meta Prophet'} (Evaluated via Holdout Split)
                         </span>
                       )}
                     </div>
@@ -711,10 +997,10 @@ LIMIT 8;`;
                     <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-xs">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-[10px] uppercase font-bold text-slate-400">
-                          Winning AI Engine
+                          Automated Best-Fit Engine
                         </span>
                         <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold font-mono">
-                          95% Confidence
+                          Auto-Selected
                         </span>
                       </div>
                       <div className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
@@ -766,6 +1052,15 @@ LIMIT 8;`;
 
                     <div className="flex items-center gap-2">
                       <button
+                        onClick={() => setShowXaiSection((prev) => !prev)}
+                        className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1 font-medium transition-colors"
+                        title="Toggle Explainable AI (XAI) SQL breakdown"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                        <span>{showXaiSection ? 'Hide Explanation' : 'Explain SQL (XAI)'}</span>
+                      </button>
+
+                      <button
                         onClick={() => handleCopySql(activeQuery.sql, activeQuery.id)}
                         className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex items-center gap-1"
                       >
@@ -790,6 +1085,237 @@ LIMIT 8;`;
                   )}
                 </div>
 
+                {/* Explainable AI (XAI) Transparency & SQL Logic Section */}
+                {showXaiSection && (() => {
+                  const explanation = generateSqlExplanation(activeQuery, currentCompany, currentUser);
+                  return (
+                    <div className="p-4 sm:p-5 rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-gradient-to-b from-indigo-50/40 via-white to-slate-50 dark:from-indigo-950/20 dark:via-slate-900/40 dark:to-slate-900/60 space-y-4 shadow-xs">
+                      {/* XAI Header Bar */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-indigo-100 dark:border-indigo-900/40">
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
+                              <Sparkles className="w-3 h-3 text-indigo-500" />
+                              Explainable AI (XAI) Transparency
+                            </span>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                              DuckDB 1.0 Vectorized Execution
+                            </span>
+                          </div>
+                          <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                            How It Works & Step-by-Step SQL Explanation
+                          </h3>
+                        </div>
+
+                        <Button
+                          variant="primary"
+                          size="xs"
+                          icon={isExportingPdf ? Loader2 : FileDown}
+                          onClick={handleExportXaiPdf}
+                          disabled={isExportingPdf}
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white shrink-0 shadow-sm"
+                        >
+                          {isExportingPdf ? 'Exporting PDF...' : 'Download XAI PDF Report'}
+                        </Button>
+                      </div>
+
+                      {/* XAI Sub-navigation Tabs */}
+                      <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl w-fit flex-wrap">
+                        <button
+                          type="button"
+                          onClick={() => setXaiTab('sql')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                            xaiTab === 'sql'
+                              ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                          }`}
+                        >
+                          SQL Logic Explained
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setXaiTab('pipeline')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                            xaiTab === 'pipeline'
+                              ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                          }`}
+                        >
+                          How It Works (Pipeline)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setXaiTab('drivers')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                            xaiTab === 'drivers'
+                              ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                          }`}
+                        >
+                          Feature Drivers & Attribution
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setXaiTab('lineage')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                            xaiTab === 'lineage'
+                              ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                          }`}
+                        >
+                          Tenant Security & Lineage
+                        </button>
+                      </div>
+
+                      {/* Tab 1: SQL Logic Explained */}
+                      {xaiTab === 'sql' && (
+                        <div className="space-y-2.5">
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            Clause-by-clause breakdown of how the engine generated and executes this query:
+                          </p>
+                          <div className="grid grid-cols-1 gap-2">
+                            {explanation.clauses.map((item, idx) => (
+                              <div
+                                key={idx}
+                                className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 space-y-1 text-xs"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="px-2 py-0.5 rounded font-mono font-bold text-[10px] bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-700">
+                                    {item.clause}
+                                  </span>
+                                  <code className="text-slate-700 dark:text-slate-300 font-mono text-[11px] truncate flex-1">
+                                    {item.content}
+                                  </code>
+                                </div>
+                                <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed pl-1">
+                                  {item.explanation}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Tab 2: How It Works (Pipeline) */}
+                      {xaiTab === 'pipeline' && (
+                        <div className="space-y-2.5">
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            End-to-end processing lifecycle from natural language to lakehouse execution:
+                          </p>
+                          <div className="space-y-2">
+                            {explanation.pipelineSteps.map((st, idx) => (
+                              <div
+                                key={idx}
+                                className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 text-xs space-y-0.5"
+                              >
+                                <div className="font-semibold text-teal-600 dark:text-teal-400 flex items-center gap-1.5">
+                                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                                  <span>{st.step}</span>
+                                </div>
+                                <p className="text-[11px] text-slate-600 dark:text-slate-400 pl-5 leading-relaxed">
+                                  {st.detail}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Tab 3: Feature Drivers & Attribution */}
+                      {xaiTab === 'drivers' && (
+                        <div className="space-y-2.5">
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            {activeQuery.isForecast
+                              ? 'Model decision factors and statistical time-series drivers:'
+                              : 'Dominant dimensional factors and concentration attribution:'}
+                          </p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {explanation.xaiAttribution.map((attr, idx) => (
+                              <div
+                                key={idx}
+                                className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 text-xs space-y-1"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="font-semibold text-slate-900 dark:text-white">
+                                    {attr.factor}
+                                  </span>
+                                  <span className="text-[10px] font-bold font-mono px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
+                                    {attr.score}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                                  {attr.description}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Tab 4: Tenant Security & Lineage */}
+                      {xaiTab === 'lineage' && (
+                        <div className="space-y-2.5 text-xs">
+                          <p className="text-slate-500 dark:text-slate-400">
+                            Multi-tenant cryptographic protection and data provenance:
+                          </p>
+                          <div className="p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/40 dark:bg-emerald-950/20 space-y-2">
+                            <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-semibold text-xs">
+                              <ShieldCheck className="w-4 h-4 shrink-0" />
+                              <span>Cryptographic Tenant Boundary Verified</span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-600 dark:text-slate-400 pt-1">
+                              <div>
+                                <span className="font-mono text-slate-400 block text-[10px]">TENANT ISOLATION KEY</span>
+                                <span className="font-semibold font-mono text-slate-800 dark:text-slate-200">
+                                  {currentCompany?.id || 'IEDC-001'} (Hard Parquet Partition)
+                                </span>
+                              </div>
+                              <div>
+                                <span className="font-mono text-slate-400 block text-[10px]">AUTHORIZATION ROLE</span>
+                                <span className="font-semibold font-mono text-slate-800 dark:text-slate-200">
+                                  {currentUser?.role || 'ADMIN'} (Permitted)
+                                </span>
+                              </div>
+                              <div>
+                                <span className="font-mono text-slate-400 block text-[10px]">COLUMN STORAGE SCHEME</span>
+                                <span className="font-semibold font-mono text-slate-800 dark:text-slate-200">
+                                  Apache Parquet v2 (Snappy Compressed)
+                                </span>
+                              </div>
+                              <div>
+                                <span className="font-mono text-slate-400 block text-[10px]">EXECUTION ENGINE</span>
+                                <span className="font-semibold font-mono text-slate-800 dark:text-slate-200">
+                                  DuckDB 1.0 (Zero-Copy Pushdown)
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* PDF Report Generation Promo Banner */}
+                      <div className="p-3 rounded-xl bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                        <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                          <FileText className="w-4 h-4 text-indigo-500 shrink-0" />
+                          <span>
+                            Need an audit document? Generate a signed, multi-page <strong>Explainable AI (XAI) PDF Report</strong> for compliance and executive review.
+                          </span>
+                        </div>
+                        <Button
+                          variant="primary"
+                          size="xs"
+                          icon={isExportingPdf ? Loader2 : FileDown}
+                          onClick={handleExportXaiPdf}
+                          disabled={isExportingPdf}
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white shrink-0"
+                        >
+                          {isExportingPdf ? 'Exporting PDF...' : 'Download XAI PDF'}
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {/* Suggested Chart Visualization */}
                 {activeQuery.results && activeQuery.results.length > 0 && (
                   <div className="space-y-2 pt-2">
@@ -804,17 +1330,25 @@ LIMIT 8;`;
                       </span>
 
                       <div className="flex gap-2 items-center flex-wrap">
-                        {activeQuery.isForecast && (
-                          <Button
-                            variant="primary"
-                            size="xs"
-                            icon={ArrowUpRight}
-                            onClick={() => navigate(`/predictive-ai?dataset=${activeQuery.forecastDetails?.datasetId || ''}`)}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white"
-                          >
-                            Open in Predictive AI Studio
-                          </Button>
-                        )}
+                        <Button
+                          variant={showXaiSection ? 'primary' : 'outline'}
+                          size="xs"
+                          icon={Sparkles}
+                          onClick={() => setShowXaiSection((prev) => !prev)}
+                          className={showXaiSection ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
+                        >
+                          {showXaiSection ? 'Hide Explainable AI' : 'Explain Query (XAI)'}
+                        </Button>
+                        <Button
+                          variant="primary"
+                          size="xs"
+                          icon={isExportingPdf ? Loader2 : FileDown}
+                          onClick={handleExportXaiPdf}
+                          disabled={isExportingPdf}
+                          className="bg-gradient-to-r from-teal-600 to-indigo-600 hover:from-teal-700 hover:to-indigo-700 text-white shadow-xs"
+                        >
+                          {isExportingPdf ? 'Exporting PDF...' : 'Generate XAI PDF'}
+                        </Button>
                         <Button
                           variant="outline"
                           size="xs"

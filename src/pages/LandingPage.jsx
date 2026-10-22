@@ -49,7 +49,7 @@ export function LandingPage() {
           </h1>
 
           <p className="text-base sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Upload raw datasets, auto-transform to compressed Parquet columnar format, converse in plain English or voice, and compose real-time dashboards with complete organization isolation.
+            Unlock faster analytics, simplify data exploration with AI-powered text and voice queries, automate data optimization, and turn insights into real-time dashboards—all through one secure, unified Lakehouse platform.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
@@ -71,8 +71,9 @@ export function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-slate-800/80 bg-slate-950 py-10 px-4 sm:px-6 lg:px-8 mt-auto text-center text-xs text-slate-500">
         <p className="mb-2">QUERIX — A Unified Multi-Tenant Lakehouse Analytics Platform</p>
-        <p>© 2026 QUERIX. Built for cryptographic company isolation, DuckDB analytical engine, and dual-engine forecasting.</p>
+        <p>© 2026 QUERIX. Turning Data into Insights.</p>
       </footer>
     </div>
   );
 }
+

@@ -1,5 +1,22 @@
 {
   "companies": {
+    "NOVA-002": {
+      "id": "NOVA-002",
+      "name": "Nova Dynamics Global",
+      "tagline": "Aerospace & Autonomous Systems",
+      "industry": "Aerospace & Advanced Defense",
+      "timezone": "America/Los_Angeles (PST)",
+      "logo": "\ud83d\ude80",
+      "createdDate": "2023-06-20",
+      "storageTier": "Mission Critical Lakehouse (100 TB)",
+      "defaultAccess": "Restricted (Admin approval)",
+      "allowedRegistrationRoles": [
+        "STAFF"
+      ],
+      "dataRetentionDays": 730,
+      "autoArchiveParquet": true,
+      "_mongo_id": "6ad0761fe6cfe92714734011"
+    },
     "ACME-001": {
       "id": "ACME-001",
       "name": "Acme Technologies Inc.",
@@ -17,23 +34,6 @@
       "dataRetentionDays": 365,
       "autoArchiveParquet": true,
       "_mongo_id": "6ad0761fe6cfe92714734010"
-    },
-    "NOVA-002": {
-      "id": "NOVA-002",
-      "name": "Nova Dynamics Global",
-      "tagline": "Aerospace & Autonomous Systems",
-      "industry": "Aerospace & Advanced Defense",
-      "timezone": "America/Los_Angeles (PST)",
-      "logo": "\ud83d\ude80",
-      "createdDate": "2023-06-20",
-      "storageTier": "Mission Critical Lakehouse (100 TB)",
-      "defaultAccess": "Restricted (Admin approval)",
-      "allowedRegistrationRoles": [
-        "STAFF"
-      ],
-      "dataRetentionDays": 730,
-      "autoArchiveParquet": true,
-      "_mongo_id": "6ad0761fe6cfe92714734011"
     },
     "APEX-001": {
       "id": "APEX-001",
@@ -73,82 +73,6 @@
     }
   },
   "users": [
-    {
-      "id": "u-acme-2",
-      "companyId": "ACME-001",
-      "name": "David Chen",
-      "email": "david.hr@acme.io",
-      "password": "password123",
-      "role": "HR",
-      "title": "Senior People Analytics Lead",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-      "status": "ACTIVE",
-      "joinDate": "2023-04-12",
-      "lastActive": "12 mins ago",
-      "voiceLanguage": "en-US",
-      "_mongo_id": "6ad0761fe6cfe92714734013"
-    },
-    {
-      "id": "u-acme-5",
-      "companyId": "ACME-001",
-      "name": "Kevin Vance",
-      "email": "kevin.rejected@external.com",
-      "password": "password123",
-      "role": "STAFF",
-      "title": "Contractor",
-      "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
-      "status": "REJECTED",
-      "rejectionReason": "Non-corporate email domain is not permitted for Acme Lakehouse access.",
-      "joinDate": "2026-10-02",
-      "lastActive": "Rejected",
-      "voiceLanguage": "en-US",
-      "_mongo_id": "6ad0761fe6cfe92714734016"
-    },
-    {
-      "id": "u-acme-3",
-      "companyId": "ACME-001",
-      "name": "Maya Patel",
-      "email": "maya.staff@acme.io",
-      "password": "password123",
-      "role": "STAFF",
-      "title": "Financial Revenue Analyst",
-      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
-      "status": "ACTIVE",
-      "joinDate": "2023-08-20",
-      "lastActive": "Just now",
-      "voiceLanguage": "en-US",
-      "_mongo_id": "6ad0761fe6cfe92714734014"
-    },
-    {
-      "id": "u-acme-4",
-      "companyId": "ACME-001",
-      "name": "Robert Taylor",
-      "email": "robert.taylor@acme.io",
-      "password": "password123",
-      "role": "HR",
-      "title": "Compensation Consultant",
-      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
-      "status": "PENDING",
-      "joinDate": "2026-10-08",
-      "lastActive": "Pending approval",
-      "voiceLanguage": "en-US",
-      "_mongo_id": "6ad0761fe6cfe92714734015"
-    },
-    {
-      "id": "u-acme-1",
-      "companyId": "ACME-001",
-      "name": "Sarah Jenkins",
-      "email": "sarah.admin@acme.io",
-      "password": "Password@2026",
-      "role": "ADMIN",
-      "title": "VP of Data Architecture",
-      "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
-      "status": "ACTIVE",
-      "joinDate": "2023-02-01",
-      "lastActive": "Just now",
-      "voiceLanguage": "en-US",
-      "_mongo_id": "6ad0761fe6cfe92714734012"
-    },
     {
       "id": "u-nova-1",
       "companyId": "NOVA-002",
@@ -225,6 +149,82 @@
       "_mongo_id": "6ad0761fe6cfe9271473401a"
     },
     {
+      "id": "u-acme-2",
+      "companyId": "ACME-001",
+      "name": "David Chen",
+      "email": "david.hr@acme.io",
+      "password": "password123",
+      "role": "HR",
+      "title": "Senior People Analytics Lead",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+      "status": "ACTIVE",
+      "joinDate": "2023-04-12",
+      "lastActive": "12 mins ago",
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0761fe6cfe92714734013"
+    },
+    {
+      "id": "u-acme-5",
+      "companyId": "ACME-001",
+      "name": "Kevin Vance",
+      "email": "kevin.rejected@external.com",
+      "password": "password123",
+      "role": "STAFF",
+      "title": "Contractor",
+      "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
+      "status": "REJECTED",
+      "rejectionReason": "Non-corporate email domain is not permitted for Acme Lakehouse access.",
+      "joinDate": "2026-10-02",
+      "lastActive": "Rejected",
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0761fe6cfe92714734016"
+    },
+    {
+      "id": "u-acme-3",
+      "companyId": "ACME-001",
+      "name": "Maya Patel",
+      "email": "maya.staff@acme.io",
+      "password": "password123",
+      "role": "STAFF",
+      "title": "Financial Revenue Analyst",
+      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+      "status": "ACTIVE",
+      "joinDate": "2023-08-20",
+      "lastActive": "Just now",
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0761fe6cfe92714734014"
+    },
+    {
+      "id": "u-acme-4",
+      "companyId": "ACME-001",
+      "name": "Robert Taylor",
+      "email": "robert.taylor@acme.io",
+      "password": "password123",
+      "role": "HR",
+      "title": "Compensation Consultant",
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+      "status": "PENDING",
+      "joinDate": "2026-10-08",
+      "lastActive": "Pending approval",
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0761fe6cfe92714734015"
+    },
+    {
+      "id": "u-acme-1",
+      "companyId": "ACME-001",
+      "name": "Sarah Jenkins",
+      "email": "sarah.admin@acme.io",
+      "password": "Password@2026",
+      "role": "ADMIN",
+      "title": "VP of Data Architecture",
+      "avatar": "data:image/jpeg;base64,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",
+      "status": "ACTIVE",
+      "joinDate": "2023-02-01",
+      "lastActive": "Just now",
+      "voiceLanguage": "en-US",
+      "_mongo_id": "6ad0761fe6cfe92714734012"
+    },
+    {
       "id": "u-1792053939079",
       "companyId": "APEX-001",
       "name": "Jordan Bell",
@@ -271,6 +271,347 @@
     }
   ],
   "datasets": [
+    {
+      "id": "ds-nova-1",
+      "companyId": "NOVA-002",
+      "name": "aerospace_avionics_supply_inventory.parquet",
+      "displayName": "Orbital Hardware & Critical Component Stock",
+      "description": "Mission critical propulsion, avionics, solar components, supply lead times, and warehouse allocations.",
+      "format": "Parquet (Snappy)",
+      "size": "5.6 MB",
+      "rowCount": 51200,
+      "colCount": 7,
+      "compressionRatio": "71% (vs CSV)",
+      "accessLevel": "All",
+      "uploaderId": "u-nova-1",
+      "uploaderEmail": "elena.admin@nova.space",
+      "uploaderName": "Dr. Elena Rostov",
+      "uploaderRole": "ADMIN",
+      "uploadDate": "2026-09-18",
+      "tags": [
+        "avionics",
+        "aerospace",
+        "hardware",
+        "satellites",
+        "propulsion"
+      ],
+      "previewData": [
+        {
+          "sku": "AV-7001",
+          "component_name": "StarTracker Optic v4",
+          "category": "Sensors",
+          "warehouse_id": "WH-Mojave",
+          "stock_qty": 48,
+          "unit_cost": 14200,
+          "lead_days": 21,
+          "status": "Optimal"
+        },
+        {
+          "sku": "AV-7002",
+          "component_name": "Ion Thruster Valve B",
+          "category": "Propulsion",
+          "warehouse_id": "WH-Kenedy",
+          "stock_qty": 12,
+          "unit_cost": 28900,
+          "lead_days": 45,
+          "status": "Low Stock"
+        },
+        {
+          "sku": "AV-7003",
+          "component_name": "Gallium Nitride Solar Wing",
+          "category": "Power",
+          "warehouse_id": "WH-Mojave",
+          "stock_qty": 85,
+          "unit_cost": 8400,
+          "lead_days": 14,
+          "status": "Optimal"
+        },
+        {
+          "sku": "AV-7004",
+          "component_name": "Radiation-Hardened SoC",
+          "category": "Avionics",
+          "warehouse_id": "WH-Vandenberg",
+          "stock_qty": 34,
+          "unit_cost": 31500,
+          "lead_days": 60,
+          "status": "Optimal"
+        },
+        {
+          "sku": "AV-7005",
+          "component_name": "Titanium Fuel Manifold",
+          "category": "Propulsion",
+          "warehouse_id": "WH-Kenedy",
+          "stock_qty": 6,
+          "unit_cost": 42000,
+          "lead_days": 90,
+          "status": "Critical"
+        }
+      ],
+      "schema": [
+        {
+          "column": "sku",
+          "type": "VARCHAR(24)",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 51200,
+          "sample": "AV-7001"
+        },
+        {
+          "column": "component_name",
+          "type": "VARCHAR(96)",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 4200,
+          "sample": "StarTracker Optic v4"
+        },
+        {
+          "column": "category",
+          "type": "VARCHAR(32)",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 6,
+          "sample": "Sensors"
+        },
+        {
+          "column": "warehouse_id",
+          "type": "VARCHAR(24)",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 5,
+          "sample": "WH-Mojave"
+        },
+        {
+          "column": "stock_qty",
+          "type": "INTEGER",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 380,
+          "sample": "48"
+        },
+        {
+          "column": "unit_cost",
+          "type": "INTEGER",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 540,
+          "sample": "14200"
+        },
+        {
+          "column": "lead_days",
+          "type": "INTEGER",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 45,
+          "sample": "21"
+        }
+      ],
+      "columnStats": [
+        {
+          "column": "unit_cost",
+          "min": 1200,
+          "max": 185000,
+          "mean": 24800,
+          "stdDev": 19400,
+          "distribution": [
+            {
+              "label": "<$10k",
+              "value": 14200
+            },
+            {
+              "label": "$10k-$30k",
+              "value": 22100
+            },
+            {
+              "label": "$30k-$75k",
+              "value": 11400
+            },
+            {
+              "label": "$75k+",
+              "value": 3500
+            }
+          ]
+        }
+      ],
+      "history": [
+        {
+          "id": "v-1",
+          "version": "v1.0",
+          "author": "Dr. Elena Rostov",
+          "action": "Initial Ingestion",
+          "date": "2026-09-18 10:30",
+          "comment": "Avionics supply chain warehouse sync."
+        }
+      ],
+      "_mongo_id": "6ad07620e6cfe9271473401f"
+    },
+    {
+      "id": "ds-nova-2",
+      "companyId": "NOVA-002",
+      "name": "constellation_satellite_telemetry_stream.parquet",
+      "displayName": "Constellation Real-Time Orbital Telemetry",
+      "description": "Satellite orbital altitude, velocity vectors, thermal shield readings, battery state-of-charge, and health statuses.",
+      "format": "Parquet (Snappy)",
+      "size": "19.4 MB",
+      "rowCount": 320400,
+      "colCount": 7,
+      "compressionRatio": "79% (vs CSV)",
+      "accessLevel": "Admin only",
+      "uploaderId": "u-nova-3",
+      "uploaderEmail": "liam.staff@nova.space",
+      "uploaderName": "Liam O'Connor",
+      "uploaderRole": "STAFF",
+      "uploadDate": "2026-10-09",
+      "tags": [
+        "satellites",
+        "orbital",
+        "telemetry",
+        "thermal",
+        "space"
+      ],
+      "previewData": [
+        {
+          "packet_id": "PKT-9921",
+          "satellite_id": "NOVA-SAT-01",
+          "orbital_altitude_km": 542.4,
+          "velocity_km_s": 7.62,
+          "solar_temp_c": 44.2,
+          "battery_soc_pct": 98.1,
+          "status": "Nominal"
+        },
+        {
+          "packet_id": "PKT-9922",
+          "satellite_id": "NOVA-SAT-02",
+          "orbital_altitude_km": 539.8,
+          "velocity_km_s": 7.64,
+          "solar_temp_c": 51.8,
+          "battery_soc_pct": 86.4,
+          "status": "Warning"
+        },
+        {
+          "packet_id": "PKT-9923",
+          "satellite_id": "NOVA-SAT-03",
+          "orbital_altitude_km": 548.1,
+          "velocity_km_s": 7.59,
+          "solar_temp_c": 39.0,
+          "battery_soc_pct": 99.2,
+          "status": "Nominal"
+        },
+        {
+          "packet_id": "PKT-9924",
+          "satellite_id": "NOVA-SAT-04",
+          "orbital_altitude_km": 545.2,
+          "velocity_km_s": 7.61,
+          "solar_temp_c": 42.1,
+          "battery_soc_pct": 94.8,
+          "status": "Nominal"
+        },
+        {
+          "packet_id": "PKT-9925",
+          "satellite_id": "NOVA-SAT-05",
+          "orbital_altitude_km": 541.0,
+          "velocity_km_s": 7.63,
+          "solar_temp_c": 46.5,
+          "battery_soc_pct": 90.2,
+          "status": "Nominal"
+        }
+      ],
+      "schema": [
+        {
+          "column": "packet_id",
+          "type": "VARCHAR(32)",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 320400,
+          "sample": "PKT-9921"
+        },
+        {
+          "column": "satellite_id",
+          "type": "VARCHAR(24)",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 48,
+          "sample": "NOVA-SAT-01"
+        },
+        {
+          "column": "orbital_altitude_km",
+          "type": "FLOAT",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 840,
+          "sample": "542.4"
+        },
+        {
+          "column": "velocity_km_s",
+          "type": "FLOAT",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 320,
+          "sample": "7.62"
+        },
+        {
+          "column": "solar_temp_c",
+          "type": "FLOAT",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 410,
+          "sample": "44.2"
+        },
+        {
+          "column": "battery_soc_pct",
+          "type": "FLOAT",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 590,
+          "sample": "98.1"
+        },
+        {
+          "column": "status",
+          "type": "VARCHAR(16)",
+          "nullCount": 0,
+          "nullPct": "0.0%",
+          "uniqueCount": 3,
+          "sample": "Nominal"
+        }
+      ],
+      "columnStats": [
+        {
+          "column": "battery_soc_pct",
+          "min": 68.2,
+          "max": 100.0,
+          "mean": 94.1,
+          "stdDev": 4.8,
+          "distribution": [
+            {
+              "label": "<80%",
+              "value": 4800
+            },
+            {
+              "label": "80-90%",
+              "value": 46200
+            },
+            {
+              "label": "90-95%",
+              "value": 112000
+            },
+            {
+              "label": "95-100%",
+              "value": 157400
+            }
+          ]
+        }
+      ],
+      "history": [
+        {
+          "id": "v-1",
+          "version": "v1.0",
+          "author": "Liam O'Connor",
+          "action": "Initial Ingestion",
+          "date": "2026-10-09 18:22",
+          "comment": "Downlink batch ingested from Goldstone ground station."
+        }
+      ],
+      "_mongo_id": "6ad07620e6cfe92714734020"
+    },
     {
       "id": "ds-acme-1",
       "companyId": "ACME-001",
@@ -1175,347 +1516,6 @@
       "_mongo_id": "6ad0b1af328f7428dd4613e5"
     },
     {
-      "id": "ds-nova-1",
-      "companyId": "NOVA-002",
-      "name": "aerospace_avionics_supply_inventory.parquet",
-      "displayName": "Orbital Hardware & Critical Component Stock",
-      "description": "Mission critical propulsion, avionics, solar components, supply lead times, and warehouse allocations.",
-      "format": "Parquet (Snappy)",
-      "size": "5.6 MB",
-      "rowCount": 51200,
-      "colCount": 7,
-      "compressionRatio": "71% (vs CSV)",
-      "accessLevel": "All",
-      "uploaderId": "u-nova-1",
-      "uploaderEmail": "elena.admin@nova.space",
-      "uploaderName": "Dr. Elena Rostov",
-      "uploaderRole": "ADMIN",
-      "uploadDate": "2026-09-18",
-      "tags": [
-        "avionics",
-        "aerospace",
-        "hardware",
-        "satellites",
-        "propulsion"
-      ],
-      "previewData": [
-        {
-          "sku": "AV-7001",
-          "component_name": "StarTracker Optic v4",
-          "category": "Sensors",
-          "warehouse_id": "WH-Mojave",
-          "stock_qty": 48,
-          "unit_cost": 14200,
-          "lead_days": 21,
-          "status": "Optimal"
-        },
-        {
-          "sku": "AV-7002",
-          "component_name": "Ion Thruster Valve B",
-          "category": "Propulsion",
-          "warehouse_id": "WH-Kenedy",
-          "stock_qty": 12,
-          "unit_cost": 28900,
-          "lead_days": 45,
-          "status": "Low Stock"
-        },
-        {
-          "sku": "AV-7003",
-          "component_name": "Gallium Nitride Solar Wing",
-          "category": "Power",
-          "warehouse_id": "WH-Mojave",
-          "stock_qty": 85,
-          "unit_cost": 8400,
-          "lead_days": 14,
-          "status": "Optimal"
-        },
-        {
-          "sku": "AV-7004",
-          "component_name": "Radiation-Hardened SoC",
-          "category": "Avionics",
-          "warehouse_id": "WH-Vandenberg",
-          "stock_qty": 34,
-          "unit_cost": 31500,
-          "lead_days": 60,
-          "status": "Optimal"
-        },
-        {
-          "sku": "AV-7005",
-          "component_name": "Titanium Fuel Manifold",
-          "category": "Propulsion",
-          "warehouse_id": "WH-Kenedy",
-          "stock_qty": 6,
-          "unit_cost": 42000,
-          "lead_days": 90,
-          "status": "Critical"
-        }
-      ],
-      "schema": [
-        {
-          "column": "sku",
-          "type": "VARCHAR(24)",
-          "nullCount": 0,
-          "nullPct": "0.0%",
-          "uniqueCount": 51200,
-          "sample": "AV-7001"
-        },
-        {
-          "column": "component_name",
-          "type": "VARCHAR(96)",
-          "nullCount": 0,
-          "nullPct": "0.0%",
-          "uniqueCount": 4200,
-          "sample": "StarTracker Optic v4"
-        },
-        {
-          "column": "category",
-          "type": "VARCHAR(32)",
-          "nullCount": 0,
-          "nullPct": "0.0%",
-          "uniqueCount": 6,
-          "sample": "Sensors"
-        },
-        {
-          "column": "warehouse_id",
-          "type": "VARCHAR(24)",
-          "nullCount": 0,
-          "nullPct": "0.0%",
-          "uniqueCount": 5,
-          "sample": "WH-Mojave"
-        },
-        {
-          "column": "stock_qty",
-          "type": "INTEGER",
-          "nullCount": 0,
-          "nullPct": "0.0%",
-          "uniqueCount": 380,
-          "sample": "48"
-        },
-        {
-          "column": "unit_cost",
-          "type": "INTEGER",
-          "nullCount": 0,
-          "nullPct": "0.0%",
-          "uniqueCount": 540,
-          "sample": "14200"
-        },
-        {
-          "column": "lead_days",
-          "type": "INTEGER",
-          "nullCount": 0,
-          "nullPct": "0.0%",
-          "uniqueCount": 45,
-          "sample": "21"
-        }
-      ],
-      "columnStats": [
-        {
-          "column": "unit_cost",
-          "min": 1200,
-          "max": 185000,
-          "mean": 24800,
-          "stdDev": 19400,
-          "distribution": [
-            {
-              "label": "<$10k",
-              "value": 14200
-            },
-            {
-              "label": "$10k-$30k",
-              "value": 22100
-            },
-            {
-              "label": "$30k-$75k",
-              "value": 11400
-            },
-            {
-              "label": "$75k+",
-              "value": 3500
-            }
-          ]
-        }
-      ],
-      "history": [
-        {
-          "id": "v-1",
-          "version": "v1.0",
-          "author": "Dr. Elena Rostov",
-          "action": "Initial Ingestion",
-          "date": "2026-09-18 10:30",
-          "comment": "Avionics supply chain warehouse sync."
-        }
-      ],
-      "_mongo_id": "6ad07620e6cfe9271473401f"
-    },
-    {
-      "id": "ds-nova-2",
-      "companyId": "NOVA-002",
-      "name": "constellation_satellite_telemetry_stream.parquet",
-      "displayName": "Constellation Real-Time Orbital Telemetry",
-      "description": "Satellite orbital altitude, velocity vectors, thermal shield readings, battery state-of-charge, and health statuses.",
-      "format": "Parquet (Snappy)",
-      "size": "19.4 MB",
-      "rowCount": 320400,
-      "colCount": 7,
-      "compressionRatio": "79% (vs CSV)",
-      "accessLevel": "Admin only",
-      "uploaderId": "u-nova-3",
-      "uploaderEmail": "liam.staff@nova.space",
-      "uploaderName": "Liam O'Connor",
-      "uploaderRole": "STAFF",
-      "uploadDate": "2026-10-09",
-      "tags": [
-        "satellites",
-        "orbital",
-        "telemetry",
-        "thermal",
-        "space"
-      ],
-      "previewData": [
-        {
-          "packet_id": "PKT-9921",
-          "satellite_id": "NOVA-SAT-01",
-          "orbital_altitude_km": 542.4,
-          "velocity_km_s": 7.62,
-          "solar_temp_c": 44.2,
-          "battery_soc_pct": 98.1,
-          "status": "Nominal"
-        },
-        {
-          "packet_id": "PKT-9922",
-          "satellite_id": "NOVA-SAT-02",
-          "orbital_altitude_km": 539.8,
-          "velocity_km_s": 7.64,
-          "solar_temp_c": 51.8,
-          "battery_soc_pct": 86.4,
-          "status": "Warning"
-        },
-        {
-          "packet_id": "PKT-9923",
-          "satellite_id": "NOVA-SAT-03",
-          "orbital_altitude_km": 548.1,
-          "velocity_km_s": 7.59,
-          "solar_temp_c": 39.0,
-          "battery_soc_pct": 99.2,
-          "status": "Nominal"
-        },
-        {
-          "packet_id": "PKT-9924",
-          "satellite_id": "NOVA-SAT-04",
-          "orbital_altitude_km": 545.2,
-          "velocity_km_s": 7.61,
-          "solar_temp_c": 42.1,
-          "battery_soc_pct": 94.8,
-          "status": "Nominal"
-        },
-        {
-          "packet_id": "PKT-9925",
-          "satellite_id": "NOVA-SAT-05",
-          "orbital_altitude_km": 541.0,
-          "velocity_km_s": 7.63,
-          "solar_temp_c": 46.5,
-          "battery_soc_pct": 90.2,
-          "status": "Nominal"
-        }
-      ],
-      "schema": [
-        {
-          "column": "packet_id",
-          "type": "VARCHAR(32)",
-          "nullCount": 0,
-          "nullPct": "0.0%",
-          "uniqueCount": 320400,
-          "sample": "PKT-9921"
-        },
-        {
-          "column": "satellite_id",
-          "type": "VARCHAR(24)",
-          "nullCount": 0,
-          "nullPct": "0.0%",
-          "uniqueCount": 48,
-          "sample": "NOVA-SAT-01"
-        },
-        {
-          "column": "orbital_altitude_km",
-          "type": "FLOAT",
-          "nullCount": 0,
-          "nullPct": "0.0%",
-          "uniqueCount": 840,
-          "sample": "542.4"
-        },
-        {
-          "column": "velocity_km_s",
-          "type": "FLOAT",
-          "nullCount": 0,
-          "nullPct": "0.0%",
-          "uniqueCount": 320,
-          "sample": "7.62"
-        },
-        {
-          "column": "solar_temp_c",
-          "type": "FLOAT",
-          "nullCount": 0,
-          "nullPct": "0.0%",
-          "uniqueCount": 410,
-          "sample": "44.2"
-        },
-        {
-          "column": "battery_soc_pct",
-          "type": "FLOAT",
-          "nullCount": 0,
-          "nullPct": "0.0%",
-          "uniqueCount": 590,
-          "sample": "98.1"
-        },
-        {
-          "column": "status",
-          "type": "VARCHAR(16)",
-          "nullCount": 0,
-          "nullPct": "0.0%",
-          "uniqueCount": 3,
-          "sample": "Nominal"
-        }
-      ],
-      "columnStats": [
-        {
-          "column": "battery_soc_pct",
-          "min": 68.2,
-          "max": 100.0,
-          "mean": 94.1,
-          "stdDev": 4.8,
-          "distribution": [
-            {
-              "label": "<80%",
-              "value": 4800
-            },
-            {
-              "label": "80-90%",
-              "value": 46200
-            },
-            {
-              "label": "90-95%",
-              "value": 112000
-            },
-            {
-              "label": "95-100%",
-              "value": 157400
-            }
-          ]
-        }
-      ],
-      "history": [
-        {
-          "id": "v-1",
-          "version": "v1.0",
-          "author": "Liam O'Connor",
-          "action": "Initial Ingestion",
-          "date": "2026-10-09 18:22",
-          "comment": "Downlink batch ingested from Goldstone ground station."
-        }
-      ],
-      "_mongo_id": "6ad07620e6cfe92714734020"
-    },
-    {
       "id": "ds-1792057108410",
       "accessLevel": "All",
       "colCount": 1,
@@ -2176,32 +2176,18 @@
   ],
   "charts": [
     {
-      "id": "ch-1",
-      "companyId": "ACME-001",
-      "title": "Headcount by Department",
-      "datasetId": "ds-acme-1",
-      "datasetName": "acme_employees_2025.parquet",
+      "id": "ch-4",
+      "companyId": "NOVA-002",
+      "title": "Avionics Stock by Category",
+      "datasetId": "ds-nova-1",
+      "datasetName": "aerospace_avionics_supply_inventory.parquet",
       "chartType": "bar",
-      "xAxis": "department",
-      "yAxis": "salary",
-      "color": "#3b82f6",
+      "xAxis": "category",
+      "yAxis": "stock_qty",
+      "color": "#06b6d4",
       "isPinned": true,
-      "createdAt": "2026-09-15",
-      "_mongo_id": "6ad07620e6cfe92714734021"
-    },
-    {
-      "id": "ch-2",
-      "companyId": "ACME-001",
-      "title": "Regional Revenue Distribution",
-      "datasetId": "ds-acme-2",
-      "datasetName": "q3_global_sales_revenue.parquet",
-      "chartType": "pie",
-      "xAxis": "region",
-      "yAxis": "deal_size",
-      "color": "#10b981",
-      "isPinned": true,
-      "createdAt": "2026-10-05",
-      "_mongo_id": "6ad07620e6cfe92714734022"
+      "createdAt": "2026-09-22",
+      "_mongo_id": "6ad07620e6cfe92714734024"
     },
     {
       "id": "ch-3",
@@ -2218,21 +2204,50 @@
       "_mongo_id": "6ad07620e6cfe92714734023"
     },
     {
-      "id": "ch-4",
-      "companyId": "NOVA-002",
-      "title": "Avionics Stock by Category",
-      "datasetId": "ds-nova-1",
-      "datasetName": "aerospace_avionics_supply_inventory.parquet",
-      "chartType": "bar",
-      "xAxis": "category",
-      "yAxis": "stock_qty",
-      "color": "#06b6d4",
+      "id": "ch-2",
+      "companyId": "ACME-001",
+      "title": "Regional Revenue Distribution",
+      "datasetId": "ds-acme-2",
+      "datasetName": "q3_global_sales_revenue.parquet",
+      "chartType": "pie",
+      "xAxis": "region",
+      "yAxis": "deal_size",
+      "color": "#10b981",
       "isPinned": true,
-      "createdAt": "2026-09-22",
-      "_mongo_id": "6ad07620e6cfe92714734024"
+      "createdAt": "2026-10-05",
+      "_mongo_id": "6ad07620e6cfe92714734022"
+    },
+    {
+      "id": "ch-1",
+      "companyId": "ACME-001",
+      "title": "Headcount by Department",
+      "datasetId": "ds-acme-1",
+      "datasetName": "acme_employees_2025.parquet",
+      "chartType": "bar",
+      "xAxis": "department",
+      "yAxis": "salary",
+      "color": "#3b82f6",
+      "isPinned": true,
+      "createdAt": "2026-09-15",
+      "_mongo_id": "6ad07620e6cfe92714734021"
     }
   ],
   "dashboards": [
+    {
+      "id": "dash-2",
+      "companyId": "NOVA-002",
+      "name": "Orbital Mission Readiness",
+      "description": "Satellite health, supply chain component inventory, and ground station downlink telemetry.",
+      "visibility": "Restricted",
+      "layout": "grid-2x2",
+      "chartIds": [
+        "ch-4"
+      ],
+      "charts": [],
+      "createdAt": "2026-09-25",
+      "updatedAt": "2026-10-12 09:15",
+      "_mongo_id": "6ad07620e6cfe92714734026"
+    },
     {
       "id": "dash-1",
       "companyId": "ACME-001",
@@ -2248,47 +2263,21 @@
       "createdAt": "2026-09-16",
       "updatedAt": "2026-10-10 14:32",
       "_mongo_id": "6ad07620e6cfe92714734025"
-    },
-    {
-      "id": "dash-2",
-      "companyId": "NOVA-002",
-      "name": "Orbital Mission Readiness",
-      "description": "Satellite health, supply chain component inventory, and ground station downlink telemetry.",
-      "visibility": "Restricted",
-      "layout": "grid-2x2",
-      "chartIds": [
-        "ch-4"
-      ],
-      "charts": [],
-      "createdAt": "2026-09-25",
-      "updatedAt": "2026-10-12 09:15",
-      "_mongo_id": "6ad07620e6cfe92714734026"
     }
   ],
   "audit_logs": [
     {
-      "id": "aud-1792464939789",
-      "companyId": "IEDC-001",
-      "timestamp": "08:25 AM 10/20/2026",
-      "userName": "pournami",
+      "id": "aud-4",
+      "companyId": "NOVA-002",
+      "timestamp": "08:30 AM 10/14/2026",
+      "userName": "Dr. Elena Rostov",
       "userRole": "ADMIN",
-      "action": "Password Reset Requested",
-      "resource": "pournami (pournamiek22@gmail.com)",
-      "details": "Generated security OTP for identity verification. Email sent: False (Resend API error: You can only send testing emails to your own email address (majproject26@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.)",
-      "ip": "127.0.0.1",
-      "status": "Success"
-    },
-    {
-      "id": "aud-1792464802404",
-      "companyId": "IEDC-001",
-      "timestamp": "08:23 AM 10/20/2026",
-      "userName": "pournami",
-      "userRole": "ADMIN",
-      "action": "Password Reset Requested",
-      "resource": "pournami (pournamiek22@gmail.com)",
-      "details": "Generated security OTP for identity verification. Email sent: False (Resend API error: You can only send testing emails to your own email address (majproject26@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.)",
-      "ip": "127.0.0.1",
-      "status": "Success"
+      "action": "Dataset Ingested",
+      "resource": "constellation_satellite_telemetry_stream.parquet",
+      "details": "Converted 320,400 raw telemetry records to Snappy Parquet.",
+      "ip": "10.0.4.12",
+      "status": "Success",
+      "_mongo_id": "6ad07620e6cfe9271473402a"
     },
     {
       "id": "aud-3",
@@ -2668,19 +2657,6 @@
       "_mongo_id": "6ad07620e6cfe92714734027"
     },
     {
-      "id": "aud-4",
-      "companyId": "NOVA-002",
-      "timestamp": "08:30 AM 10/14/2026",
-      "userName": "Dr. Elena Rostov",
-      "userRole": "ADMIN",
-      "action": "Dataset Ingested",
-      "resource": "constellation_satellite_telemetry_stream.parquet",
-      "details": "Converted 320,400 raw telemetry records to Snappy Parquet.",
-      "ip": "10.0.4.12",
-      "status": "Success",
-      "_mongo_id": "6ad07620e6cfe9271473402a"
-    },
-    {
       "id": "aud-1792053939223",
       "companyId": "APEX-001",
       "timestamp": "02:15 PM 10/15/2026",
@@ -2692,6 +2668,32 @@
       "ip": "127.0.0.1",
       "status": "Success",
       "_mongo_id": "6ad092b30cf47c31c7afdf75"
+    },
+    {
+      "id": "aud-1792464939789",
+      "companyId": "IEDC-001",
+      "timestamp": "08:25 AM 10/20/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Password Reset Requested",
+      "resource": "pournami (pournamiek22@gmail.com)",
+      "details": "Generated security OTP for identity verification. Email sent: False (Resend API error: You can only send testing emails to your own email address (majproject26@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.)",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad6d82bb56354fef8551094"
+    },
+    {
+      "id": "aud-1792464802404",
+      "companyId": "IEDC-001",
+      "timestamp": "08:23 AM 10/20/2026",
+      "userName": "pournami",
+      "userRole": "ADMIN",
+      "action": "Password Reset Requested",
+      "resource": "pournami (pournamiek22@gmail.com)",
+      "details": "Generated security OTP for identity verification. Email sent: False (Resend API error: You can only send testing emails to your own email address (majproject26@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.)",
+      "ip": "127.0.0.1",
+      "status": "Success",
+      "_mongo_id": "6ad6d7a2b56354fef8551093"
     },
     {
       "id": "aud-1792463074438",
@@ -3125,6 +3127,46 @@
   ],
   "saved_queries": [
     {
+      "id": "q-3",
+      "question": "Which avionics inventory categories have the lowest current stock?",
+      "interpreted": "Group by category, SUM(stock_qty), order by stock_qty ascending.",
+      "datasetName": "aerospace_avionics_supply_inventory.parquet",
+      "sql": "SELECT category, SUM(stock_qty) as total_stock, ROUND(AVG(lead_days), 1) as avg_lead_days FROM avionics_inventory GROUP BY category ORDER BY total_stock ASC;",
+      "columns": [
+        "category",
+        "total_stock",
+        "avg_lead_days"
+      ],
+      "results": [
+        {
+          "category": "Propulsion",
+          "total_stock": 18,
+          "avg_lead_days": 67.5
+        },
+        {
+          "category": "Avionics",
+          "total_stock": 34,
+          "avg_lead_days": 60.0
+        },
+        {
+          "category": "Sensors",
+          "total_stock": 48,
+          "avg_lead_days": 21.0
+        },
+        {
+          "category": "Power",
+          "total_stock": 85,
+          "avg_lead_days": 14.0
+        }
+      ],
+      "suggestedChart": "bar",
+      "xAxis": "category",
+      "yAxis": "total_stock",
+      "summary": "Propulsion components currently report critical stock levels at only 18 units combined, with the longest replacement lead time of 67.5 days.",
+      "companyId": "NOVA-002",
+      "_mongo_id": "6ad07620e6cfe9271473402d"
+    },
+    {
       "id": "q-1",
       "question": "Show top 5 departments by average employee salary",
       "interpreted": "Group by department, calculate AVG(salary), sort descending, limit 5.",
@@ -3198,46 +3240,6 @@
       "summary": "North America accounts for $1,010,000 in closed-won revenue across 3 major enterprise deals, followed by EMEA with $785,000.",
       "companyId": "ACME-001",
       "_mongo_id": "6ad07620e6cfe9271473402c"
-    },
-    {
-      "id": "q-3",
-      "question": "Which avionics inventory categories have the lowest current stock?",
-      "interpreted": "Group by category, SUM(stock_qty), order by stock_qty ascending.",
-      "datasetName": "aerospace_avionics_supply_inventory.parquet",
-      "sql": "SELECT category, SUM(stock_qty) as total_stock, ROUND(AVG(lead_days), 1) as avg_lead_days FROM avionics_inventory GROUP BY category ORDER BY total_stock ASC;",
-      "columns": [
-        "category",
-        "total_stock",
-        "avg_lead_days"
-      ],
-      "results": [
-        {
-          "category": "Propulsion",
-          "total_stock": 18,
-          "avg_lead_days": 67.5
-        },
-        {
-          "category": "Avionics",
-          "total_stock": 34,
-          "avg_lead_days": 60.0
-        },
-        {
-          "category": "Sensors",
-          "total_stock": 48,
-          "avg_lead_days": 21.0
-        },
-        {
-          "category": "Power",
-          "total_stock": 85,
-          "avg_lead_days": 14.0
-        }
-      ],
-      "suggestedChart": "bar",
-      "xAxis": "category",
-      "yAxis": "total_stock",
-      "summary": "Propulsion components currently report critical stock levels at only 18 units combined, with the longest replacement lead time of 67.5 days.",
-      "companyId": "NOVA-002",
-      "_mongo_id": "6ad07620e6cfe9271473402d"
     }
   ]
 }

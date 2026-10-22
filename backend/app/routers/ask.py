@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
 from typing import Dict, Any, List, Optional
 import re
 from pathlib import Path
@@ -11,6 +11,7 @@ from app.services.forecasting_service import (
     list_time_series_datasets,
     run_predictive_ai_forecast
 )
+from app.services.whisper_service import transcribe_audio_bytes
 from app.config import PARQUET_DIR
 
 router = APIRouter(prefix="/api/ask", tags=["Ask Your Data"])
@@ -33,7 +34,7 @@ def ask_your_data(req: AskDataRequest, current_user: Dict[str, Any] = Depends(ge
     # "after 2 years what will happen", "in 2 years", "predict revenue next year")
     # -------------------------------------------------------------------------
     is_future_query = False
-    horizon_days = 730  # Default 2-year horizon
+    horizon_days = 365  # Default 1-year horizon
 
     # Check for duration patterns
     m_yr = re.search(r"(?:after|in|next|over the next)\s+(\d+)\s*(?:years?|yrs?)", q_lower)
@@ -53,21 +54,41 @@ def ask_your_data(req: AskDataRequest, current_user: Dict[str, Any] = Depends(ge
     elif m_dy:
         is_future_query = True
         horizon_days = max(7, min(1095, int(m_dy.group(1))))
-    elif re.search(r"(?:next\s+year|after\s+a\s+year|in\s+a\s+year|1\s+year)", q_lower):
+    elif re.search(r"(?:next\s+year|after\s+a\s+year|in\s+a\s+year|1\s+year|over\s+the\s+next\s+year)", q_lower):
         is_future_query = True
         horizon_days = 365
-    elif re.search(r"(?:2\s+years?|two\s+years?|2\s+yrs?)", q_lower) and any(w in q_lower for w in ["what", "predict", "forecast", "will", "happen", "future"]):
+    elif re.search(r"(?:next\s+quarter|upcoming\s+quarter|in\s+a\s+quarter)", q_lower):
+        is_future_query = True
+        horizon_days = 90
+    elif re.search(r"(?:next\s+month|in\s+a\s+month|upcoming\s+month)", q_lower):
+        is_future_query = True
+        horizon_days = 30
+    elif re.search(r"(?:2\s+years?|two\s+years?|2\s+yrs?)", q_lower):
         is_future_query = True
         horizon_days = 730
+    elif re.search(r"\b(predict|prediction|predicting|predictive|forecast|forecasting|forecasts|projection|projected)\b", q_lower):
+        is_future_query = True
+        if any(w in q_lower for w in ["2 year", "two year", "24 month", "2yr"]):
+            horizon_days = 730
+        elif any(w in q_lower for w in ["1 year", "one year", "12 month", "year", "1yr"]):
+            horizon_days = 365
+        elif any(w in q_lower for w in ["quarter", "3 month"]):
+            horizon_days = 90
+        elif any(w in q_lower for w in ["month"]):
+            horizon_days = 30
+        else:
+            horizon_days = 365
     elif any(phrase in q_lower for phrase in [
         "what will happen", "what happens after", "will happen", "future prediction",
         "predict the future", "forecast future", "future of", "predict after", "predict future",
-        "future trajectory", "predict revenue", "predict sales", "predict users", "forecast revenue",
-        "forecast sales", "forecast active users", "project revenue", "project sales", "future trend",
-        "predictive ai", "future outlook"
+        "future trajectory", "future trend", "future outlook", "in the future"
     ]):
         is_future_query = True
-        horizon_days = 730 if any(y in q_lower for y in ["2", "two"]) else 365 if any(y in q_lower for y in ["1", "one", "next year"]) else 730
+        horizon_days = 730 if any(y in q_lower for y in ["2", "two"]) else 365
+
+    # Guard: past questions should not be treated as future predictions
+    if any(past in q_lower for past in ["last year", "last month", "last quarter", "yesterday", "previous year", "past year", "history of", "historical data"]) and not any(fut in q_lower for fut in ["predict", "forecast", "future", "what will happen", "after"]):
+        is_future_query = False
 
     if is_future_query:
         ts_datasets = list_time_series_datasets(company_id, user_role)
@@ -160,9 +181,10 @@ def ask_your_data(req: AskDataRequest, current_user: Dict[str, Any] = Depends(ge
 
                 summary = (
                     f"🔮 **Predictive AI Future Forecast ({horizon_label}):**\n\n"
-                    f"To answer your question about future performance, our **Dual-Engine Predictive AI (Auto-ARIMA + Meta Prophet)** "
-                    f"analyzed historical records from **{target_ts.get('displayName')}** and executed a chronological 80/20 holdout simulation.\n\n"
-                    f"• **Winning Algorithm**: **{winner_model}** (Holdout RMSE: {rmse_val:.2f}, MAPE: {mape_val:.1f}%)\n"
+                    f"To answer your question about future performance, our **Dual-Engine Predictive AI** automatically evaluated both "
+                    f"**Auto-ARIMA** and **Meta Prophet** against chronological validation holdout data and selected **{winner_model}** "
+                    f"as the most accurate forecasting tool.\n\n"
+                    f"• **Auto-Selected Tool**: **{winner_model}** (Holdout RMSE: {rmse_val:.2f}, MAPE: {mape_val:.1f}%)\n"
                     f"• **Current Baseline ({baseline_date})**: **{baseline_val:,.2f}** {metric_col}\n"
                     f"• **Projected Value in {horizon_label} ({projected_date})**: **{projected_val:,.2f}** ({pct_sign} {trend_dir})\n"
                     f"• **95% Confidence Interval**: **{lower_ci:,.2f}** to **{upper_ci:,.2f}**\n\n"
@@ -251,7 +273,7 @@ def ask_your_data(req: AskDataRequest, current_user: Dict[str, Any] = Depends(ge
 
                 return AskDataResponse(
                     question=question,
-                    interpreted=f"Dual-Engine Predictive AI Forecast (Auto-ARIMA vs. Meta Prophet) for {metric_col} over {horizon_label}.",
+                    interpreted=f"Dual-Engine Predictive AI: Auto-selected {winner_model} (ARIMA vs. Prophet holdout comparison) for {metric_col} over {horizon_label}.",
                     datasetName=target_ts.get("displayName") or target_ts["name"],
                     sql=generated_sql,
                     columns=["date", "actual", "forecast", "lower", "upper", "value"],
@@ -523,3 +545,30 @@ def get_query_history(limit: int = 50, current_user: Dict[str, Any] = Depends(ge
     company_id = current_user.get("companyId", "ACME-001").upper()
     history = db.get_query_history(company_id=company_id, limit=limit)
     return {"success": True, "history": history}
+
+@router.post("/transcribe")
+async def transcribe_speech(
+    file: UploadFile = File(...),
+    language: Optional[str] = Form("en")
+):
+    """
+    Transcribes voice speech audio into natural language queries using OpenAI Whisper (faster-whisper).
+    Accepts raw audio blobs (.webm, .wav, .mp4, .ogg) recorded directly from the browser microphone.
+    """
+    try:
+        audio_bytes = await file.read()
+        if not audio_bytes or len(audio_bytes) < 100:
+            raise HTTPException(status_code=400, detail="Audio recording is empty or too short.")
+
+        result = transcribe_audio_bytes(
+            audio_bytes=audio_bytes,
+            filename=file.filename or "audio.webm",
+            language=language or "en"
+        )
+        if not result.get("success"):
+            raise HTTPException(status_code=400, detail=result.get("error", "Failed to transcribe speech."))
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Whisper transcription failed: {str(e)}")
