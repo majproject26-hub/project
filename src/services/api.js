@@ -196,6 +196,15 @@ class ApiService {
     return this.request(`/api/datasets/${id}`);
   }
 
+  async previewDataset(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.request('/api/datasets/preview', {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
   async uploadDataset(formData) {
     return this.request('/api/datasets/upload', {
       method: 'POST',

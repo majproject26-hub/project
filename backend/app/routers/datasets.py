@@ -110,6 +110,79 @@ async def upload_dataset(
 
     return {"success": True, "dataset": dataset_dict}
 
+@router.post("/preview")
+async def preview_uploaded_file(file: UploadFile = File(...)):
+    """
+    Inspects an uploaded data file (CSV, JSON, or Parquet) and returns
+    detected schema, column types, row counts, and sample preview rows.
+    """
+    import io
+    import pandas as pd
+    import pyarrow.parquet as pq
+
+    raw_bytes = await file.read()
+    if not raw_bytes:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+
+    filename = file.filename or "dataset.csv"
+    fn_lower = filename.lower()
+
+    fmt = "csv"
+    try:
+        if raw_bytes.startswith(b"PAR1") or fn_lower.endswith(".parquet"):
+            fmt = "parquet"
+            try:
+                tbl = pq.read_table(io.BytesIO(raw_bytes))
+                df = tbl.to_pandas()
+            except Exception:
+                df = pd.read_parquet(io.BytesIO(raw_bytes))
+        elif fn_lower.endswith(".json"):
+            fmt = "json"
+            df = pd.read_json(io.BytesIO(raw_bytes))
+        else:
+            fmt = "csv"
+            try:
+                df = pd.read_csv(io.BytesIO(raw_bytes))
+            except Exception:
+                df = pd.read_csv(io.BytesIO(raw_bytes), sep=None, engine="python", on_bad_lines="skip")
+    except Exception as parse_err:
+        raise HTTPException(status_code=400, detail=f"Failed to parse {filename}: {str(parse_err)}")
+
+    headers = [str(c) for c in df.columns]
+    sample_df = df.head(10).fillna("")
+    sample_rows = [[str(v) for v in row] for row in sample_df.values.tolist()]
+
+    schema = []
+    for col in headers:
+        s = df[col]
+        dtype = str(s.dtype).lower()
+        col_type = "VARCHAR(64)"
+        if "int" in dtype:
+            col_type = "INTEGER"
+        elif "float" in dtype or "double" in dtype or "decimal" in dtype:
+            col_type = "FLOAT"
+        elif "datetime" in dtype or "date" in dtype:
+            col_type = "DATE"
+        elif "bool" in dtype:
+            col_type = "BOOLEAN"
+
+        sample_val = str(s.dropna().iloc[0]) if not s.dropna().empty else ""
+        schema.append({
+            "column": col,
+            "type": col_type,
+            "sample": sample_val,
+            "nullable": bool(s.isnull().any())
+        })
+
+    return {
+        "success": True,
+        "format": fmt,
+        "rowCount": len(df),
+        "headers": headers,
+        "sampleRows": sample_rows,
+        "schema": schema
+    }
+
 @router.delete("/all")
 def delete_all_datasets(current_user: Dict[str, Any] = Depends(require_roles(["ADMIN"]))):
     company_id = current_user.get("companyId", "").upper()

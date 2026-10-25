@@ -56,22 +56,24 @@ export function DatasetUploadPage() {
     setDisplayName(info.name.replace(/\.[^/.]+$/, '').replace(/_/g, ' '));
     setDescription(`Ingested dataset with ${info.rowCount.toLocaleString()} records, transformed to Parquet format.`);
 
-    // Auto-detect schema based on sample values
-    const detected = info.headers.map((h, i) => {
-      const sampleVal = info.sampleRows[0] ? info.sampleRows[0][i] : '';
-      let type = 'VARCHAR(64)';
-      if (!isNaN(sampleVal) && sampleVal !== '') {
-        type = sampleVal.includes('.') ? 'FLOAT' : 'INTEGER';
-      } else if (sampleVal.includes('-') && sampleVal.length === 10 && !isNaN(Date.parse(sampleVal))) {
-        type = 'DATE';
-      }
-      return {
-        column: h,
-        type,
-        nullable: true,
-        sample: sampleVal,
-      };
-    });
+    // Auto-detect schema based on sample values or pre-computed schema
+    const detected = info.schema && info.schema.length > 0
+      ? info.schema
+      : info.headers.map((h, i) => {
+          const sampleVal = info.sampleRows[0] ? info.sampleRows[0][i] : '';
+          let type = 'VARCHAR(64)';
+          if (!isNaN(sampleVal) && sampleVal !== '') {
+            type = sampleVal.includes('.') ? 'FLOAT' : 'INTEGER';
+          } else if (sampleVal.includes('-') && sampleVal.length === 10 && !isNaN(Date.parse(sampleVal))) {
+            type = 'DATE';
+          }
+          return {
+            column: h,
+            type,
+            nullable: true,
+            sample: sampleVal,
+          };
+        });
 
     setSchemaColumns(detected);
     setCurrentStep(1); // Advance to preview
@@ -93,11 +95,20 @@ export function DatasetUploadPage() {
     // Prepare upload file
     let uploadFile = fileData.rawFile;
     if (!uploadFile) {
-      const csvContent = [
-        fileData.headers.join(','),
-        ...fileData.sampleRows.map((r) => r.join(',')),
-      ].join('\n');
-      uploadFile = new File([csvContent], fileData.name || 'dataset.csv', { type: 'text/csv' });
+      if (fileData.format === 'json') {
+        const jsonContent = JSON.stringify(fileData.sampleRows.map(row => {
+          const obj = {};
+          fileData.headers.forEach((h, idx) => { obj[h] = row[idx]; });
+          return obj;
+        }), null, 2);
+        uploadFile = new File([jsonContent], fileData.name || 'dataset.json', { type: 'application/json' });
+      } else {
+        const csvContent = [
+          fileData.headers.join(','),
+          ...fileData.sampleRows.map((r) => r.join(',')),
+        ].join('\n');
+        uploadFile = new File([csvContent], fileData.name || 'dataset.csv', { type: 'text/csv' });
+      }
     }
 
     const formData = new FormData();

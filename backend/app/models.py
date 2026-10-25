@@ -124,6 +124,10 @@ class AskDataResponse(BaseModel):
     summary: str
     isForecast: Optional[bool] = False
     forecastDetails: Optional[Dict[str, Any]] = None
+    agentExecution: Optional[Dict[str, Any]] = None
+    structuredReport: Optional[Dict[str, Any]] = None
+    matplotlibChart: Optional[str] = None
+    plotlySpec: Optional[Dict[str, Any]] = None
 
 # --- Chart Schemas ---
 class ChartCreate(BaseModel):
