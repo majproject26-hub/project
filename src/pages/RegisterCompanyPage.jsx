@@ -14,7 +14,6 @@ import {
   EyeOff,
   Sparkles,
   Layers,
-  HardDrive,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/common/Toast';
@@ -31,7 +30,6 @@ export function RegisterCompanyPage() {
   const [companyName, setCompanyName] = useState('');
   const [companyId, setCompanyId] = useState('');
   const [industry, setIndustry] = useState('Enterprise Software & SaaS');
-  const [storageTier, setStorageTier] = useState('Enterprise Lakehouse (50 TB)');
 
   // Initial Admin details
   const [adminName, setAdminName] = useState('');
@@ -111,7 +109,6 @@ export function RegisterCompanyPage() {
         adminName,
         adminEmail,
         adminPassword,
-        storageTier,
       });
 
       setLoading(false);
@@ -234,43 +231,6 @@ export function RegisterCompanyPage() {
                   </select>
                 </div>
               </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
-                  Storage Partition Tier
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <div
-                    onClick={() => setStorageTier('Enterprise Lakehouse (50 TB)')}
-                    className={`p-2.5 rounded-xl border cursor-pointer transition-all ${
-                      storageTier.includes('50 TB')
-                        ? 'border-teal-500 bg-teal-950/30 text-white'
-                        : 'border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between text-xs font-semibold">
-                      <span>Enterprise (50 TB)</span>
-                      <CheckCircle2 className={`w-3.5 h-3.5 ${storageTier.includes('50 TB') ? 'text-teal-400' : 'opacity-0'}`} />
-                    </div>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Automated Snappy Parquet</p>
-                  </div>
-
-                  <div
-                    onClick={() => setStorageTier('Hyperscale Lakehouse (100 TB)')}
-                    className={`p-2.5 rounded-xl border cursor-pointer transition-all ${
-                      storageTier.includes('100 TB')
-                        ? 'border-teal-500 bg-teal-950/30 text-white'
-                        : 'border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between text-xs font-semibold">
-                      <span>Hyperscale (100 TB)</span>
-                      <CheckCircle2 className={`w-3.5 h-3.5 ${storageTier.includes('100 TB') ? 'text-teal-400' : 'opacity-0'}`} />
-                    </div>
-                    <p className="text-[10px] text-slate-400 mt-0.5">High-Frequency Telemetry</p>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Section 2: Administrator Credentials */}
@@ -358,16 +318,6 @@ export function RegisterCompanyPage() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-teal-950/40 border border-teal-900/60 text-xs text-teal-300 space-y-1">
-              <div className="flex items-center gap-1.5 font-semibold text-teal-200">
-                <CheckCircle2 className="w-4 h-4 text-teal-400" />
-                <span>Zero Cross-Tenant Leakage Guaranteed</span>
-              </div>
-              <p className="text-[11px] text-teal-400/80 leading-relaxed">
-                Your company will have 100% cryptographic isolation, dedicated parquet catalog partitions, user approval pipeline, and immutable audit logs.
-              </p>
             </div>
 
             <Button type="submit" loading={loading} className="w-full" size="md" icon={ArrowRight} iconPosition="right">

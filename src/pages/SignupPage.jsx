@@ -34,7 +34,6 @@ export function SignupPage({ defaultMode = 'company' }) {
   const [companyName, setCompanyName] = useState('');
   const [newCompanyId, setNewCompanyId] = useState('');
   const [industry, setIndustry] = useState('Enterprise Software & SaaS');
-  const [storageTier, setStorageTier] = useState('Enterprise Lakehouse (50 TB)');
   const [adminName, setAdminName] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
@@ -122,7 +121,6 @@ export function SignupPage({ defaultMode = 'company' }) {
         adminName,
         adminEmail,
         adminPassword,
-        storageTier,
       });
 
       setLoading(false);
@@ -322,43 +320,6 @@ export function SignupPage({ defaultMode = 'company' }) {
                     </select>
                   </div>
                 </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">
-                    Storage Partition Tier
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div
-                      onClick={() => setStorageTier('Enterprise Lakehouse (50 TB)')}
-                      className={`p-2.5 rounded-xl border cursor-pointer transition-all ${
-                        storageTier.includes('50 TB')
-                          ? 'border-teal-500 bg-teal-950/30 text-white'
-                          : 'border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between text-xs font-semibold">
-                        <span>Enterprise (50 TB)</span>
-                        <CheckCircle2 className={`w-3.5 h-3.5 ${storageTier.includes('50 TB') ? 'text-teal-400' : 'opacity-0'}`} />
-                      </div>
-                      <p className="text-[10px] text-slate-400 mt-0.5">Automated Snappy Parquet</p>
-                    </div>
-
-                    <div
-                      onClick={() => setStorageTier('Hyperscale Lakehouse (100 TB)')}
-                      className={`p-2.5 rounded-xl border cursor-pointer transition-all ${
-                        storageTier.includes('100 TB')
-                          ? 'border-teal-500 bg-teal-950/30 text-white'
-                          : 'border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between text-xs font-semibold">
-                        <span>Hyperscale (100 TB)</span>
-                        <CheckCircle2 className={`w-3.5 h-3.5 ${storageTier.includes('100 TB') ? 'text-teal-400' : 'opacity-0'}`} />
-                      </div>
-                      <p className="text-[10px] text-slate-400 mt-0.5">High-Frequency Telemetry</p>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               {/* Admin credentials */}
@@ -446,11 +407,6 @@ export function SignupPage({ defaultMode = 'company' }) {
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-teal-950/40 border border-teal-900/60 text-xs text-teal-300 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
-                <span>Zero Cross-Tenant Leakage • 100% Isolated Data Lakehouse</span>
               </div>
 
               <Button type="submit" loading={loading} className="w-full" size="md" icon={ArrowRight} iconPosition="right">
